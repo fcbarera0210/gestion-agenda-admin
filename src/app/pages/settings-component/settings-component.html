@@ -1,0 +1,46 @@
+<div class="space-y-8">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-800">Ajustes</h1>
+    <p class="mt-1 text-gray-600">Configura tu disponibilidad y otras preferencias de la aplicación.</p>
+  </div>
+
+  <form [formGroup]="scheduleForm" (ngSubmit)="saveSchedule()">
+    <div class="p-8 bg-white rounded-lg shadow">
+      <h2 class="text-xl font-semibold text-gray-700">Horario de Trabajo Semanal</h2>
+      <p class="mt-1 text-sm text-gray-500">Define los intervalos en los que estás disponible para recibir reservas.</p>
+      
+      <div class="mt-6 space-y-6" formArrayName="days">
+        <div *ngFor="let day of days.controls; let i = index" [formGroupName]="i" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-start py-4 border-b last:border-b-0">
+          
+          <div class="flex items-center space-x-3 md:col-span-2">
+            <input type="checkbox" [id]="'day-active-' + i" formControlName="isActive" class="h-5 w-5 rounded text-primary focus:ring-primary border-gray-300">
+            <label [for]="'day-active-' + i" class="font-medium text-gray-700 capitalize">{{ daysOfWeek[i] }}</label>
+          </div>
+
+          <div class="md:col-span-10 space-y-3" [class.opacity-50]="!day.get('isActive')?.value">
+            <div formArrayName="slots">
+              <div *ngFor="let slot of getSlots(i).controls; let j = index" [formGroupName]="j" class="flex items-center gap-4 mb-3">
+                <input type="time" formControlName="start" class="w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                <span class="text-gray-500">-</span>
+                <input type="time" formControlName="end" class="w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                <button type="button" (click)="removeSlot(i, j)" class="p-2 text-gray-400 rounded-md hover:bg-gray-200" title="Eliminar intervalo">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" (click)="addSlot(i)" class="text-sm font-medium text-primary hover:text-opacity-80">
+              + Añadir descanso
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-8 pt-6 border-t">
+        <button type="submit" class="px-6 py-2 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

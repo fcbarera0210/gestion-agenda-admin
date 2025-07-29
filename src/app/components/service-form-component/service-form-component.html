@@ -39,8 +39,12 @@
         <button type="button" (click)="cancel()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
           Cancelar
         </button>
-        <button type="submit" [disabled]="!serviceForm.valid"
-                class="px-4 py-2 font-semibold text-white rounded-lg bg-primary hover:bg-opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed">
+        <button type="submit"
+                class="px-4 py-2 font-semibold text-white rounded-lg transition-colors"
+                [ngClass]="{
+                  'bg-primary hover:bg-opacity-90': serviceForm.valid,
+                  'bg-gray-400 cursor-not-allowed': !serviceForm.valid
+                }">
           Guardar
         </button>
       </div>
