@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { Client, ClientsService } from '../../services/clients-service';
+import { Client, ClientsService, HistoryEntry } from '../../services/clients-service';
 import { ToastService } from '../../services/toast-service';
 import { ClientFormComponent } from '../../components/client-form-component/client-form-component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog-component/confirmation-dialog-component';
@@ -27,6 +27,8 @@ export class ClientsComponent implements OnInit {
   // Control para el modal del historial
   showHistoryModal = false;
   selectedClientIdForHistory: string | null = null;
+
+  historyToShow$!: Observable<HistoryEntry[]>;
 
   constructor(
     private clientsService: ClientsService,
@@ -88,6 +90,7 @@ export class ClientsComponent implements OnInit {
   }
 
   openHistoryModal(clientId: string) {
+    this.historyToShow$ = this.clientsService.getHistory(clientId);
     this.selectedClientIdForHistory = clientId;
     this.showHistoryModal = true;
   }

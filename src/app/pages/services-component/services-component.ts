@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { Service, ServicesService } from '../../services/services-service';
+import { HistoryEntry, Service, ServicesService } from '../../services/services-service';
 import { ServiceFormComponent } from '../../components/service-form-component/service-form-component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog-component/confirmation-dialog-component';
 import { ToastService } from '../../services/toast-service';
+import { HistoryModalComponent } from '../../components/history-modal-component/history-modal-component';
 
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule, ServiceFormComponent, ConfirmationDialogComponent],
+  imports: [CommonModule, ServiceFormComponent, ConfirmationDialogComponent, HistoryModalComponent],
   templateUrl: './services-component.html',
 })
 export class ServicesComponent implements OnInit {
@@ -19,9 +20,14 @@ export class ServicesComponent implements OnInit {
   showConfirmationDialog = false;
   serviceIdToDelete: string | null = null;
 
+  showHistoryModal = false;
+  selectedServiceIdForHistory: string | null = null;
+
+  historyToShow$!: Observable<HistoryEntry[]>;
+
   constructor(
     private servicesService: ServicesService,
-    private toastService: ToastService // Servicio de Toast inyectado
+    private toastService: ToastService 
   ) {
     this.services$ = this.servicesService.getServices();
   }
@@ -90,5 +96,16 @@ export class ServicesComponent implements OnInit {
   cancelDelete() {
     this.showConfirmationDialog = false;
     this.serviceIdToDelete = null;
+  }
+
+  openHistoryModal(serviceId: string) {
+    this.historyToShow$ = this.servicesService.getHistory(serviceId);
+    this.selectedServiceIdForHistory = serviceId;
+    this.showHistoryModal = true;
+  }
+
+  closeHistoryModal() {
+    this.showHistoryModal = false;
+    this.selectedServiceIdForHistory = null;
   }
 }

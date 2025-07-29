@@ -13,8 +13,8 @@
 </app-confirmation-dialog>
 
 <app-history-modal
-  *ngIf="showHistoryModal && selectedClientIdForHistory"
-  [clientId]="selectedClientIdForHistory"
+  *ngIf="showHistoryModal"
+  [history$]="historyToShow$"  
   (onCancel)="closeHistoryModal()">
 </app-history-modal>
 
