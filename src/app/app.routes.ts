@@ -5,6 +5,7 @@ import { DashboardComponent } from './components/dashboard-component/dashboard-c
 import { authGuard } from './guards/auth-guard';
 import { LayoutComponent } from './components/layout-component/layout-component';
 import { ServicesComponent } from './pages/services-component/services-component';
+import { ClientsComponent } from './pages/clients-component/clients-component';
 
 export const routes: Routes = [
   // Rutas públicas (sin layout)
@@ -20,6 +21,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       // Aquí irán las futuras rutas protegidas (clientes, servicios, etc.)
       { path: 'services', component: ServicesComponent },
+      { path: 'clients', component: ClientsComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
