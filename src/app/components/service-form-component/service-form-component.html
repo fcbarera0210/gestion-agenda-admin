@@ -1,0 +1,49 @@
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
+
+    <h2 class="text-2xl font-bold text-gray-800">
+      {{ service?.id ? 'Editar Servicio' : 'Añadir Nuevo Servicio' }}
+    </h2>
+
+    <form [formGroup]="serviceForm" (ngSubmit)="save()" class="space-y-4">
+
+      <div>
+        <label for="name" class="text-sm font-medium text-gray-700">Nombre del Servicio</label>
+        <input id="name" type="text" formControlName="name" placeholder="Ej: Consulta Inicial"
+               class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="duration" class="text-sm font-medium text-gray-700">Duración (min)</label>
+          <input id="duration" type="number" formControlName="duration"
+                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div>
+          <label for="price" class="text-sm font-medium text-gray-700">Precio</label>
+          <input id="price" type="number" formControlName="price"
+                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+      </div>
+
+      <div>
+        <label for="bufferTime" class="text-sm font-medium text-gray-700">Tiempo Búfer (min)</label>
+        <p class="text-xs text-gray-500">Tiempo extra no visible para el cliente (antes/después de la cita).</p>
+        <input id="bufferTime" type="number" formControlName="bufferTime"
+               class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+      </div>
+
+      <div class="flex justify-end pt-4 space-x-4">
+        <button type="button" (click)="cancel()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="!serviceForm.valid"
+                class="px-4 py-2 font-semibold text-white rounded-lg bg-primary hover:bg-opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -3,11 +3,27 @@ import { RegisterComponent } from './components/register-component/register-comp
 import { LoginComponent } from './components/login-component/login-component';
 import { DashboardComponent } from './components/dashboard-component/dashboard-component';
 import { authGuard } from './guards/auth-guard';
+import { LayoutComponent } from './components/layout-component/layout-component';
+import { ServicesComponent } from './pages/services-component/services-component';
 
 export const routes: Routes = [
-  { path: 'register', component: RegisterComponent },
+  // Rutas públicas (sin layout)
   { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard' }
+  { path: 'register', component: RegisterComponent },
+
+  // Rutas protegidas (dentro del layout)
+  {
+    path: '',
+    component: LayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      // Aquí irán las futuras rutas protegidas (clientes, servicios, etc.)
+      { path: 'services', component: ServicesComponent },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+  },
+
+  // Redirección para cualquier otra ruta
+  { path: '**', redirectTo: 'dashboard' }
 ];

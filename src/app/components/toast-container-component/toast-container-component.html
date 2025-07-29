@@ -1,0 +1,7 @@
+<div class="fixed top-5 right-5 z-50 space-y-4">
+  <app-toast 
+    *ngFor="let toast of toasts$ | async" 
+    [toast]="toast"
+    (onRemove)="removeToast($event)">
+  </app-toast>
+</div>
