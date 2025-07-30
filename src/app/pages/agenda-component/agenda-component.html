@@ -1,16 +1,13 @@
 <div class="p-8 bg-white rounded-lg shadow">
   <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
     <h1 class="text-3xl font-bold text-gray-800">Agenda Semanal</h1>
-    
     <div class="flex items-center space-x-2">
       <button (click)="previousWeek()" class="p-2 text-gray-500 rounded-md hover:bg-gray-100" title="Semana anterior">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
       </button>
-
       <button (click)="today()" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
         Hoy
       </button>
-
       <button (click)="nextWeek()" class="p-2 text-gray-500 rounded-md hover:bg-gray-100" title="Semana siguiente">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
       </button>
@@ -23,6 +20,7 @@
       [viewDate]="viewDate"
       [events]="events"
       [weekStartsOn]="1"
+      [locale]="locale" 
       [hourSegments]="2"
       [dayStartHour]="dayStartHour"
       [dayEndHour]="dayEndHour"
@@ -37,6 +35,30 @@
   *ngIf="showAppointmentModal"
   [startDate]="selectedDate!"
   [appointment]="selectedAppointment"  
-  (onSave)="handleSaveAppointment($event)"
-  (onCancel)="closeAppointmentModal()">
-</app-appointment-form>
+  [isDeleting]="isDeletingAppointment" (onSave)="handleSaveAppointment($event)"
+  (onDelete)="handleDeleteAppointment($event)" 
+  (onCancel)="closeAllModals()"> </app-appointment-form>
+
+<div *ngIf="showChoiceModal" (click)="closeAllModals()" class="fixed inset-0 z-40 bg-black bg-opacity-50"></div>
+<div *ngIf="showChoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg space-y-6">
+    <h2 class="text-2xl font-bold text-center text-gray-800">¿Qué deseas hacer?</h2>
+    <div class="flex flex-col space-y-4">
+      <button (click)="openAppointmentForm()" class="px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
+        Agendar Nueva Cita
+      </button>
+      <button (click)="openTimeBlockForm()" class="px-6 py-3 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
+        Bloquear este Horario
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-time-block-form
+  *ngIf="showTimeBlockModal"
+  [startDate]="selectedDate!"
+  [timeBlock]="selectedTimeBlock" 
+  [isDeleting]="isDeletingBlock" (onSave)="handleSaveTimeBlock($event)"
+  (onDelete)="handleDeleteTimeBlock($event)" 
+  (onCancel)="closeAllModals()">
+</app-time-block-form>

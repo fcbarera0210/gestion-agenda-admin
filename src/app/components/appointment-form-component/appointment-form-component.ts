@@ -8,11 +8,12 @@ import { addMinutes, parseISO } from 'date-fns';
 import { Client, ClientsService } from '../../services/clients-service';
 import { Service, ServicesService } from '../../services/services-service';
 import { Appointment, AppointmentStatus } from '../../services/appointments-service';
+import { ConfirmationDialogComponent } from '../confirmation-dialog-component/confirmation-dialog-component';
 
 @Component({
   selector: 'app-appointment-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent],
   templateUrl: './appointment-form-component.html',
 })
 export class AppointmentFormComponent implements OnInit, OnChanges {
@@ -22,7 +23,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo
   };
   @Input() startDate!: Date;
-  @Input() appointment: Appointment | null = null;
+  @Input() appointment: Appointment | undefined | null = null;
+  @Input() isDeleting = false;
   @Output() onSave = new EventEmitter<Appointment>();
   @Output() onCancel = new EventEmitter<void>();
 
@@ -32,6 +34,9 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   
   isLoading = false;
   isEditMode = false;
+
+  showConfirmationDialog = false;
+  @Output() onDelete = new EventEmitter<string>();
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +48,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       serviceId: ['', Validators.required],
       start: ['', Validators.required],
       status: ['confirmed' as AppointmentStatus, Validators.required],
+      notes: ['']
     });
 
     this.clients$ = this.clientsService.getClients();
@@ -54,18 +60,37 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.configureFormForMode();
   }
+
+  // --- Lógica de Eliminación ---
+
+  // 3. Abre el diálogo de confirmación
+  requestDelete(): void {
+    this.showConfirmationDialog = true;
+  }
+
+  // 4. Se ejecuta si el usuario confirma la eliminación
+  confirmDelete(): void {
+    if (this.appointment?.id) {
+      this.onDelete.emit(this.appointment.id);
+    }
+    this.showConfirmationDialog = false;
+  }
+
+  // 5. Se ejecuta si el usuario cancela
+  cancelDelete(): void {
+    this.showConfirmationDialog = false;
+  }
   
   private configureFormForMode(): void {
     if (this.appointment) {
       this.isEditMode = true;
-      setTimeout(() => {
-        this.appointmentForm.patchValue({
+      this.appointmentForm.patchValue({
           clientId: this.appointment!.clientId,
           serviceId: this.appointment!.serviceId,
           start: formatDate(this.appointment!.start.toDate(), 'yyyy-MM-ddTHH:mm', 'en-US'),
           status: this.appointment!.status,
+          notes: this.appointment!.notes || ''
         });
-      });
     } else {
       this.isEditMode = false;
       this.appointmentForm.reset(); 
@@ -107,6 +132,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       title: `${selectedService.name}`,
       color: this.statusColors[formValue.status as AppointmentStatus],
       status: formValue.status,
+      notes: formValue.notes
     };
 
     // 2. Si estamos en modo edición, añadimos el 'id' al objeto.

@@ -1,0 +1,67 @@
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
+    
+    <h2 class="text-2xl font-bold text-gray-800">Bloquear Horario</h2>
+
+    <form [formGroup]="blockForm" (ngSubmit)="save()" class="space-y-4">
+      
+      <div>
+        <label for="title" class="text-sm font-medium text-gray-700">Motivo (opcional)</label>
+        <input id="title" type="text" formControlName="title" placeholder="Ej: Almuerzo, Cita Médica"
+               class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+        <div>
+          <label for="start" class="text-sm font-medium text-gray-700">Hora de Inicio</label>
+          <input id="start" type="datetime-local" formControlName="start" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 rounded-lg">
+        </div>
+        <div>
+          <label for="end" class="text-sm font-medium text-gray-700">Hora de Fin</label>
+          <input id="end" type="datetime-local" formControlName="end" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 rounded-lg">
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4 space-x-4">
+        
+      </div>
+
+      <div class="flex items-center justify-between pt-4">
+        <div>
+          <button *ngIf="isEditMode" type="button" (click)="requestDelete()" 
+                  class="px-4 py-2 font-semibold text-red-600 rounded-lg hover:bg-red-50">
+            Eliminar Bloqueo
+          </button>
+        </div>
+
+        <div class="flex space-x-4">
+          <button type="button" (click)="cancel()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
+          Cancelar
+        </button>
+        <button type="submit" 
+                class="flex items-center justify-center w-32 px-4 py-2 font-semibold text-white rounded-lg transition-colors"
+                [ngClass]="{
+                  'bg-primary hover:bg-opacity-90': !isLoading,
+                  'bg-primary/70 cursor-wait': isLoading
+                }"
+                [disabled]="isLoading || blockForm.invalid">
+          <ng-container *ngIf="!isLoading">Bloquear</ng-container>
+          <ng-container *ngIf="isLoading">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Guardando...
+          </ng-container>
+        </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-confirmation-dialog
+  *ngIf="showConfirmationDialog"
+  message="¿Estás seguro de que quieres eliminar este bloqueo de horario?"
+  (onConfirm)="confirmDelete()"
+  (onCancel)="cancelDelete()">
+</app-confirmation-dialog>

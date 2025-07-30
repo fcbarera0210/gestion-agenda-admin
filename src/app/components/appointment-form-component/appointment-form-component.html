@@ -38,7 +38,40 @@
         <input id="start" type="datetime-local" formControlName="start" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 rounded-lg">
       </div>
 
-      <div class="flex justify-end pt-4 space-x-4">
+      <div>
+        <label for="notes" class="text-sm font-medium text-gray-700">Notas de la Cita</label>
+        <textarea id="notes" formControlName="notes" rows="3" placeholder="Anotaciones sobre la sesión, seguimiento, etc."
+                  class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-4">
+      <div>
+        <button 
+          *ngIf="isEditMode" 
+          type="button" 
+          (click)="requestDelete()" 
+          class="flex items-center justify-center w-36 px-4 py-2 font-semibold rounded-lg transition-colors"
+          [disabled]="isDeleting"
+          [ngClass]="{
+            'text-red-600 hover:bg-red-50': !isDeleting,
+            'text-red-400 bg-red-50 cursor-wait': isDeleting
+          }">
+
+          <ng-container *ngIf="!isDeleting">
+            Eliminar Cita
+          </ng-container>
+
+          <ng-container *ngIf="isDeleting">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Eliminando...
+          </ng-container>
+        </button>
+      </div>
+
+      <div class="flex space-x-4">
         <button type="button" (click)="cancel()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
           Cancelar
         </button>
@@ -56,6 +89,14 @@
           </ng-container>
         </button>
       </div>
+    </div>
     </form>
   </div>
 </div>
+
+<app-confirmation-dialog
+  *ngIf="showConfirmationDialog"
+  message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
+  (onConfirm)="confirmDelete()"
+  (onCancel)="cancelDelete()">
+</app-confirmation-dialog>

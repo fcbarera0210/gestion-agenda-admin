@@ -12,15 +12,15 @@ export interface Appointment {
   professionalId?: string;
   clientId: string;
   serviceId: string;
-  start: Timestamp; // Usaremos el Timestamp de Firebase para las fechas
+  start: Timestamp;
   end: Timestamp;
-  title: string; // Título que se mostrará en el calendario
-  color?: { // Colores para el evento del calendario
+  title: string; 
+  color?: {
     primary: string;
     secondary: string;
   };
-  // Podemos añadir más campos en el futuro, como el estado (confirmada, cancelada, etc.)
   status: AppointmentStatus;
+  notes?: string;
 }
 
 @Injectable({
