@@ -15,6 +15,7 @@ export class SettingsComponent implements OnInit {
   scheduleForm: FormGroup;
   daysOfWeek = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
   private subscriptions: Subscription[] = [];
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -119,6 +120,7 @@ export class SettingsComponent implements OnInit {
 
   // Guarda todos los cambios en Firestore
   saveSchedule() {
+    this.isLoading = true;
     const formValue = this.scheduleForm.value;
     const scheduleToSave: WorkSchedule = {};
     
@@ -139,7 +141,10 @@ export class SettingsComponent implements OnInit {
       .catch(err => {
         this.toastService.show('Error al guardar el horario', 'error');
         console.error(err);
-      });
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });;
   }
 
   ngOnDestroy(): void {

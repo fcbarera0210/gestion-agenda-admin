@@ -1,0 +1,21 @@
+::ng-deep .cal-day-headers,
+::ng-deep .cal-hours {
+  overflow-x: auto !important; /* Permite el scroll horizontal de los encabezados de los días y las horas si es necesario */
+}
+
+::ng-deep .cal-hour-rows {
+  min-height: 600px !important; /* Ajusta esta altura según tu necesidad */
+}
+
+// Estilos para los eventos en la vista de semana
+::ng-deep .cal-week-view .cal-event {
+  height: auto !important; // Permite que la altura del evento sea automática
+  min-height: 60px;       // Establece una altura mínima
+  padding: 8px !important;      // Añade un poco más de espacio interior
+}
+
+// Permite que el título del evento ocupe varias líneas
+::ng-deep .cal-event-title {
+  white-space: normal !important;
+  font-size: 0.8rem; // Ajusta el tamaño de la fuente si es necesario
+}
