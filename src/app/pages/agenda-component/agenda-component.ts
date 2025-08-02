@@ -5,6 +5,9 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
 import { map, combineLatest } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
+import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays } from 'date-fns';
+
+// Componentes y Servicios
 import { SettingsService, WorkSchedule } from '../../services/settings-service';
 import { Appointment, AppointmentsService } from '../../services/appointments-service';
 import { ClientsService } from '../../services/clients-service';
@@ -12,7 +15,6 @@ import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
 import { ToastService } from '../../services/toast-service';
-import { addDays, subDays } from 'date-fns';
 
 @Component({
   selector: 'app-agenda',
@@ -24,26 +26,25 @@ import { addDays, subDays } from 'date-fns';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AgendaComponent implements OnInit {
-  
+
+  // --- Propiedades del Calendario ---
   locale: string = 'es';
   viewDate: Date = new Date();
   events: CalendarEvent<Appointment | TimeBlock>[] = [];
-  
   excludeDays: number[] = [];
   dayStartHour = 8;
   dayEndHour = 20;
   isCalendarReady = false;
 
+  // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
   showAppointmentModal = false;
   showTimeBlockModal = false;
-
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
   selectedTimeBlock: TimeBlock | null = null;
-
-  isDeletingAppointment = false; // Estado de carga para borrar citas
-  isDeletingBlock = false;      // Estado de carga para borrar bloqueos
+  isDeletingAppointment = false;
+  isDeletingBlock = false;
 
   constructor(
     private settingsService: SettingsService,
@@ -59,13 +60,26 @@ export class AgendaComponent implements OnInit {
     this.loadEvents();
   }
 
-  loadEvents() {
+  // --- Carga de Datos ---
+
+  loadWorkSchedule(): void {
+    this.settingsService.getProfessionalProfile().subscribe(profile => {
+      if (profile && profile.workSchedule) {
+        this.processWorkSchedule(profile.workSchedule);
+      }
+      this.isCalendarReady = true;
+      this.cdr.markForCheck();
+    });
+  }
+
+  loadEvents(): void {
     combineLatest([
       this.appointmentsService.getAppointments(),
       this.clientsService.getClients(),
-      this.timeBlockService.getTimeBlocks()
+      this.timeBlockService.getTimeBlocks(),
+      this.settingsService.getProfessionalProfile()
     ]).pipe(
-      map(([appointments, clients, timeBlocks]) => {
+      map(([appointments, clients, timeBlocks, profile]) => {
         const clientsMap = new Map(clients.map(client => [client.id, client.name]));
         
         const appointmentEvents = appointments.map(apt => ({
@@ -83,15 +97,75 @@ export class AgendaComponent implements OnInit {
           color: block.color,
           meta: { ...block, type: 'timeBlock' },
         }));
+
+        const breakEvents: CalendarEvent[] = [];
+        if (profile && profile.workSchedule) {
+          const schedule: WorkSchedule = profile.workSchedule;
+          const weekStartsOn = 1; // 1 = Lunes
+          const startOfView = startOfWeek(this.viewDate, { weekStartsOn });
+          const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+          for (let i = 0; i < 7; i++) {
+            const dateInWeek = addDays(startOfView, i);
+            const dayName = daysOfWeek[getDay(dateInWeek)];
+            const daySchedule = schedule[dayName];
+
+            if (daySchedule && daySchedule.isActive && daySchedule.breaks) {
+              daySchedule.breaks.forEach(breakSlot => {
+                const [startHour, startMinute] = breakSlot.start.split(':').map(Number);
+                const [endHour, endMinute] = breakSlot.end.split(':').map(Number);
+
+                breakEvents.push({
+                  start: setMinutes(setHours(dateInWeek, startHour), startMinute),
+                  end: setMinutes(setHours(dateInWeek, endHour), endMinute),
+                  title: '<i>Descanso</i>',
+                  color: { primary: '#6c757d', secondary: '#e9ecef' }, // Mismo color que los bloqueos
+                  meta: { type: 'break' }, // Un tipo distinto por si lo necesitamos
+                });
+              });
+            }
+          }
+        }
         
-        return [...appointmentEvents, ...timeBlockEvents];
+        return [...appointmentEvents, ...timeBlockEvents, ...breakEvents];
       })
     ).subscribe(calendarEvents => {
       this.events = calendarEvents;
       this.cdr.markForCheck();
     });
   }
-  
+
+  processWorkSchedule(schedule: WorkSchedule): void {
+    const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const excluded: number[] = [];
+    let minHour = 24;
+    let maxHour = 0;
+
+    daysOfWeek.forEach((dayName, index) => {
+      const dayConfig = schedule[dayName];
+      if (!dayConfig || !dayConfig.isActive || !dayConfig.workHours) {
+        excluded.push(index);
+      } else {
+        const start = parseInt(dayConfig.workHours.start.split(':')[0]);
+        const end = parseInt(dayConfig.workHours.end.split(':')[0]);
+        if (start < minHour) minHour = start;
+        if (end > maxHour) maxHour = end;
+      }
+    });
+
+    this.excludeDays = excluded;
+    this.dayStartHour = minHour === 24 ? 8 : Math.max(0, minHour - 1);
+    this.dayEndHour = maxHour === 0 ? 20 : Math.min(23, maxHour + 1);
+  }
+
+  // --- Navegación del Calendario ---
+
+  previousWeek(): void { this.viewDate = subDays(this.viewDate, 7); }
+  today(): void { this.viewDate = new Date(); }
+  nextWeek(): void { this.viewDate = addDays(this.viewDate, 7); }
+
+  // --- Manejadores de Eventos del Calendario ---
+
   onHourSegmentClicked(event: { date: Date }): void {
     this.selectedDate = event.date;
     this.showChoiceModal = true;
@@ -104,10 +178,12 @@ export class AgendaComponent implements OnInit {
       this.showAppointmentModal = true;
     } else if (event.meta.type === 'timeBlock') {
       this.selectedTimeBlock = event.meta;
-      this.selectedDate = event.start; // Guardamos la fecha por si la necesitamos
+      this.selectedDate = event.start;
       this.showTimeBlockModal = true;
     }
   }
+
+  // --- Manejadores de Acciones de los Modales ---
 
   openAppointmentForm(): void {
     this.showChoiceModal = false;
@@ -118,8 +194,8 @@ export class AgendaComponent implements OnInit {
     this.showChoiceModal = false;
     this.showTimeBlockModal = true;
   }
-  
-  handleSaveAppointment(appointmentData: any) {
+
+  handleSaveAppointment(appointmentData: any): void {
     const promise = appointmentData.id
       ? this.appointmentsService.updateAppointment(appointmentData)
       : this.appointmentsService.addAppointment(appointmentData);
@@ -135,8 +211,8 @@ export class AgendaComponent implements OnInit {
       });
   }
 
-  handleDeleteAppointment(appointmentId: string) {
-    this.isDeletingAppointment = true; // Usamos la variable correcta
+  handleDeleteAppointment(appointmentId: string): void {
+    this.isDeletingAppointment = true;
     this.appointmentsService.deleteAppointment(appointmentId)
       .then(() => {
         this.toastService.show('Cita eliminada correctamente', 'success');
@@ -151,7 +227,7 @@ export class AgendaComponent implements OnInit {
       });
   }
 
-  handleSaveTimeBlock(blockData: TimeBlock) {
+  handleSaveTimeBlock(blockData: TimeBlock): void {
     const promise = blockData.id
       ? this.timeBlockService.updateTimeBlock(blockData)
       : this.timeBlockService.addTimeBlock(blockData);
@@ -167,7 +243,7 @@ export class AgendaComponent implements OnInit {
       });
   }
   
-  handleDeleteTimeBlock(blockId: string) {
+  handleDeleteTimeBlock(blockId: string): void {
     this.isDeletingBlock = true;
     this.timeBlockService.deleteTimeBlock(blockId)
       .then(() => {
@@ -183,7 +259,7 @@ export class AgendaComponent implements OnInit {
       });
   }
   
-  closeAllModals() {
+  closeAllModals(): void {
     this.showChoiceModal = false;
     this.showAppointmentModal = false;
     this.showTimeBlockModal = false;
@@ -192,10 +268,4 @@ export class AgendaComponent implements OnInit {
     this.selectedTimeBlock = null;
     this.cdr.markForCheck();
   }
-  
-  previousWeek(): void { this.viewDate = subDays(this.viewDate, 7); }
-  today(): void { this.viewDate = new Date(); }
-  nextWeek(): void { this.viewDate = addDays(this.viewDate, 7); }
-  loadWorkSchedule() { this.settingsService.getProfessionalProfile().subscribe(profile => { if (profile && profile.workSchedule) { this.processWorkSchedule(profile.workSchedule); } this.isCalendarReady = true; this.cdr.markForCheck(); }); }
-  processWorkSchedule(schedule: WorkSchedule) { const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const excluded: number[] = []; let minHour = 24; let maxHour = 0; daysOfWeek.forEach((dayName, index) => { const dayConfig = schedule[dayName]; if (!dayConfig || !dayConfig.isActive || dayConfig.slots.length === 0) { excluded.push(index); } else { dayConfig.slots.forEach(slot => { const start = parseInt(slot.start.split(':')[0]); const end = parseInt(slot.end.split(':')[0]); if (start < minHour) minHour = start; if (end > maxHour) maxHour = end; }); } }); this.excludeDays = excluded; this.dayStartHour = Math.max(0, minHour - 1); this.dayEndHour = Math.min(23, maxHour + 1); }
 }
