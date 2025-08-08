@@ -14,7 +14,9 @@
 
 <app-history-modal
   *ngIf="showHistoryModal"
-  [history$]="historyToShow$"  
+  [dataHistory$]="dataHistoryToShow$"
+  [appointmentHistory$]="appointmentHistoryToShow$"
+  [showAppointmentHistoryTab]="true" 
   (onCancel)="closeHistoryModal()">
 </app-history-modal>
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
-import { Firestore, collection, addDoc, collectionData, query, where, doc, updateDoc, deleteDoc, Timestamp } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, collectionData, query, where, doc, updateDoc, deleteDoc, Timestamp, orderBy } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -69,5 +69,16 @@ export class AppointmentsService {
   deleteAppointment(appointmentId: string): Promise<void> {
     const appointmentDocRef = doc(this.firestore, `appointments/${appointmentId}`);
     return deleteDoc(appointmentDocRef);
+  }
+
+  getAppointmentsForClient(clientId: string): Observable<Appointment[]> {
+    const appointmentsRef = collection(this.firestore, 'appointments');
+    // Creamos una consulta que filtra por clientId y ordena por la fecha de inicio descendente
+    const q = query(
+      appointmentsRef, 
+      where('clientId', '==', clientId),
+      orderBy('start', 'desc') // Muestra las más recientes primero
+    );
+    return collectionData(q, { idField: 'id' }) as Observable<Appointment[]>;
   }
 }

@@ -6,6 +6,7 @@ import { ToastService } from '../../services/toast-service';
 import { ClientFormComponent } from '../../components/client-form-component/client-form-component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog-component/confirmation-dialog-component';
 import { HistoryModalComponent } from '../../components/history-modal-component/history-modal-component';
+import { Appointment, AppointmentsService } from '../../services/appointments-service'; // 👈 Importa
 
 @Component({
   selector: 'app-clients',
@@ -30,8 +31,12 @@ export class ClientsComponent implements OnInit {
 
   historyToShow$!: Observable<HistoryEntry[]>;
 
+  dataHistoryToShow$!: Observable<HistoryEntry[]>;
+  appointmentHistoryToShow$!: Observable<Appointment[]>;
+
   constructor(
     private clientsService: ClientsService,
+    private appointmentsService: AppointmentsService,
     private toastService: ToastService
   ) {
     this.clients$ = this.clientsService.getClients();
@@ -90,13 +95,12 @@ export class ClientsComponent implements OnInit {
   }
 
   openHistoryModal(clientId: string) {
-    this.historyToShow$ = this.clientsService.getHistory(clientId);
-    this.selectedClientIdForHistory = clientId;
+    this.dataHistoryToShow$ = this.clientsService.getHistory(clientId);
+    this.appointmentHistoryToShow$ = this.appointmentsService.getAppointmentsForClient(clientId);
     this.showHistoryModal = true;
   }
 
   closeHistoryModal() {
     this.showHistoryModal = false;
-    this.selectedClientIdForHistory = null;
   }
 }

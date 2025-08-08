@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { Observable } from 'rxjs';
-import { HistoryEntry } from '../../services/clients-service'; // La interfaz es la misma
+import { Observable, of } from 'rxjs';
+import { HistoryEntry } from '../../services/clients-service';
+import { Appointment } from '../../services/appointments-service';
 
 @Component({
   selector: 'app-history-modal',
@@ -10,11 +11,18 @@ import { HistoryEntry } from '../../services/clients-service'; // La interfaz es
   templateUrl: './history-modal-component.html',
 })
 export class HistoryModalComponent {
-  // 👇 EN LUGAR de clientId, ahora recibe el Observable con el historial
-  @Input() history$!: Observable<HistoryEntry[]>;
+  @Input() dataHistory$!: Observable<HistoryEntry[]>;
+  @Input() appointmentHistory$: Observable<Appointment[]> = of([]); 
+  @Input() showAppointmentHistoryTab = false; 
   @Output() onCancel = new EventEmitter<void>();
 
-  constructor() {} // Ya no necesita el servicio
+  activeTab: 'data' | 'appointments' = 'data'; // La pestaña activa por defecto
+
+  constructor() {}
+
+  selectTab(tab: 'data' | 'appointments'): void {
+    this.activeTab = tab;
+  }
 
   cancel(): void {
     this.onCancel.emit();
