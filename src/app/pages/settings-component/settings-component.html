@@ -22,6 +22,15 @@
               class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
         Horario de Trabajo
       </button>
+
+      <button (click)="selectTab('team')"
+              [ngClass]="{
+                'border-primary text-primary': activeTab === 'team',
+                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'team'
+              }"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+        Equipo
+      </button>
     </nav>
   </div>
 
@@ -121,6 +130,11 @@
           </div>
         </div>
       </form>
+    </div>
+    <div>
+      <div *ngIf="activeTab === 'team'">
+        <app-team-management></app-team-management>
+      </div>
     </div>
   </div>
 </div>

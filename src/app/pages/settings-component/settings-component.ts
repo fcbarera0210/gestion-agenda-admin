@@ -4,15 +4,16 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
 import { ToastService } from '../../services/toast-service';
 import { Subscription } from 'rxjs';
+import { TeamManagementComponent } from '../team-management-component/team-management-component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TeamManagementComponent],
   templateUrl: './settings-component.html',
 })
 export class SettingsComponent implements OnInit, OnDestroy {
-  activeTab: 'profile' | 'schedule' = 'profile';
+  activeTab: 'profile' | 'schedule' | 'team' = 'profile';
   profileForm: FormGroup;
   scheduleForm: FormGroup;
   daysOfWeek = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
@@ -151,7 +152,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  selectTab(tab: 'profile' | 'schedule'): void {
+  selectTab(tab: 'profile' | 'schedule' | 'team'): void {
     this.activeTab = tab;
   }
 

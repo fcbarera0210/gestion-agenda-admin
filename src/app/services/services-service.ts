@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Auth } from '@angular/fire/auth';
-import { Firestore, collection, addDoc, collectionData, doc, updateDoc, deleteDoc, runTransaction, serverTimestamp, writeBatch, query } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Auth, authState } from '@angular/fire/auth';
+import { Firestore, collection, addDoc, collectionData, doc, updateDoc, deleteDoc, runTransaction, serverTimestamp, writeBatch, query, where } from '@angular/fire/firestore';
+import { Observable, of, switchMap } from 'rxjs';
 
 // Interfaz para el servicio
 export interface Service {
@@ -33,12 +33,21 @@ export class ServicesService {
 
   // Obtener todos los servicios (sin cambios)
   getServices(): Observable<Service[]> {
-    const servicesRef = collection(this.firestore, 'services');
-    return collectionData(servicesRef, { idField: 'id' }) as Observable<Service[]>;
+    return authState(this.auth).pipe(
+      switchMap(user => {
+        if (!user) {
+          return of([]); // Si no hay usuario, no hay servicios
+        }
+        const servicesRef = collection(this.firestore, 'services');
+        // Filtramos los servicios por el ID del profesional actual
+        const q = query(servicesRef, where('professionalId', '==', user.uid));
+        return collectionData(q, { idField: 'id' }) as Observable<Service[]>;
+      })
+    );
   }
 
   // Añadir un nuevo servicio con su entrada de historial
-  async addService(service: Service): Promise<void> {
+  async addService(service: Omit<Service, 'id' | 'professionalId'>): Promise<void> {
     const user = this.auth.currentUser;
     if (!user) throw new Error("No hay un usuario autenticado.");
 
@@ -46,7 +55,8 @@ export class ServicesService {
     const serviceDocRef = doc(collection(this.firestore, 'services'));
     const historyDocRef = doc(collection(serviceDocRef, 'history'));
 
-    batch.set(serviceDocRef, service);
+    // Añadimos el professionalId al guardar
+    batch.set(serviceDocRef, { ...service, professionalId: user.uid });
     batch.set(historyDocRef, {
       timestamp: serverTimestamp(),
       userId: user.uid,
