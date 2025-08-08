@@ -9,7 +9,13 @@ export interface TimeSlot {
   end: string;
 }
 
-// 👇 Nueva estructura más clara
+export interface ProfessionalProfile {
+  displayName: string;
+  title: string; // Ej: "Psicólogo Clínico"
+  phone: string;
+  address: string;
+}
+
 export interface DaySchedule {
   isActive: boolean;
   workHours: TimeSlot; // Un único horario laboral
@@ -51,5 +57,14 @@ export class SettingsService {
     return updateDoc(userDocRef, {
       workSchedule: schedule
     });
+  }
+
+  updateProfile(profileData: Partial<ProfessionalProfile>): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) {
+      return Promise.reject(new Error("Usuario no autenticado."));
+    }
+    const userDocRef = doc(this.firestore, `professionals/${user.uid}`);
+    return updateDoc(userDocRef, profileData);
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
 import { ToastService } from '../../services/toast-service';
 import { Subscription } from 'rxjs';
@@ -12,6 +12,8 @@ import { Subscription } from 'rxjs';
   templateUrl: './settings-component.html',
 })
 export class SettingsComponent implements OnInit, OnDestroy {
+  activeTab: 'profile' | 'schedule' = 'profile';
+  profileForm: FormGroup;
   scheduleForm: FormGroup;
   daysOfWeek = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
   private subscriptions: Subscription[] = [];
@@ -22,6 +24,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private settingsService: SettingsService,
     private toastService: ToastService
   ) {
+    this.profileForm = this.fb.group({
+      displayName: ['', Validators.required],
+      title: [''],
+      phone: [''],
+      address: [''],
+    });
+
     this.scheduleForm = this.fb.group({
       days: this.fb.array(
         this.daysOfWeek.map(() => this.createDayGroup())
@@ -31,8 +40,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.settingsService.getProfessionalProfile().subscribe(profile => {
-      if (profile && profile.workSchedule) {
-        this.patchForm(profile.workSchedule);
+      if (profile) {
+        // Rellena el formulario de perfil
+        this.profileForm.patchValue(profile);
+
+        // Rellena el formulario de horario
+        if (profile.workSchedule) {
+          this.patchForm(profile.workSchedule);
+        }
       }
       this.setupDaySubscriptions();
     });
@@ -134,5 +149,21 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  selectTab(tab: 'profile' | 'schedule'): void {
+    this.activeTab = tab;
+  }
+
+  saveProfile(): void {
+    if (this.profileForm.invalid) {
+      this.toastService.show('Por favor, completa los campos requeridos.', 'error');
+      return;
+    }
+    this.isLoading = true;
+    this.settingsService.updateProfile(this.profileForm.value)
+      .then(() => this.toastService.show('Perfil actualizado con éxito', 'success'))
+      .catch(() => this.toastService.show('Error al actualizar el perfil', 'error'))
+      .finally(() => this.isLoading = false);
   }
 }
