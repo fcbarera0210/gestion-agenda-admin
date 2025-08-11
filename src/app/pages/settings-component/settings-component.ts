@@ -1,29 +1,41 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
 import { ToastService } from '../../services/toast-service';
 import { Subscription } from 'rxjs';
 import { TeamManagementComponent } from '../team-management-component/team-management-component';
+import { AuthService } from '../../services/auth-service';
+import { ReauthModalComponent } from '../../components/reauth-modal-component/reauth-modal-component';
+
+export const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const newPassword = control.get('newPassword');
+  const confirmPassword = control.get('confirmPassword');
+  return newPassword && confirmPassword && newPassword.value !== confirmPassword.value ? { passwordsMismatch: true } : null;
+};
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TeamManagementComponent],
+  imports: [CommonModule, ReactiveFormsModule, TeamManagementComponent, ReauthModalComponent],
   templateUrl: './settings-component.html',
 })
 export class SettingsComponent implements OnInit, OnDestroy {
-  activeTab: 'profile' | 'schedule' | 'team' = 'profile';
+  activeTab: 'profile' | 'schedule' | 'team' | 'account' = 'profile';
   profileForm: FormGroup;
   scheduleForm: FormGroup;
   daysOfWeek = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
   private subscriptions: Subscription[] = [];
   isLoading = false;
+  passwordForm: FormGroup;
+  isLoadingPassword = false;
+  showReauthModal = false;
 
   constructor(
     private fb: FormBuilder,
     private settingsService: SettingsService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authService: AuthService
   ) {
     this.profileForm = this.fb.group({
       displayName: ['', Validators.required],
@@ -37,6 +49,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
         this.daysOfWeek.map(() => this.createDayGroup())
       )
     });
+
+    this.passwordForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
+    }, { validators: passwordsMatchValidator });
   }
 
   ngOnInit(): void {
@@ -152,8 +169,53 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  selectTab(tab: 'profile' | 'schedule' | 'team'): void {
+  selectTab(tab: 'profile' | 'schedule' | 'team' | 'account'): void {
     this.activeTab = tab;
+  }
+
+  changePassword(): void {
+    if (this.passwordForm.invalid) return;
+    this.isLoadingPassword = true;
+    const { newPassword } = this.passwordForm.value;
+
+    this.authService.changeUserPassword(newPassword)
+      .then(() => {
+        this.toastService.show('Contraseña actualizada con éxito', 'success');
+        this.passwordForm.reset();
+        this.isLoadingPassword = false;
+      })
+      .catch((error) => {
+        // 👇 ESTA ES LA LÓGICA CLAVE
+        if (error.code === 'auth/requires-recent-login') {
+          // Si el error es el que esperamos, abrimos el modal de re-autenticación
+          this.toastService.show('Por favor, confirma tu contraseña actual.', 'info');
+          this.showReauthModal = true;
+        } else {
+          this.toastService.show('Error: ' + error.message, 'error');
+        }
+        this.isLoadingPassword = false;
+        console.error(error);
+      });
+  }
+
+  handleReauthentication(currentPassword: string) {
+    this.showReauthModal = false; // Cierra el modal de re-autenticación
+    this.isLoadingPassword = true; // Muestra el loading en el botón original
+
+    const { newPassword } = this.passwordForm.value;
+    
+    this.authService.reauthenticateAndChangePassword(currentPassword, newPassword)
+      .then(() => {
+        this.toastService.show('Contraseña actualizada con éxito', 'success');
+        this.passwordForm.reset();
+      })
+      .catch(err => {
+        this.toastService.show('Error de autenticación. Contraseña incorrecta.', 'error');
+        console.error(err);
+      })
+      .finally(() => {
+        this.isLoadingPassword = false;
+      });
   }
 
   saveProfile(): void {

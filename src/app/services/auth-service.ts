@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updatePassword } from '@angular/fire/auth';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { InvitationService } from './invitation-service';
 
@@ -13,6 +13,30 @@ export class AuthService {
     private firestore: Firestore,
     private invitationService: InvitationService
   ) { }
+
+  changeUserPassword(newPassword: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) {
+      return Promise.reject(new Error("No hay un usuario autenticado."));
+    }
+    return updatePassword(user, newPassword);
+  }
+
+  async reauthenticateAndChangePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user || !user.email) {
+      throw new Error("Usuario no encontrado o sin email.");
+    }
+    
+    // 1. Crear la credencial con la contraseña actual
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    
+    // 2. Re-autenticar al usuario
+    await reauthenticateWithCredential(user, credential);
+    
+    // 3. Si la re-autenticación fue exitosa, ahora sí cambiamos la contraseña
+    await updatePassword(user, newPassword);
+  }
 
   async register({ email, password, invitationCode }: any) { 
     const isValidCode = await this.invitationService.validateAndUseCode(invitationCode, email);

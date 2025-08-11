@@ -31,6 +31,15 @@
               class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
         Equipo
       </button>
+
+      <button (click)="selectTab('account')"
+              [ngClass]="{
+                'border-primary text-primary': activeTab === 'account',
+                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'account'
+              }"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+        Cuenta
+      </button>
     </nav>
   </div>
 
@@ -136,5 +145,45 @@
         <app-team-management></app-team-management>
       </div>
     </div>
+
+    <div>
+    <div *ngIf="activeTab === 'account'">
+      <div class="p-8 bg-white rounded-lg shadow-md space-y-6">
+        <h3 class="text-xl font-semibold text-gray-700">Seguridad de la Cuenta</h3>
+        
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="space-y-4 max-w-md">
+            <div>
+              <label for="newPassword" class="text-sm font-medium text-gray-700">Nueva Contraseña</label>
+              <input id="newPassword" type="password" formControlName="newPassword"
+                     class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label for="confirmPassword" class="text-sm font-medium text-gray-700">Confirmar Nueva Contraseña</label>
+              <input id="confirmPassword" type="password" formControlName="confirmPassword"
+                     class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div *ngIf="passwordForm.errors?.['passwordsMismatch'] && passwordForm.get('confirmPassword')?.touched" class="text-sm text-red-600">
+              Las contraseñas no coinciden.
+            </div>
+          </div>
+          <div class="flex justify-start mt-6 pt-6 border-t">
+            <button type="submit" [disabled]="isLoadingPassword || passwordForm.invalid" class="flex items-center justify-center w-48 px-6 py-2 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90 disabled:bg-primary/70 disabled:cursor-wait">
+              <ng-container *ngIf="!isLoadingPassword">Cambiar Contraseña</ng-container>
+              <ng-container *ngIf="isLoadingPassword">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Guardando...
+              </ng-container>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
+
+<app-reauth-modal
+  *ngIf="showReauthModal"
+  (onConfirm)="handleReauthentication($event)"
+  (onCancel)="showReauthModal = false">
+</app-reauth-modal>
