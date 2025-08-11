@@ -1,38 +1,50 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastService } from '../../services/toast-service';
-import { InvitationService } from '../../services/invitation-service'; // 👈 Importa el nuevo servicio
+import { TeamService } from '../../services/team-service'; // Asegúrate de tener este servicio
 
 @Component({
   selector: 'app-team-management',
   standalone: true,
-  imports: [CommonModule], // Ya no necesitamos ReactiveFormsModule aquí
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './team-management-component.html',
 })
 export class TeamManagementComponent implements OnInit {
+
+  newUserForm: FormGroup;
   isLoading = false;
-  generatedCode: string | null = null;
 
   constructor(
+    private fb: FormBuilder,
     private toastService: ToastService,
-    private invitationService: InvitationService // 👈 Inyecta el servicio
-  ) {}
+    private teamService: TeamService
+  ) {
+    this.newUserForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
 
   ngOnInit(): void {}
 
-  async generateCode(): Promise<void> {
-    this.isLoading = true;
-    this.generatedCode = null; // Limpiamos el código anterior
+  inviteUser(): void {
+    if (this.newUserForm.invalid) return;
 
-    try {
-      const code = await this.invitationService.createInvitationCode();
-      this.generatedCode = code;
-      this.toastService.show('Código de invitación generado con éxito', 'success');
-    } catch (error) {
-      console.error(error);
-      this.toastService.show('Error al generar el código', 'error');
-    } finally {
-      this.isLoading = false;
-    }
+    this.isLoading = true;
+    const email = this.newUserForm.value.email;
+
+    this.teamService.inviteNewUser(email).subscribe({
+      next: () => {
+        this.toastService.show(`Invitación enviada a ${email}`, 'success');
+        this.newUserForm.reset();
+      },
+      error: (error) => {
+        this.toastService.show(error.message, 'error');
+        console.error(error);
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 }
