@@ -22,6 +22,7 @@ export const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): 
 })
 export class SettingsComponent implements OnInit, OnDestroy {
   activeTab: 'profile' | 'schedule' | 'team' | 'account' = 'profile';
+  userRole: 'admin' | 'member' | null = null;
   profileForm: FormGroup;
   scheduleForm: FormGroup;
   daysOfWeek = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
@@ -59,6 +60,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.settingsService.getProfessionalProfile().subscribe(profile => {
       if (profile) {
+        this.userRole = profile.role;
         // Rellena el formulario de perfil
         this.profileForm.patchValue(profile);
 

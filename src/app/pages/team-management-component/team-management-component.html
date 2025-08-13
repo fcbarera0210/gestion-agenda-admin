@@ -1,48 +1,85 @@
 <div class="p-8 bg-white rounded-lg shadow-md space-y-8">
   <div>
-    <h3 class="text-xl font-semibold text-gray-700">Añadir Nuevo Miembro al Equipo</h3>
+    <h3 class="text-xl font-semibold text-gray-700">Generar Código de Invitación</h3>
     <p class="mt-1 text-sm text-gray-500">
-      Ingresa el correo del nuevo miembro. Recibirá una invitación con una contraseña temporal para acceder.
+      Crea un código de un solo uso para que un nuevo miembro del equipo pueda registrarse.
     </p>
-    <form [formGroup]="newUserForm" (ngSubmit)="inviteUser()" class="mt-4 flex flex-col md:flex-row items-start gap-4">
-      <div class="w-full">
-        <label for="email" class="sr-only">Correo Electrónico</label>
-        <input id="email" type="email" formControlName="email" placeholder="correo@ejemplo.com"
-               class="w-full px-4 py-3 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-      </div>
-      <button type="submit" [disabled]="isLoading || newUserForm.invalid"
-              class="flex items-center justify-center w-full md:w-auto px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90 disabled:bg-primary/70 disabled:cursor-wait">
-        <ng-container *ngIf="!isLoading">Invitar Usuario</ng-container>
+    <div class="mt-4 flex flex-col md:flex-row items-center gap-4">
+      <input 
+        type="text" 
+        [value]="generatedCode || '...'" 
+        readonly 
+        class="w-full px-4 py-3 text-center font-mono text-lg text-gray-700 bg-gray-100 rounded-lg">
+      
+      <button 
+        (click)="generateCode()" 
+        [disabled]="isLoading"
+        class="flex items-center justify-center w-full md:w-auto px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90 disabled:bg-primary/70 disabled:cursor-wait">
+        <ng-container *ngIf="!isLoading">Generar Código</ng-container>
         <ng-container *ngIf="isLoading">
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          Invitando...
+          Generando...
         </ng-container>
       </button>
-    </form>
+    </div>
+    <p *ngIf="generatedCode" class="mt-2 text-sm text-green-600">
+      ¡Código generado! Cópialo y compártelo con el nuevo miembro.
+    </p>
   </div>
 
   <div class="pt-8 border-t">
-  <h3 class="text-xl font-semibold text-gray-700">Miembros del Equipo</h3>
+  <h3 class="text-xl font-semibold text-gray-700">Códigos de Invitación Pendientes</h3>
+  <p class="mt-1 text-sm text-gray-500">
+    Estos son los códigos que has generado y que aún no han sido utilizados.
+  </p>
   <div class="mt-4">
-    <ng-container *ngIf="teamMembers$ | async as members; else loading">
-      <div *ngIf="members.length > 0; else empty" class="space-y-4">
-        <div *ngFor="let member of members" class="flex items-center justify-between p-4 border rounded-lg">
-          <div>
-            <h4 class="font-semibold text-gray-800">{{ member.displayName }}</h4>
-            <p class="text-sm text-gray-500">{{ member.email }}</p>
+    <ng-container *ngIf="pendingInvitations$ | async as invitations; else loadingCodes">
+      <div *ngIf="invitations.length > 0; else noCodes" class="space-y-3">
+        <div *ngFor="let inv of invitations" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-4">
+            <code class="font-mono text-lg text-gray-800">{{ inv.code }}</code>
+            <span class="text-xs text-gray-400">Creado: {{ inv.createdAt | date:'short' }}</span>
           </div>
-          <span class="px-2 py-1 text-xs font-semibold rounded-full capitalize"
-                [ngClass]="{
-                  'bg-primary/20 text-primary': member.role === 'admin',
-                  'bg-gray-100 text-gray-800': member.role === 'member'
-                }">
-            {{ member.role }}
-          </span>
+          <button (click)="copyToClipboard(inv.code)" class="p-2 text-gray-500 rounded-md hover:bg-gray-200" title="Copiar código">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </button>
         </div>
       </div>
-      <ng-template #empty><p class="text-gray-500">Aún no has invitado a nadie a tu equipo.</p></ng-template>
+      <ng-template #noCodes>
+        <p class="text-center text-gray-500">No tienes códigos de invitación pendientes.</p>
+      </ng-template>
     </ng-container>
-    <ng-template #loading><p class="text-gray-500">Cargando miembros...</p></ng-template>
+    <ng-template #loadingCodes>
+      <p class="text-gray-500">Cargando códigos...</p>
+    </ng-template>
   </div>
 </div>
+
+<div class="pt-8 border-t">
+  </div>
+
+  <div class="pt-8 border-t">
+    <h3 class="text-xl font-semibold text-gray-700">Miembros del Equipo</h3>
+    <div class="mt-4">
+      <ng-container *ngIf="teamMembers$ | async as members; else loading">
+        <div *ngIf="members.length > 0; else empty" class="space-y-4">
+          <div *ngFor="let member of members" class="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <h4 class="font-semibold text-gray-800">{{ member.displayName }}</h4>
+              <p class="text-sm text-gray-500">{{ member.email }}</p>
+            </div>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full capitalize"
+                  [ngClass]="{
+                    'bg-primary/20 text-primary': member.role === 'admin',
+                    'bg-gray-100 text-gray-800': member.role === 'member'
+                  }">
+              {{ member.role }}
+            </span>
+          </div>
+        </div>
+        <ng-template #empty><p class="text-gray-500">Aún no has invitado a nadie a tu equipo.</p></ng-template>
+      </ng-container>
+      <ng-template #loading><p class="text-gray-500">Cargando miembros...</p></ng-template>
+    </div>
+  </div>
 </div>

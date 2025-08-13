@@ -1,55 +1,55 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ToastService } from '../../services/toast-service';
-import { TeamService, TeamMember } from '../../services/team-service';
+import { Invitation, InvitationService } from '../../services/invitation-service';
+import { TeamMember, TeamService } from '../../services/team-service';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-team-management',
-  standalone: true, // 👈 Se asegura que sea un componente standalone
-  imports: [CommonModule, ReactiveFormsModule], // 👈 Importa los módulos necesarios
+  standalone: true,
+  imports: [CommonModule, DatePipe], // Ya no se necesita el módulo de formularios aquí
   templateUrl: './team-management-component.html',
 })
 export class TeamManagementComponent implements OnInit {
-  teamMembers$: Observable<TeamMember[]>
-  newUserForm: FormGroup;
   isLoading = false;
+  generatedCode: string | null = null;
+  teamMembers$: Observable<TeamMember[]>;
+  pendingInvitations$: Observable<Invitation[]>; 
 
   constructor(
-    private fb: FormBuilder,
     private toastService: ToastService,
+    private invitationService: InvitationService,
     private teamService: TeamService
   ) {
-    this.newUserForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
-    });
     this.teamMembers$ = this.teamService.getTeamMembers();
+    this.pendingInvitations$ = this.invitationService.getPendingInvitations();
   }
 
   ngOnInit(): void {}
 
-  inviteUser(): void {
-    if (this.newUserForm.invalid) {
-      return;
-    }
-
+  async generateCode(): Promise<void> {
     this.isLoading = true;
-    const email = this.newUserForm.value.email;
+    this.generatedCode = null;
 
-    // Esta es la lógica final que llamará a la Cloud Function
-    this.teamService.inviteNewUser(email).subscribe({
-      next: (response) => {
-        this.toastService.show(`Invitación enviada a ${email}`, 'success');
-        this.newUserForm.reset();
-      },
-      error: (error) => {
-        this.toastService.show(error.message, 'error');
-        console.error(error);
-      },
-      complete: () => {
-        this.isLoading = false;
-      }
+    try {
+      const code = await this.invitationService.createInvitationCode();
+      this.generatedCode = code;
+      this.toastService.show('Código de invitación generado con éxito', 'success');
+    } catch (error) {
+      console.error(error);
+      this.toastService.show('Error al generar el código', 'error');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  copyToClipboard(code: string): void {
+    navigator.clipboard.writeText(code).then(() => {
+      this.toastService.show('¡Código copiado!', 'success');
+    }).catch(err => {
+      this.toastService.show('Error al copiar el código', 'error');
+      console.error('Error al copiar:', err);
     });
   }
 }
