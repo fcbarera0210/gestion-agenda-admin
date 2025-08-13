@@ -15,6 +15,7 @@ import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
 import { ToastService } from '../../services/toast-service';
+import { NotificationService } from '../../services/notification-service';
 
 @Component({
   selector: 'app-agenda',
@@ -52,6 +53,7 @@ export class AgendaComponent implements OnInit {
     private clientsService: ClientsService,
     private timeBlockService: TimeBlockService,
     private toastService: ToastService,
+    private notificationService: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -196,26 +198,41 @@ export class AgendaComponent implements OnInit {
   }
 
   handleSaveAppointment(appointmentData: any): void {
-    const promise = appointmentData.id
-      ? this.appointmentsService.updateAppointment(appointmentData)
-      : this.appointmentsService.addAppointment(appointmentData);
+    const isNewAppointment = !appointmentData.id;
+    const promise = isNewAppointment
+      ? this.appointmentsService.addAppointment(appointmentData)
+      : this.appointmentsService.updateAppointment(appointmentData);
 
     promise
-    .then(async () => { // 👈 Haz la función async
-      this.toastService.show('Cita guardada con éxito', 'success');
-
-      // 👇 Llama a la función de envío de correo
-      if (!appointmentData.id) { // Solo envía correo para citas nuevas
-        const clients = await firstValueFrom(this.clientsService.getClients());
-        const profile = await firstValueFrom(this.settingsService.getProfessionalProfile());
-        const clientData = clients.find(c => c.id === appointmentData.clientId);
-        if (clientData && profile) {
-          this.appointmentsService.sendConfirmationEmail(appointmentData, clientData, profile);
+      .then(async () => { // 👈 Haz la función async
+        this.toastService.show('Cita guardada con éxito', 'success');
+        
+        // 👇 Lógica para enviar el correo SOLO para citas nuevas
+        if (isNewAppointment) {
+          try {
+            const clients = await firstValueFrom(this.clientsService.getClients());
+            const clientData = clients.find(c => c.id === appointmentData.clientId);
+            
+            if (clientData) {
+              const appointmentDate = appointmentData.start.toDate();
+              const templateParams = {
+                client_name: clientData.name,
+                service_name: appointmentData.title,
+                date: appointmentDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }),
+                time: appointmentDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                reply_to: clientData.email,
+              };
+              // No esperamos a que el correo se envíe para cerrar el modal
+              this.notificationService.sendAppointmentConfirmation(templateParams);
+            }
+          } catch (error) {
+            console.error("Error al preparar los datos para el email:", error);
+          }
         }
-      }
 
-      this.closeAllModals();
-    }).catch(err => {
+        this.closeAllModals();
+      })
+      .catch(err => {
         this.toastService.show('Error al guardar la cita', 'error');
         console.error(err);
       });
