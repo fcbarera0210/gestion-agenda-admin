@@ -1,59 +1,75 @@
-# AdminPanel
+# Panel de Administración - Gestión de Agenda Profesional
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+Este proyecto es el panel de administración para un sistema completo de gestión de clientes (CRM) y agendamiento de horas, diseñado para profesionales independientes.
 
-## Development server
+**Proyecto en vivo:** [https://gestion-agenda-pro.web.app](https://gestion-agenda-pro.web.app)
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## 📋 Sobre el Proyecto
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Esta aplicación permite a un profesional gestionar todos los aspectos de su negocio de manera centralizada. Es la base para un futuro portal de clientes donde los usuarios finales podrán agendar horas de forma autónoma.
 
-## Code scaffolding
+### ✨ Características Implementadas
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+* **Dashboard Principal:** Vista rápida de la actividad diaria y estadísticas clave.
+* **Gestión de Agenda:** Un calendario semanal interactivo para crear, editar, eliminar y visualizar citas y bloqueos de tiempo.
+* **Gestión de Clientes:** CRUD completo para la base de datos de clientes, con historial de cambios y de citas.
+* **Gestión de Servicios:** Creación y administración de los servicios ofrecidos por el profesional.
+* **Ajustes Avanzados:**
+    * Configuración de perfil profesional.
+    * Definición de horario laboral y descansos.
+    * Gestión de equipo con sistema de invitaciones por código.
+    * Cambio de contraseña seguro con re-autenticación.
+* **Autenticación Segura:** Sistema de roles (admin/miembro) y control de acceso a funcionalidades.
 
-```bash
-ng generate component component-name
-```
+---
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🛠️ Construido Con
 
-```bash
-ng generate --help
-```
+* **Framework Principal:** [Angular](https://angular.io/) (Standalone Components)
+* **Backend y Base de Datos:** [Firebase](https://firebase.google.com/) (Firestore, Authentication, Hosting)
+* **Estilos:** [Tailwind CSS](https://tailwindcss.com/)
+* **Librería de Calendario:** [angular-calendar](https://mattlewis92.github.io/angular-calendar/docs/)
+* **Manejo de Fechas:** [date-fns](https://date-fns.org/)
 
-## Building
+---
 
-To build the project run:
+## 🚀 Cómo Empezar
 
-```bash
-ng build
-```
+Para levantar una copia local del proyecto, sigue estos pasos.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Prerrequisitos
 
-## Running unit tests
+* Node.js (v18 o superior)
+* Angular CLI: `npm install -g @angular/cli`
+* Firebase CLI: `npm install -g firebase-tools`
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Instalación
 
-```bash
-ng test
-```
+1.  Clona el repositorio:
+    ```sh
+    git clone [https://github.com/fcbarera0210/gestion-agenda-admin.git](https://github.com/fcbarera0210/gestion-agenda-admin.git)
+    ```
+2.  Navega a la carpeta del proyecto:
+    ```sh
+    cd gestion-agenda-admin
+    ```
+3.  Instala las dependencias de NPM:
+    ```sh
+    npm install
+    ```
+4.  Configura tus variables de entorno de Firebase en `src/environments/environment.ts`.
+5.  Levanta el servidor de desarrollo:
+    ```sh
+    ng serve -o
+    ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 🛣️ Hoja de Ruta (Roadmap)
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+* [ X ] Implementar notificaciones por correo con EmailJS.
+* [ ] Añadir buscador a los selectores de clientes y servicios.
+* [ ] Implementar "Recordarme" en el login.
+* [ ] **(Gran Siguiente Paso)** Desarrollar el portal del cliente para el agendamiento público.
