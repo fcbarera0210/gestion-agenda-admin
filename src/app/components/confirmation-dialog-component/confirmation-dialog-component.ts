@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ConfirmationDialogComponent {
   @Input() message: string = '¿Estás seguro?';
+  @Input() isLoading = false;
   @Output() onConfirm = new EventEmitter<void>();
   @Output() onCancel = new EventEmitter<void>();
 

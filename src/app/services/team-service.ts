@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { from, Observable, of } from 'rxjs';
 import { Auth, authState } from '@angular/fire/auth'; // 👈 Importa Auth
-import { Firestore, collection, query, where, collectionData } from '@angular/fire/firestore'; // 👈 Importa Firestore
+import { Firestore, collection, query, where, collectionData, doc, updateDoc, deleteDoc } from '@angular/fire/firestore'; // 👈 Importa Firestore
 import { switchMap } from 'rxjs/operators';
 
 // Creamos una interfaz para los miembros del equipo
@@ -30,10 +30,6 @@ export class TeamService {
     return from(createUserFn({ email }));
   }
 
-  // 👇 AÑADE ESTE MÉTODO
-  /**
-   * Obtiene todos los miembros del equipo del usuario actual.
-   */
   getTeamMembers(): Observable<TeamMember[]> {
     return authState(this.auth).pipe(
       switchMap(user => {
@@ -47,5 +43,15 @@ export class TeamService {
         return collectionData(q, { idField: 'id' }) as Observable<TeamMember[]>;
       })
     );
+  }
+
+  updateMemberRole(memberId: string, newRole: 'admin' | 'member'): Promise<void> {
+    const memberDocRef = doc(this.firestore, `professionals/${memberId}`);
+    return updateDoc(memberDocRef, { role: newRole });
+  }
+
+  deleteTeamMember(memberId: string): Promise<void> {
+    const memberDocRef = doc(this.firestore, `professionals/${memberId}`);
+    return deleteDoc(memberDocRef);
   }
 }
