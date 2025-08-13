@@ -3,6 +3,7 @@ import { Auth, authState } from '@angular/fire/auth';
 import { Firestore, collection, addDoc, collectionData, query, where, doc, updateDoc, deleteDoc, Timestamp, orderBy } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import emailjs from '@emailjs/browser';
 
 export type AppointmentStatus = 'confirmed' | 'pending' | 'cancelled';
 
@@ -31,7 +32,34 @@ export class AppointmentsService {
   constructor(
     private firestore: Firestore,
     private auth: Auth
-  ) { }
+  ) {
+    emailjs.init({
+      publicKey: 'VJw7HPRhQEHP1OFer', 
+    });
+  }
+
+  async sendConfirmationEmail(appointmentData: any, clientData: any, professionalData: any): Promise<void> {
+    const appointmentDate = appointmentData.start.toDate();
+    const templateParams = {
+      client_name: clientData.name,
+      service_name: appointmentData.title,
+      date: appointmentDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      time: appointmentDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      professional_name: professionalData.displayName,
+      reply_to: clientData.email,
+    };
+
+    try {
+      await emailjs.send(
+        'service_v05sxup', // 👈 Reemplaza con tu Service ID de EmailJS
+        'template_vig0r7t', // 👈 Reemplaza con tu Template ID
+        templateParams
+      );
+      console.log('Correo de confirmación enviado exitosamente.');
+    } catch (error) {
+      console.error('Error al enviar el correo con EmailJS:', error);
+    }
+  }
 
   // Obtiene todas las citas del profesional que ha iniciado sesión
   getAppointments(): Observable<Appointment[]> {

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Firestore, collection, addDoc, doc, getDoc, updateDoc, where, getDocs, query } from '@angular/fire/firestore';
 
 export interface Invitation {
@@ -14,12 +15,18 @@ export interface Invitation {
 })
 export class InvitationService {
 
-  constructor(private firestore: Firestore) { }
+  constructor(
+    private firestore: Firestore,
+    private auth: Auth
+  ) { }
 
   /**
    * Genera un código de invitación único y lo guarda en Firestore.
    */
   async createInvitationCode(): Promise<string> {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error("Debes estar autenticado para generar un código.");
+
     // Genera un código simple y aleatorio (ej. ABCDE-12345)
     const code = (Math.random().toString(36).substring(2, 7) + '-' + Math.random().toString(36).substring(2, 7)).toUpperCase();
 
@@ -27,7 +34,8 @@ export class InvitationService {
     await addDoc(invitationsRef, {
       code: code,
       createdAt: new Date(),
-      used: false
+      used: false,
+      createdBy: user.uid 
     });
 
     return code;
@@ -44,14 +52,17 @@ export class InvitationService {
       return null;
     }
 
-    // El código es válido, lo marcamos como usado
     const invitationDoc = querySnapshot.docs[0];
+    const invitationData = invitationDoc.data();
+
+    // Marcamos el código como usado
     await updateDoc(invitationDoc.ref, {
       used: true,
       usedBy: userEmail,
     });
 
-    return invitationDoc.id;
+    // Devolvemos el ID del creador
+    return invitationData['createdBy'] || null; 
   }
 
   // (Añadiremos los métodos para validar y usar el código más adelante,

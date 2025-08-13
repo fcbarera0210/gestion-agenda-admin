@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CalendarModule, DateAdapter, CalendarEvent } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
-import { map, combineLatest } from 'rxjs';
+import { map, combineLatest, firstValueFrom } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
 import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays } from 'date-fns';
 
@@ -201,11 +201,21 @@ export class AgendaComponent implements OnInit {
       : this.appointmentsService.addAppointment(appointmentData);
 
     promise
-      .then(() => {
-        this.toastService.show('Cita guardada con éxito', 'success');
-        this.closeAllModals();
-      })
-      .catch(err => {
+    .then(async () => { // 👈 Haz la función async
+      this.toastService.show('Cita guardada con éxito', 'success');
+
+      // 👇 Llama a la función de envío de correo
+      if (!appointmentData.id) { // Solo envía correo para citas nuevas
+        const clients = await firstValueFrom(this.clientsService.getClients());
+        const profile = await firstValueFrom(this.settingsService.getProfessionalProfile());
+        const clientData = clients.find(c => c.id === appointmentData.clientId);
+        if (clientData && profile) {
+          this.appointmentsService.sendConfirmationEmail(appointmentData, clientData, profile);
+        }
+      }
+
+      this.closeAllModals();
+    }).catch(err => {
         this.toastService.show('Error al guardar la cita', 'error');
         console.error(err);
       });

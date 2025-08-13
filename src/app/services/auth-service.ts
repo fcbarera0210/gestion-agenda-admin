@@ -39,22 +39,26 @@ export class AuthService {
   }
 
   async register({ email, password, invitationCode }: any) { 
-    const isValidCode = await this.invitationService.validateAndUseCode(invitationCode, email);
+    const adminId = await this.invitationService.validateAndUseCode(invitationCode, email);
 
-    if (!isValidCode) {
+    if (!adminId) {
       throw new Error("El código de invitación no es válido o ya ha sido utilizado.");
     }
-
+    
+    // 2. Creamos el usuario en el sistema de autenticación
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-
+      
       const user = userCredential.user;
       const userDocRef = doc(this.firestore, `professionals/${user.uid}`);
-
+      
+      // 3. Creamos su perfil en Firestore, asignándole el teamId del admin que lo invitó
       await setDoc(userDocRef, {
         uid: user.uid,
         email: user.email,
         displayName: email,
+        teamId: adminId, // Asignamos el equipo
+        role: 'member',   // Le damos un rol de miembro
         workSchedule: {}
       });
 

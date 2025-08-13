@@ -1,20 +1,51 @@
 import { Injectable } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { Observable, from } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
+import { Auth, authState } from '@angular/fire/auth'; // 👈 Importa Auth
+import { Firestore, collection, query, where, collectionData } from '@angular/fire/firestore'; // 👈 Importa Firestore
+import { switchMap } from 'rxjs/operators';
+
+// Creamos una interfaz para los miembros del equipo
+export interface TeamMember {
+  id?: string;
+  displayName: string;
+  email: string;
+  role: 'admin' | 'member';
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeamService {
 
-  constructor(private functions: Functions) { }
+  constructor(
+    private functions: Functions,
+    private auth: Auth, // 👈 Inyecta
+    private firestore: Firestore // 👈 Inyecta
+  ) { }
 
-  /**
-   * Llama a la Cloud Function 'createUser' para invitar a un nuevo usuario.
-   * @param email El correo del nuevo usuario.
-   */
+  // El método de invitar ya no es necesario aquí, lo dejamos por si lo usamos después
   inviteNewUser(email: string): Observable<any> {
     const createUserFn = httpsCallable(this.functions, 'createUser');
     return from(createUserFn({ email }));
+  }
+
+  // 👇 AÑADE ESTE MÉTODO
+  /**
+   * Obtiene todos los miembros del equipo del usuario actual.
+   */
+  getTeamMembers(): Observable<TeamMember[]> {
+    return authState(this.auth).pipe(
+      switchMap(user => {
+        if (!user) return of([]);
+
+        const professionalsRef = collection(this.firestore, 'professionals');
+        // Buscamos a todos los que tengan el teamId del usuario actual
+        // O cuyo propio UID sea el teamId (para incluir al admin)
+        const q = query(professionalsRef, where('teamId', '==', user.uid));
+        
+        return collectionData(q, { idField: 'id' }) as Observable<TeamMember[]>;
+      })
+    );
   }
 }
