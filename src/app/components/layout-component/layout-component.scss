@@ -10,8 +10,8 @@ aside .nav-link {
 }
 
 aside.collapsed {
-  width: 5rem;
-  padding: 1rem;
+  width: 4rem;
+  padding: 0.5rem;
 }
 
 aside.collapsed .nav-text {
@@ -19,27 +19,35 @@ aside.collapsed .nav-text {
 }
 
 aside.collapsed .nav-link {
-  @apply justify-center w-12 h-12 p-0 mx-auto;
+  @apply justify-center w-10 h-10 p-0 mx-auto;
 }
 
 aside.collapsed .logo-container {
-  @apply justify-center bg-primary px-0 h-20 rounded-xl;
+  @apply justify-center px-0 h-12 rounded-xl;
 }
 
-/* Uniform icon spacing */
+/* Uniform icon size (1.5rem) */
 .nav-icon {
-  @apply w-6 h-6 p-2 m-1;
+  @apply w-6 h-6 p-0 m-0;
+}
+
+/* Ensure left alignment when expanded */
+aside:not(.collapsed) .nav-link {
+  @apply justify-start;
 }
 
 @media (min-width: 768px) {
   aside.collapsed:hover {
     width: 16rem;
   }
+  aside.collapsed:hover nav {
+    @apply items-start;
+  }
   aside.collapsed:hover .nav-text {
     display: inline;
   }
   aside.collapsed:hover .nav-link {
-    @apply w-full justify-start p-4 mx-0;
+    @apply w-full justify-start h-10 px-3 mx-0;
   }
   aside.collapsed:hover .logo-container {
     @apply justify-start bg-transparent px-4 h-12;
