@@ -148,3 +148,4 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     this.onCancel.emit();
   }
 }
+

@@ -12,19 +12,34 @@
       <div>
         <label for="name" class="text-sm font-medium text-gray-700">Nombre Completo</label>
           <input id="name" type="text" formControlName="name" placeholder="Ej: Ana Contreras"
-                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                 [attr.aria-invalid]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched"
+                 [attr.aria-describedby]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched ? 'name-error' : null">
+        <div id="name-error" *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched" class="mt-1 text-sm text-red-600">
+          El nombre es obligatorio.
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label for="email" class="text-sm font-medium text-gray-700">Correo Electrónico</label>
             <input id="email" type="email" formControlName="email" placeholder="ejemplo@correo.com"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   [attr.aria-invalid]="clientForm.get('email')?.invalid && clientForm.get('email')?.touched"
+                   [attr.aria-describedby]="clientForm.get('email')?.invalid && clientForm.get('email')?.touched ? 'email-error' : null">
+          <div id="email-error" *ngIf="clientForm.get('email')?.invalid && clientForm.get('email')?.touched" class="mt-1 text-sm text-red-600">
+            {{ clientForm.get('email')?.errors?.['email'] ? 'Ingresa un correo válido.' : 'El correo es obligatorio.' }}
+          </div>
         </div>
         <div>
           <label for="phone" class="text-sm font-medium text-gray-700">Teléfono</label>
             <input id="phone" type="tel" formControlName="phone" placeholder="+56 9 1234 5678"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   [attr.aria-invalid]="clientForm.get('phone')?.invalid && clientForm.get('phone')?.touched"
+                   [attr.aria-describedby]="clientForm.get('phone')?.invalid && clientForm.get('phone')?.touched ? 'phone-error' : null">
+          <div id="phone-error" *ngIf="clientForm.get('phone')?.invalid && clientForm.get('phone')?.touched" class="mt-1 text-sm text-red-600">
+            El teléfono es obligatorio.
+          </div>
         </div>
       </div>
 
@@ -43,10 +58,12 @@
                 [ngClass]="{
                   'bg-primary hover:bg-opacity-90': clientForm.valid,
                   'bg-gray-400 cursor-not-allowed': !clientForm.valid
-                }">
+                }"
+                [disabled]="clientForm.invalid">
           Guardar Cliente
         </button>
       </div>
     </form>
   </div>
 </div>
+

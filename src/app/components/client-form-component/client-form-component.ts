@@ -32,13 +32,16 @@ export class ClientFormComponent implements OnInit {
   }
 
   save(): void {
-    if (this.clientForm.valid) {
-      const formData = { ...this.client, ...this.clientForm.value };
-      this.onSave.emit(formData);
+    if (this.clientForm.invalid) {
+      this.clientForm.markAllAsTouched();
+      return;
     }
+    const formData = { ...this.client, ...this.clientForm.value };
+    this.onSave.emit(formData);
   }
 
   cancel(): void {
     this.onCancel.emit();
   }
 }
+
