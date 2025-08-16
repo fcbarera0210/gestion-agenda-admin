@@ -6,3 +6,36 @@
 :root {
   --color-primary: 243 92% 62%; /* Este es un color HSL azul/púrpura similar al de la imagen */
 }
+
+.light-theme {
+  --bg-color: #f8fafc;
+  --text-color: #1f2937;
+  --card-bg: #ffffff;
+  --table-bg: #ffffff;
+  --calendar-bg: #ffffff;
+}
+
+.dark-theme {
+  --bg-color: #1f2937;
+  --text-color: #f8fafc;
+  --card-bg: #111827;
+  --table-bg: #1f2937;
+  --calendar-bg: #1f2937;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+table {
+  background-color: var(--table-bg);
+  color: var(--text-color);
+}
+
+.cal-week-view,
+.cal-day-headers,
+.cal-hour-rows {
+  background-color: var(--calendar-bg) !important;
+  color: var(--text-color) !important;
+}

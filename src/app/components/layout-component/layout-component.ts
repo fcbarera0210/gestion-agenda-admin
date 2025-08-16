@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ToastContainerComponent } from '../toast-container-component/toast-container-component';
 import { AuthService } from '../../services/auth-service';
 import { Router } from '@angular/router';
+import { ThemeService } from '../../services/theme-service';
 
 @Component({
   selector: 'app-layout',
@@ -15,12 +16,17 @@ import { Router } from '@angular/router';
 export class LayoutComponent {
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) {}
 
   logout() {
     this.authService.logout()
       .then(() => this.router.navigate(['/login']))
       .catch(error => console.error(error));
-  } 
+  }
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
+  }
 }
