@@ -33,13 +33,16 @@ export class ServiceFormComponent implements OnInit {
   }
 
   save(): void {
-    if (this.serviceForm.valid) {
-      const formData = { ...this.service, ...this.serviceForm.value };
-      this.onSave.emit(formData);
+    if (this.serviceForm.invalid) {
+      this.serviceForm.markAllAsTouched();
+      return;
     }
+    const formData = { ...this.service, ...this.serviceForm.value };
+    this.onSave.emit(formData);
   }
 
   cancel(): void {
     this.onCancel.emit();
   }
 }
+

@@ -11,31 +11,51 @@
       
       <div>
         <label for="client" class="text-sm font-medium text-gray-700">Cliente</label>
-          <select id="client" formControlName="clientId" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+          <select id="client" formControlName="clientId" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg"
+                  [attr.aria-invalid]="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched"
+                  [attr.aria-describedby]="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched ? 'client-error' : null">
           <option value="" disabled>Selecciona un cliente...</option>
           <option *ngFor="let client of clients$ | async" [value]="client.id">{{ client.name }}</option>
         </select>
+        <div id="client-error" *ngIf="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched" class="mt-1 text-sm text-red-600">
+          El cliente es obligatorio.
+        </div>
       </div>
       <div>
         <label for="service" class="text-sm font-medium text-gray-700">Servicio</label>
-          <select id="service" formControlName="serviceId" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+          <select id="service" formControlName="serviceId" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg"
+                  [attr.aria-invalid]="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched"
+                  [attr.aria-describedby]="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched ? 'service-error' : null">
           <option value="" disabled>Selecciona un servicio...</option>
           <option *ngFor="let service of services$ | async" [value]="service.id">{{ service.name }} ({{ service.duration }} min)</option>
         </select>
+        <div id="service-error" *ngIf="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched" class="mt-1 text-sm text-red-600">
+          El servicio es obligatorio.
+        </div>
       </div>
 
       <div>
         <label for="status" class="text-sm font-medium text-gray-700">Estado de la Cita</label>
-          <select id="status" formControlName="status" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+          <select id="status" formControlName="status" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg"
+                  [attr.aria-invalid]="appointmentForm.get('status')?.invalid && appointmentForm.get('status')?.touched"
+                  [attr.aria-describedby]="appointmentForm.get('status')?.invalid && appointmentForm.get('status')?.touched ? 'status-error' : null">
           <option value="confirmed">Confirmado / Agendado</option>
           <option value="pending">En Espera / Por Aprobar</option>
           <option value="cancelled">Rechazado / Cancelado</option>
         </select>
+        <div id="status-error" *ngIf="appointmentForm.get('status')?.invalid && appointmentForm.get('status')?.touched" class="mt-1 text-sm text-red-600">
+          El estado es obligatorio.
+        </div>
       </div>
 
       <div class="pt-4 border-t">
         <label for="start" class="text-sm font-medium text-gray-700">Fecha y Hora de Inicio</label>
-          <input id="start" type="datetime-local" formControlName="start" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+          <input id="start" type="datetime-local" formControlName="start" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg"
+                 [attr.aria-invalid]="appointmentForm.get('start')?.invalid && appointmentForm.get('start')?.touched"
+                 [attr.aria-describedby]="appointmentForm.get('start')?.invalid && appointmentForm.get('start')?.touched ? 'start-error' : null">
+        <div id="start-error" *ngIf="appointmentForm.get('start')?.invalid && appointmentForm.get('start')?.touched" class="mt-1 text-sm text-red-600">
+          La fecha y hora de inicio son obligatorias.
+        </div>
       </div>
 
       <div>
@@ -100,3 +120,4 @@
   (onConfirm)="confirmDelete()"
   (onCancel)="cancelDelete()">
 </app-confirmation-dialog>
+

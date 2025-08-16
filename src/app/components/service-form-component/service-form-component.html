@@ -12,19 +12,34 @@
       <div>
         <label for="name" class="text-sm font-medium text-gray-700">Nombre del Servicio</label>
           <input id="name" type="text" formControlName="name" placeholder="Ej: Consulta Inicial"
-                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                 [attr.aria-invalid]="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched"
+                 [attr.aria-describedby]="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched ? 'service-name-error' : null">
+        <div id="service-name-error" *ngIf="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched" class="mt-1 text-sm text-red-600">
+          El nombre es obligatorio.
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label for="duration" class="text-sm font-medium text-gray-700">Duración (min)</label>
             <input id="duration" type="number" formControlName="duration"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   [attr.aria-invalid]="serviceForm.get('duration')?.invalid && serviceForm.get('duration')?.touched"
+                   [attr.aria-describedby]="serviceForm.get('duration')?.invalid && serviceForm.get('duration')?.touched ? 'duration-error' : null">
+          <div id="duration-error" *ngIf="serviceForm.get('duration')?.invalid && serviceForm.get('duration')?.touched" class="mt-1 text-sm text-red-600">
+            {{ serviceForm.get('duration')?.errors?.['min'] ? 'Debe ser mayor o igual a 1.' : 'La duración es obligatoria.' }}
+          </div>
         </div>
         <div>
           <label for="price" class="text-sm font-medium text-gray-700">Precio</label>
             <input id="price" type="number" formControlName="price"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   [attr.aria-invalid]="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched"
+                   [attr.aria-describedby]="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched ? 'price-error' : null">
+          <div id="price-error" *ngIf="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched" class="mt-1 text-sm text-red-600">
+            {{ serviceForm.get('price')?.errors?.['min'] ? 'Debe ser mayor o igual a 0.' : 'El precio es obligatorio.' }}
+          </div>
         </div>
       </div>
 
@@ -32,7 +47,12 @@
         <label for="bufferTime" class="text-sm font-medium text-gray-700">Tiempo Búfer (min)</label>
         <p class="text-xs text-gray-500">Tiempo extra no visible para el cliente (antes/después de la cita).</p>
           <input id="bufferTime" type="number" formControlName="bufferTime"
-                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                 [attr.aria-invalid]="serviceForm.get('bufferTime')?.invalid && serviceForm.get('bufferTime')?.touched"
+                 [attr.aria-describedby]="serviceForm.get('bufferTime')?.invalid && serviceForm.get('bufferTime')?.touched ? 'buffer-error' : null">
+        <div id="buffer-error" *ngIf="serviceForm.get('bufferTime')?.invalid && serviceForm.get('bufferTime')?.touched" class="mt-1 text-sm text-red-600">
+          {{ serviceForm.get('bufferTime')?.errors?.['min'] ? 'Debe ser mayor o igual a 0.' : 'El tiempo búfer es obligatorio.' }}
+        </div>
       </div>
 
       <div class="flex justify-end pt-4 space-x-4">
@@ -44,7 +64,8 @@
                 [ngClass]="{
                   'bg-primary hover:bg-opacity-90': serviceForm.valid,
                   'bg-gray-400 cursor-not-allowed': !serviceForm.valid
-                }">
+                }"
+                [disabled]="serviceForm.invalid">
           Guardar
         </button>
       </div>
