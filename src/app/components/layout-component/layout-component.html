@@ -84,8 +84,8 @@
 
     <!-- Navegación Principal -->
     <nav
-      class="flex flex-col flex-grow"
-      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-2'] : ['items-start', 'space-y-2']"
+      class="flex flex-col flex-grow space-y-2"
+      [ngClass]="isSidebarCollapsed ? 'items-center' : 'items-start'"
     >
       <!-- Dashboard -->
       <div>
@@ -199,8 +199,8 @@
 
     <!-- Navegación Inferior -->
     <div
-      class="flex flex-col"
-      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-2'] : ['items-start', 'space-y-2']"
+      class="flex flex-col space-y-2"
+      [ngClass]="isSidebarCollapsed ? 'items-center' : 'items-start'"
     >
       <div>
         <a

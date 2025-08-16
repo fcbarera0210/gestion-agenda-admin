@@ -26,9 +26,9 @@ aside.collapsed .logo-container {
   @apply justify-center px-0 h-12 rounded-xl;
 }
 
-/* Uniform icon spacing */
+/* Uniform icon size (1.5rem) */
 .nav-icon {
-  @apply w-8 h-8 p-0 m-0;
+  @apply w-6 h-6 p-0 m-0;
 }
 
 /* Ensure left alignment when expanded */
