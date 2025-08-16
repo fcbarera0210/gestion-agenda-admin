@@ -57,8 +57,6 @@ table {
   color: var(--text-color) !important;
 }
 
-.dark-theme mwl-calendar-week-view,
-.dark-theme mwl-calendar-week-view * {
-  background-color: var(--calendar-bg) !important;
-  color: var(--text-color) !important;
+.cal-event {
+  color: #000 !important;
 }
