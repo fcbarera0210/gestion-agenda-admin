@@ -85,7 +85,7 @@
     <!-- Navegación Principal -->
     <nav
       class="flex flex-col flex-grow"
-      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-4'] : ['items-start', 'space-y-2']"
+      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-2'] : ['items-start', 'space-y-2']"
     >
       <!-- Dashboard -->
       <div>
@@ -95,7 +95,7 @@
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeSidebar()"
         [attr.title]="isSidebarCollapsed ? 'Dashboard' : null"
-        class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+        class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
       >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +122,7 @@
           routerLinkActive="bg-primary text-white"
           (click)="closeSidebar()"
           [attr.title]="isSidebarCollapsed ? 'Servicios' : null"
-          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+          class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -149,7 +149,7 @@
           routerLinkActive="bg-primary text-white"
           (click)="closeSidebar()"
           [attr.title]="isSidebarCollapsed ? 'Clientes' : null"
-          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+          class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +176,7 @@
           routerLinkActive="bg-primary text-white"
           (click)="closeSidebar()"
           [attr.title]="isSidebarCollapsed ? 'Agenda' : null"
-          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+          class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -200,7 +200,7 @@
     <!-- Navegación Inferior -->
     <div
       class="flex flex-col"
-      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-4'] : ['items-start', 'space-y-2']"
+      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-2'] : ['items-start', 'space-y-2']"
     >
       <div>
         <a
@@ -208,7 +208,7 @@
           routerLinkActive="bg-primary text-white"
           (click)="closeSidebar()"
           [attr.title]="isSidebarCollapsed ? 'Ajustes' : null"
-          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+          class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +237,7 @@
         <button
           (click)="toggleTheme(); closeSidebar()"
           [attr.title]="isSidebarCollapsed ? 'Cambiar tema' : null"
-          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+          class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +261,7 @@
         <button
           (click)="logout(); closeSidebar()"
           [attr.title]="isSidebarCollapsed ? 'Cerrar sesión' : null"
-          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200 gap-3"
+          class="nav-link flex items-center justify-start w-full h-10 px-3 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             class="nav-icon"
