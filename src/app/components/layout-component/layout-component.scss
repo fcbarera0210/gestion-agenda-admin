@@ -11,7 +11,7 @@ aside .nav-link {
 
 aside.collapsed {
   width: 5rem;
-  padding: 1rem 0;
+  padding: 1rem;
 }
 
 aside.collapsed .nav-text {
@@ -24,6 +24,11 @@ aside.collapsed .nav-link {
 
 aside.collapsed .logo-container {
   @apply justify-center bg-primary px-0 h-20 rounded-xl;
+}
+
+/* Uniform icon spacing */
+.nav-icon {
+  @apply w-6 h-6 p-2 m-1;
 }
 
 @media (min-width: 768px) {
