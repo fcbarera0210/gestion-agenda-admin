@@ -39,3 +39,26 @@ table {
   background-color: var(--calendar-bg) !important;
   color: var(--text-color) !important;
 }
+
+.dark-theme .bg-white,
+.dark-theme .bg-gray-50,
+.dark-theme .bg-gray-100,
+.dark-theme .bg-gray-200,
+.dark-theme .bg-gray-300 {
+  background-color: var(--card-bg) !important;
+}
+
+.dark-theme .text-gray-800,
+.dark-theme .text-gray-700,
+.dark-theme .text-gray-600,
+.dark-theme .text-gray-500,
+.dark-theme .text-gray-400,
+.dark-theme .text-gray-900 {
+  color: var(--text-color) !important;
+}
+
+.dark-theme mwl-calendar-week-view,
+.dark-theme mwl-calendar-week-view * {
+  background-color: var(--calendar-bg) !important;
+  color: var(--text-color) !important;
+}
