@@ -1,5 +1,7 @@
 <div class="flex h-screen bg-[var(--bg-color)]">
-  <aside class="flex flex-col items-center w-20 py-8 space-y-8 bg-[var(--card-bg)] shadow-md">
+  <div *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden"></div>
+
+  <aside [class.translate-x-0]="isSidebarOpen" class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-transform -translate-x-full md:relative md:translate-x-0 md:w-20 md:p-8 md:items-center">
     <!-- Logo -->
     <a routerLink="/dashboard" class="p-2 text-white rounded-lg bg-primary">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -7,24 +9,24 @@
       </svg>
     </a>
 
-    <!-- Navegación Principal (ocupa el espacio disponible) -->
-    <nav class="flex flex-col items-center flex-grow space-y-2">
-      <!-- Enlace Dashboard -->
+    <!-- Navegación Principal -->
+    <nav class="flex flex-col items-start flex-grow space-y-2 md:items-center">
+      <!-- Dashboard -->
       <div class="relative group">
-        <a routerLink="/dashboard" 
-           routerLinkActive="bg-primary text-white" 
+        <a routerLink="/dashboard"
+           routerLinkActive="bg-primary text-white"
            [routerLinkActiveOptions]="{exact: true}"
            class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         </a>
         <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap -translate-y-1/2 top-1/2">
           Dashboard
         </div>
       </div>
 
-      <!-- Enlace Servicios -->
+      <!-- Servicios -->
       <div class="relative group">
-        <a routerLink="/services" 
+        <a routerLink="/services"
            routerLinkActive="bg-primary text-white"
            class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" /></svg>
@@ -34,9 +36,9 @@
         </div>
       </div>
 
-      <!-- Enlace Clientes -->
+      <!-- Clientes -->
       <div class="relative group">
-        <a routerLink="/clients" 
+        <a routerLink="/clients"
            routerLinkActive="bg-primary text-white"
            class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -48,8 +50,9 @@
         </div>
       </div>
 
+      <!-- Agenda -->
       <div class="relative group">
-        <a routerLink="/agenda" 
+        <a routerLink="/agenda"
           routerLinkActive="bg-primary text-white"
           class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -62,8 +65,8 @@
       </div>
     </nav>
 
-    <!-- Navegación Inferior (Ajustes) -->
-    <div class="flex flex-col items-center space-y-2">
+    <!-- Navegación Inferior -->
+    <div class="flex flex-col items-start space-y-2 md:items-center">
       <div class="relative group">
         <a routerLink="/settings"
            routerLinkActive="bg-primary text-white"
@@ -79,8 +82,7 @@
       </div>
 
       <div class="relative group">
-        <button (click)="toggleTheme()"
-                class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200">
+        <button (click)="toggleTheme()" class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364-6.364l.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
           </svg>
@@ -91,8 +93,7 @@
       </div>
 
       <div class="relative group">
-        <button (click)="logout()"
-                class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200">
+        <button (click)="logout()" class="flex items-center justify-center w-12 h-12 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
         </button>
         <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap -translate-y-1/2 top-1/2">
@@ -102,9 +103,24 @@
     </div>
   </aside>
 
-  <main class="flex-1 p-8 overflow-y-auto">
-    <router-outlet></router-outlet>
-  </main>
+  <div class="flex flex-col flex-1">
+    <header class="flex items-center justify-between p-4 bg-[var(--card-bg)] shadow-md md:hidden">
+      <button (click)="toggleSidebar()" class="text-[var(--text-color)]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <a routerLink="/dashboard" class="p-2 text-white rounded-lg bg-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </a>
+    </header>
+
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
 </div>
 
 <app-toast-container></app-toast-container>

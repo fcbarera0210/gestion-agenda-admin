@@ -20,9 +20,9 @@
 </app-confirmation-dialog>
 
 <div class="space-y-8">
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-bold text-gray-800">Gestión de Servicios</h1>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Servicios</h1>
       <p class="mt-1 text-gray-600">Añade, edita y organiza los servicios que ofreces a tus clientes.</p>
     </div>
     <button (click)="addNewService()" class="px-4 py-2 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
@@ -30,11 +30,11 @@
     </button>
   </div>
 
-  <div class="p-6 bg-white rounded-lg shadow">
+  <div class="p-4 md:p-6 bg-white rounded-lg shadow">
     <h2 class="text-xl font-semibold text-gray-700">Mis Servicios</h2>
     <div class="mt-4">
       <ng-container *ngIf="services$ | async as services; else loading">
-        <div *ngIf="services.length > 0; else empty" class="space-y-4">
+        <div *ngIf="services.length > 0; else empty" class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div *ngFor="let service of services" class="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <h3 class="font-semibold text-gray-800">{{ service.name }}</h3>
