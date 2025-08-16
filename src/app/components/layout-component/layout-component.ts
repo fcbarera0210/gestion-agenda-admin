@@ -15,13 +15,14 @@ import { ThemeService } from '../../services/theme-service';
 export class LayoutComponent {
   isSidebarOpen = false;
   isSidebarCollapsed = false;
+  isMobile = window.innerWidth < 768;
   constructor(
     private authService: AuthService,
     private router: Router,
     private themeService: ThemeService
   ) {
     this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd && window.innerWidth < 768) {
+      if (event instanceof NavigationEnd && this.isMobile) {
         this.isSidebarOpen = false;
       }
     });
@@ -42,7 +43,9 @@ export class LayoutComponent {
   }
 
   toggleCollapse() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (!this.isMobile) {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    }
   }
 
   closeSidebar() {
@@ -51,8 +54,11 @@ export class LayoutComponent {
 
   @HostListener('window:resize')
   onResize() {
-    if (window.innerWidth >= 768) {
+    this.isMobile = window.innerWidth < 768;
+    if (!this.isMobile) {
       this.isSidebarOpen = false;
+    } else {
+      this.isSidebarCollapsed = false;
     }
   }
 }
