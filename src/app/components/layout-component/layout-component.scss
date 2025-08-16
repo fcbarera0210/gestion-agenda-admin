@@ -40,6 +40,9 @@ aside:not(.collapsed) .nav-link {
   aside.collapsed:hover {
     width: 16rem;
   }
+  aside.collapsed:hover nav {
+    @apply items-start;
+  }
   aside.collapsed:hover .nav-text {
     display: inline;
   }
