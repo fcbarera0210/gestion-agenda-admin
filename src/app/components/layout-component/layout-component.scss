@@ -1,1 +1,37 @@
 /* Responsive styling handled with Tailwind utility classes. */
+
+aside.collapsed {
+  width: 5rem;
+  padding: 1rem;
+}
+
+aside.collapsed .nav-text {
+  display: none;
+}
+
+aside.collapsed .nav-link {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+aside.collapsed .logo-container {
+  @apply justify-center bg-primary px-0 h-20 rounded-xl;
+}
+
+@media (min-width: 768px) {
+  aside.collapsed:hover {
+    width: max-content;
+  }
+  aside.collapsed:hover .nav-text {
+    display: inline;
+  }
+  aside.collapsed:hover .nav-link {
+    justify-content: flex-start;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  aside.collapsed:hover .logo-container {
+    @apply justify-start bg-transparent px-4 h-12;
+  }
+}

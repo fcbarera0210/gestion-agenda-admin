@@ -15,6 +15,7 @@ import { ThemeService } from '../../services/theme-service';
 })
 export class LayoutComponent {
   isSidebarOpen = false;
+  isSidebarCollapsed = false;
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -33,5 +34,9 @@ export class LayoutComponent {
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  toggleCollapse() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 }

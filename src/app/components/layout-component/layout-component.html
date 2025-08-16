@@ -1,125 +1,305 @@
-<div class="flex h-screen bg-[var(--bg-color)]" [class.overflow-hidden]="isSidebarOpen">
-  <div *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden"></div>
+<div
+  class="flex h-screen bg-[var(--bg-color)]"
+  [class.overflow-hidden]="isSidebarOpen"
+>
+  <div
+    *ngIf="isSidebarOpen"
+    (click)="toggleSidebar()"
+    class="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden"
+  ></div>
 
-  <aside [class.translate-x-0]="isSidebarOpen" class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-transform -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-20 md:p-8 md:items-center md:overflow-y-auto md:overflow-x-visible">
-    <!-- Logo -->
-    <a routerLink="/dashboard" class="p-2 text-white rounded-lg bg-primary">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-    </a>
+  <aside
+    [class.translate-x-0]="isSidebarOpen"
+    [class.collapsed]="isSidebarCollapsed"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-max md:p-4 md:overflow-y-auto md:overflow-x-hidden group"
+  >
+    <!-- Logo y controles de tamaño -->
+    <div
+      class="logo-container relative flex items-center w-full h-12 px-4"
+    >
+      <a
+        routerLink="/dashboard"
+        class="logo flex items-center justify-center w-6 h-6 rounded-full bg-white text-primary"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <circle cx="12" cy="12" r="9" stroke-width="2" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 7a5 5 0 105 5h-4"
+          />
+        </svg>
+      </a>
+      <button
+        *ngIf="!isSidebarCollapsed"
+        (click)="toggleCollapse()"
+        class="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center w-6 h-6 text-[var(--text-color)] rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
+      <button
+        *ngIf="isSidebarCollapsed"
+        (click)="toggleCollapse()"
+        class="absolute right-0 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center justify-center w-6 h-6 text-[var(--text-color)] rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </button>
+    </div>
 
     <!-- Navegación Principal -->
-    <nav class="flex flex-col items-start flex-grow space-y-2 md:items-center">
+    <nav class="flex flex-col items-start flex-grow space-y-2">
       <!-- Dashboard -->
-      <div class="relative group">
-        <a routerLink="/dashboard"
-           routerLinkActive="bg-primary text-white"
-           [routerLinkActiveOptions]="{exact: true}"
-           class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-          <span class="ml-3 md:hidden">Dashboard</span>
+      <div>
+        <a
+          routerLink="/dashboard"
+          routerLinkActive="bg-primary text-white"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+          <span class="ml-3 nav-text">Dashboard</span>
         </a>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Dashboard
-        </div>
       </div>
 
       <!-- Servicios -->
-      <div class="relative group">
-        <a routerLink="/services"
-           routerLinkActive="bg-primary text-white"
-           class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" /></svg>
-          <span class="ml-3 md:hidden">Servicios</span>
+      <div>
+        <a
+          routerLink="/services"
+          routerLinkActive="bg-primary text-white"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
+            />
+          </svg>
+          <span class="ml-3 nav-text">Servicios</span>
         </a>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Servicios
-        </div>
       </div>
 
       <!-- Clientes -->
-      <div class="relative group">
-        <a routerLink="/clients"
-           routerLinkActive="bg-primary text-white"
-           class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      <div>
+        <a
+          routerLink="/clients"
+          routerLinkActive="bg-primary text-white"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
           </svg>
-          <span class="ml-3 md:hidden">Clientes</span>
+          <span class="ml-3 nav-text">Clientes</span>
         </a>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Clientes
-        </div>
       </div>
 
       <!-- Agenda -->
-      <div class="relative group">
-        <a routerLink="/agenda"
+      <div>
+        <a
+          routerLink="/agenda"
           routerLinkActive="bg-primary text-white"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
-          <span class="ml-3 md:hidden">Agenda</span>
+          <span class="ml-3 nav-text">Agenda</span>
         </a>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Agenda
-        </div>
       </div>
     </nav>
 
     <!-- Navegación Inferior -->
-    <div class="flex flex-col items-start space-y-2 md:items-center">
-      <div class="relative group">
-        <a routerLink="/settings"
-           routerLinkActive="bg-primary text-white"
-           class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <div class="flex flex-col items-start space-y-2">
+      <div>
+        <a
+          routerLink="/settings"
+          routerLinkActive="bg-primary text-white"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
-          <span class="ml-3 md:hidden">Ajustes</span>
+          <span class="ml-3 nav-text">Ajustes</span>
         </a>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Ajustes
-        </div>
       </div>
 
-      <div class="relative group">
-        <button (click)="toggleTheme()" class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364-6.364l.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+      <div>
+        <button
+          (click)="toggleTheme()"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364-6.364l.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"
+            />
           </svg>
-          <span class="ml-3 md:hidden">Cambiar tema</span>
+          <span class="ml-3 nav-text">Cambiar tema</span>
         </button>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Cambiar tema
-        </div>
       </div>
 
-      <div class="relative group">
-        <button (click)="logout()" class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200 md:w-12 md:px-0 md:justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-          <span class="ml-3 md:hidden">Cerrar Sesión</span>
+      <div>
+        <button
+          (click)="logout()"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            ></path>
+          </svg>
+          <span class="ml-3 nav-text">Cerrar Sesión</span>
         </button>
-        <div class="absolute left-full ml-2 px-2 py-1 text-sm text-white bg-gray-800 rounded-md whitespace-nowrap -translate-y-1/2 top-1/2 hidden z-50 md:group-hover:block">
-          Cerrar Sesión
-        </div>
       </div>
+
     </div>
   </aside>
 
   <div class="flex flex-col flex-1">
-    <header class="flex items-center justify-between p-4 bg-[var(--card-bg)] shadow-md md:hidden">
-      <button (click)="toggleSidebar()" class="text-[var(--text-color)]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    <header
+      class="flex items-center justify-between p-4 bg-[var(--card-bg)] shadow-md md:hidden"
+    >
+      <button (click)="toggleSidebar()" class="p-2 text-[var(--text-color)]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
-      <a routerLink="/dashboard" class="p-2 text-white rounded-lg bg-primary">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      <a
+        routerLink="/dashboard"
+        class="flex items-center justify-center w-6 h-6 text-white rounded-lg bg-primary"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <circle cx="12" cy="12" r="9" stroke-width="2" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 7a5 5 0 105 5h-4"
+          />
         </svg>
       </a>
     </header>
