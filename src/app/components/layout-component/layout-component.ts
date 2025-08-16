@@ -14,6 +14,7 @@ import { ThemeService } from '../../services/theme-service';
   styleUrls: ['./layout-component.scss']
 })
 export class LayoutComponent {
+  isSidebarOpen = false;
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -28,5 +29,9 @@ export class LayoutComponent {
 
   toggleTheme() {
     this.themeService.toggleTheme();
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 }

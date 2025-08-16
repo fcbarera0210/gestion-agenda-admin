@@ -25,6 +25,9 @@ export class ServicesComponent implements OnInit {
 
   historyToShow$!: Observable<HistoryEntry[]>;
 
+  // Control de opciones en mobile
+  optionsServiceId: string | null = null;
+
   constructor(
     private servicesService: ServicesService,
     private toastService: ToastService 
@@ -107,5 +110,9 @@ export class ServicesComponent implements OnInit {
   closeHistoryModal() {
     this.showHistoryModal = false;
     this.selectedServiceIdForHistory = null;
+  }
+
+  toggleOptions(serviceId: string) {
+    this.optionsServiceId = this.optionsServiceId === serviceId ? null : serviceId;
   }
 }

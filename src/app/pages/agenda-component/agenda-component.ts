@@ -36,6 +36,7 @@ export class AgendaComponent implements OnInit {
   dayStartHour = 8;
   dayEndHour = 20;
   isCalendarReady = false;
+  isMobile = false;
 
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
@@ -58,8 +59,14 @@ export class AgendaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.updateIsMobile();
+    window.addEventListener('resize', () => this.updateIsMobile());
     this.loadWorkSchedule();
     this.loadEvents();
+  }
+
+  updateIsMobile(): void {
+    this.isMobile = window.innerWidth < 768;
   }
 
   // --- Carga de Datos ---
@@ -162,9 +169,9 @@ export class AgendaComponent implements OnInit {
 
   // --- Navegación del Calendario ---
 
-  previousWeek(): void { this.viewDate = subDays(this.viewDate, 7); }
+  previousWeek(): void { this.viewDate = subDays(this.viewDate, this.isMobile ? 1 : 7); }
   today(): void { this.viewDate = new Date(); }
-  nextWeek(): void { this.viewDate = addDays(this.viewDate, 7); }
+  nextWeek(): void { this.viewDate = addDays(this.viewDate, this.isMobile ? 1 : 7); }
 
   // --- Manejadores de Eventos del Calendario ---
 
