@@ -9,11 +9,22 @@ aside.collapsed .nav-text {
   display: none;
 }
 
+aside.collapsed .nav-link {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 @media (min-width: 768px) {
   aside.collapsed:hover {
     width: max-content;
   }
   aside.collapsed:hover .nav-text {
     display: inline;
+  }
+  aside.collapsed:hover .nav-link {
+    justify-content: flex-start;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

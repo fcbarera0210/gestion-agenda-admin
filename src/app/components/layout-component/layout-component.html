@@ -11,13 +11,13 @@
   <aside
     [class.translate-x-0]="isSidebarOpen"
     [class.collapsed]="isSidebarCollapsed"
-    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-max md:p-4 md:overflow-y-auto md:overflow-x-hidden"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-max md:p-4 md:overflow-y-auto md:overflow-x-hidden group"
   >
-    <!-- Logo y botón de minimizar -->
-    <div class="flex items-center justify-between w-full">
+    <!-- Logo y controles de tamaño -->
+    <div class="relative flex items-center w-full">
       <a
         routerLink="/dashboard"
-        class="flex items-center justify-center w-6 h-6 text-white rounded-lg bg-primary"
+        class="flex items-center justify-center w-6 h-6 mx-auto text-white rounded-lg bg-primary"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +38,7 @@
       <button
         *ngIf="!isSidebarCollapsed"
         (click)="toggleCollapse()"
-        class="hidden md:flex p-2 text-[var(--text-color)] rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
+        class="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center w-6 h-6 text-[var(--text-color)] rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -55,6 +55,26 @@
           />
         </svg>
       </button>
+      <button
+        *ngIf="isSidebarCollapsed"
+        (click)="toggleCollapse()"
+        class="absolute right-0 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center justify-center w-6 h-6 text-[var(--text-color)] rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </button>
     </div>
 
     <!-- Navegación Principal -->
@@ -65,7 +85,7 @@
           routerLink="/dashboard"
           routerLinkActive="bg-primary text-white"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +110,7 @@
         <a
           routerLink="/services"
           routerLinkActive="bg-primary text-white"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -115,7 +135,7 @@
         <a
           routerLink="/clients"
           routerLinkActive="bg-primary text-white"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +160,7 @@
         <a
           routerLink="/agenda"
           routerLinkActive="bg-primary text-white"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -167,7 +187,7 @@
         <a
           routerLink="/settings"
           routerLinkActive="bg-primary text-white"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -195,7 +215,7 @@
       <div>
         <button
           (click)="toggleTheme()"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +238,7 @@
       <div>
         <button
           (click)="logout()"
-          class="flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200"
+          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200"
         >
           <svg
             class="w-6 h-6"
