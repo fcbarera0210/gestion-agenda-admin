@@ -9,9 +9,8 @@
   ></div>
 
   <aside
-    [class.translate-x-0]="isSidebarOpen"
-    [class.collapsed]="isSidebarCollapsed"
-    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-max md:p-4 md:overflow-y-auto md:overflow-x-hidden group"
+    [ngClass]="{ 'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen, 'collapsed': isSidebarCollapsed }"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all overflow-y-auto md:relative md:translate-x-0 md:w-64 md:p-4 md:overflow-y-auto md:overflow-x-hidden group"
   >
     <!-- Logo y controles de tamaño -->
     <div
@@ -87,6 +86,7 @@
           routerLink="/dashboard"
           routerLinkActive="bg-primary text-white"
           [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
@@ -112,6 +112,7 @@
         <a
           routerLink="/services"
           routerLinkActive="bg-primary text-white"
+          (click)="closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
@@ -137,6 +138,7 @@
         <a
           routerLink="/clients"
           routerLinkActive="bg-primary text-white"
+          (click)="closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
@@ -162,6 +164,7 @@
         <a
           routerLink="/agenda"
           routerLinkActive="bg-primary text-white"
+          (click)="closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
@@ -189,6 +192,7 @@
         <a
           routerLink="/settings"
           routerLinkActive="bg-primary text-white"
+          (click)="closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
@@ -216,7 +220,7 @@
 
       <div>
         <button
-          (click)="toggleTheme()"
+          (click)="toggleTheme(); closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
         >
           <svg
@@ -239,7 +243,7 @@
 
       <div>
         <button
-          (click)="logout()"
+          (click)="logout(); closeSidebar()"
           class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200"
         >
           <svg
