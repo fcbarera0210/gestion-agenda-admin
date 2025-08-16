@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd, Router } from '@angular/router';
 import { ToastContainerComponent } from '../toast-container-component/toast-container-component';
 import { AuthService } from '../../services/auth-service';
-import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme-service';
 
 @Component({
@@ -20,7 +19,13 @@ export class LayoutComponent {
     private authService: AuthService,
     private router: Router,
     private themeService: ThemeService
-  ) {}
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd && window.innerWidth < 768) {
+        this.isSidebarOpen = false;
+      }
+    });
+  }
 
   logout() {
     this.authService.logout()
@@ -38,5 +43,16 @@ export class LayoutComponent {
 
   toggleCollapse() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    if (window.innerWidth >= 768) {
+      this.isSidebarOpen = false;
+    }
   }
 }

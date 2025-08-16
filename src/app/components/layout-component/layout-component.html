@@ -9,9 +9,8 @@
   ></div>
 
   <aside
-    [class.translate-x-0]="isSidebarOpen"
-    [class.collapsed]="isSidebarCollapsed"
-    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-max md:p-4 md:overflow-y-auto md:overflow-x-hidden group"
+    [ngClass]="{ 'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen, 'collapsed': isSidebarCollapsed }"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all overflow-y-auto md:relative md:translate-x-0 md:w-64 md:p-4 md:overflow-y-auto md:overflow-x-hidden group"
   >
     <!-- Logo y controles de tamaño -->
     <div
@@ -80,18 +79,23 @@
     </div>
 
     <!-- Navegación Principal -->
-    <nav class="flex flex-col items-start flex-grow space-y-2">
+    <nav
+      class="flex flex-col flex-grow"
+      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-4'] : ['items-start', 'space-y-2']"
+    >
       <!-- Dashboard -->
       <div>
-        <a
-          routerLink="/dashboard"
-          routerLinkActive="bg-primary text-white"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
-        >
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="bg-primary text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeSidebar()"
+        [attr.title]="isSidebarCollapsed ? 'Dashboard' : null"
+        class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
+      >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -103,7 +107,7 @@
               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
             />
           </svg>
-          <span class="ml-3 nav-text">Dashboard</span>
+          <span class="nav-text">Dashboard</span>
         </a>
       </div>
 
@@ -112,11 +116,13 @@
         <a
           routerLink="/services"
           routerLinkActive="bg-primary text-white"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          (click)="closeSidebar()"
+          [attr.title]="isSidebarCollapsed ? 'Servicios' : null"
+          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -128,7 +134,7 @@
               d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
             />
           </svg>
-          <span class="ml-3 nav-text">Servicios</span>
+          <span class="nav-text">Servicios</span>
         </a>
       </div>
 
@@ -137,11 +143,13 @@
         <a
           routerLink="/clients"
           routerLinkActive="bg-primary text-white"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          (click)="closeSidebar()"
+          [attr.title]="isSidebarCollapsed ? 'Clientes' : null"
+          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -153,7 +161,7 @@
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
-          <span class="ml-3 nav-text">Clientes</span>
+          <span class="nav-text">Clientes</span>
         </a>
       </div>
 
@@ -162,11 +170,13 @@
         <a
           routerLink="/agenda"
           routerLinkActive="bg-primary text-white"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          (click)="closeSidebar()"
+          [attr.title]="isSidebarCollapsed ? 'Agenda' : null"
+          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -178,22 +188,27 @@
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <span class="ml-3 nav-text">Agenda</span>
+          <span class="nav-text">Agenda</span>
         </a>
       </div>
     </nav>
 
     <!-- Navegación Inferior -->
-    <div class="flex flex-col items-start space-y-2">
+    <div
+      class="flex flex-col"
+      [ngClass]="isSidebarCollapsed ? ['items-center', 'space-y-4'] : ['items-start', 'space-y-2']"
+    >
       <div>
         <a
           routerLink="/settings"
           routerLinkActive="bg-primary text-white"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          (click)="closeSidebar()"
+          [attr.title]="isSidebarCollapsed ? 'Ajustes' : null"
+          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -210,18 +225,19 @@
               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          <span class="ml-3 nav-text">Ajustes</span>
+          <span class="nav-text">Ajustes</span>
         </a>
       </div>
 
       <div>
         <button
-          (click)="toggleTheme()"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200"
+          (click)="toggleTheme(); closeSidebar()"
+          [attr.title]="isSidebarCollapsed ? 'Cambiar tema' : null"
+          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -233,17 +249,18 @@
               d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364-6.364l.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"
             />
           </svg>
-          <span class="ml-3 nav-text">Cambiar tema</span>
+          <span class="nav-text">Cambiar tema</span>
         </button>
       </div>
 
       <div>
         <button
-          (click)="logout()"
-          class="nav-link flex items-center w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200"
+          (click)="logout(); closeSidebar()"
+          [attr.title]="isSidebarCollapsed ? 'Cerrar sesión' : null"
+          class="nav-link flex items-center justify-start w-full h-12 px-4 text-[var(--text-color)] rounded-xl hover:bg-red-500 hover:text-white transition-colors duration-200 gap-3"
         >
           <svg
-            class="w-6 h-6"
+            class="nav-icon"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -255,7 +272,7 @@
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             ></path>
           </svg>
-          <span class="ml-3 nav-text">Cerrar Sesión</span>
+          <span class="nav-text">Cerrar Sesión</span>
         </button>
       </div>
 
