@@ -28,7 +28,12 @@ aside.collapsed .logo-container {
 
 /* Uniform icon spacing */
 .nav-icon {
-  @apply w-6 h-6 p-1 m-0;
+  @apply w-8 h-8 p-0 m-0;
+}
+
+/* Ensure left alignment when expanded */
+aside:not(.collapsed) .nav-link {
+  @apply justify-start;
 }
 
 @media (min-width: 768px) {
