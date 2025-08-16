@@ -63,7 +63,7 @@
                 <button (click)="toggleOptions(client.id!)" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6a1 1 0 110-2 1 1 0 010 2zm0 6a1 1 0 110-2 1 1 0 010 2zm0 6a1 1 0 110-2 1 1 0 010 2z" /></svg>
                 </button>
-                <div *ngIf="optionsClientId === client.id" class="absolute right-0 mt-2 flex flex-col space-y-1 p-2 bg-white dark:bg-gray-800 rounded-md shadow-lg">
+                <div *ngIf="optionsClientId === client.id" class="absolute right-0 mt-2 flex flex-col space-y-1 p-2 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
                   <button (click)="openHistoryModal(client.id!)" title="Ver Historial" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700 hover:text-primary dark:hover:text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </button>
