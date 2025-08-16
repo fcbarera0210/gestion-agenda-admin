@@ -100,3 +100,11 @@ table {
 .cal-event {
   color: #000 !important;
 }
+
+.client-avatar {
+  background-color: #e5e7eb;
+}
+
+.dark-theme .client-avatar {
+  background-color: #374151 !important;
+}
