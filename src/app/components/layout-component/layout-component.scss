@@ -1,8 +1,17 @@
 /* Responsive styling handled with Tailwind utility classes. */
 
+aside {
+  transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+aside .logo-container,
+aside .nav-link {
+  transition: all 0.3s ease-in-out;
+}
+
 aside.collapsed {
   width: 5rem;
-  padding: 1rem;
+  padding: 1rem 0;
 }
 
 aside.collapsed .nav-text {
@@ -10,9 +19,7 @@ aside.collapsed .nav-text {
 }
 
 aside.collapsed .nav-link {
-  justify-content: center;
-  padding-left: 0;
-  padding-right: 0;
+  @apply justify-center w-12 h-12 p-0 mx-auto;
 }
 
 aside.collapsed .logo-container {
@@ -21,15 +28,13 @@ aside.collapsed .logo-container {
 
 @media (min-width: 768px) {
   aside.collapsed:hover {
-    width: max-content;
+    width: 16rem;
   }
   aside.collapsed:hover .nav-text {
     display: inline;
   }
   aside.collapsed:hover .nav-link {
-    justify-content: flex-start;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    @apply w-full justify-start p-4 mx-0;
   }
   aside.collapsed:hover .logo-container {
     @apply justify-start bg-transparent px-4 h-12;
