@@ -11,7 +11,7 @@ aside.collapsed .nav-text {
 
 @media (min-width: 768px) {
   aside.collapsed:hover {
-    width: 16rem;
+    width: max-content;
   }
   aside.collapsed:hover .nav-text {
     display: inline;

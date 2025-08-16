@@ -11,11 +11,14 @@
   <aside
     [class.translate-x-0]="isSidebarOpen"
     [class.collapsed]="isSidebarCollapsed"
-    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-64 md:p-4 md:overflow-y-auto md:overflow-x-hidden"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col items-start w-64 h-screen p-4 space-y-8 bg-[var(--card-bg)] shadow-md transform transition-all -translate-x-full overflow-y-auto md:relative md:translate-x-0 md:w-max md:p-4 md:overflow-y-auto md:overflow-x-hidden"
   >
     <!-- Logo y botón de minimizar -->
     <div class="flex items-center justify-between w-full">
-      <a routerLink="/dashboard" class="p-2 text-white rounded-lg bg-primary">
+      <a
+        routerLink="/dashboard"
+        class="flex items-center justify-center w-6 h-6 text-white rounded-lg bg-primary"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="w-6 h-6"
@@ -24,32 +27,32 @@
           stroke="currentColor"
         >
           <circle cx="12" cy="12" r="9" stroke-width="2" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7a5 5 0 105 5h-4" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 7a5 5 0 105 5h-4"
+          />
         </svg>
       </a>
       <button
+        *ngIf="!isSidebarCollapsed"
         (click)="toggleCollapse()"
         class="hidden md:flex p-2 text-[var(--text-color)] rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
       >
         <svg
-          *ngIf="!isSidebarCollapsed"
           xmlns="http://www.w3.org/2000/svg"
           class="w-6 h-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        <svg
-          *ngIf="isSidebarCollapsed"
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-6 h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
     </div>
@@ -257,7 +260,10 @@
           />
         </svg>
       </button>
-      <a routerLink="/dashboard" class="p-2 text-white rounded-lg bg-primary">
+      <a
+        routerLink="/dashboard"
+        class="flex items-center justify-center w-6 h-6 text-white rounded-lg bg-primary"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="w-6 h-6"
@@ -266,7 +272,12 @@
           stroke="currentColor"
         >
           <circle cx="12" cy="12" r="9" stroke-width="2" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7a5 5 0 105 5h-4" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 7a5 5 0 105 5h-4"
+          />
         </svg>
       </a>
     </header>
