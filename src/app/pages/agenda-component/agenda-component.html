@@ -14,13 +14,14 @@
     </div>
   </div>
 
-  <div class="h-[70vh] overflow-y-auto">
+  <div class="h-[60vh] md:h-[70vh] overflow-y-auto">
     <mwl-calendar-week-view
+      class="hidden md:block"
       *ngIf="isCalendarReady"
       [viewDate]="viewDate"
       [events]="events"
       [weekStartsOn]="1"
-      [locale]="locale" 
+      [locale]="locale"
       [hourSegments]="2"
       [dayStartHour]="dayStartHour"
       [dayEndHour]="dayEndHour"
@@ -28,6 +29,18 @@
       (hourSegmentClicked)="onHourSegmentClicked($event)"
       (eventClicked)="handleEventClicked($event)">
     </mwl-calendar-week-view>
+
+    <mwl-calendar-day-view
+      class="md:hidden"
+      *ngIf="isCalendarReady"
+      [viewDate]="viewDate"
+      [events]="events"
+      [hourSegments]="2"
+      [dayStartHour]="dayStartHour"
+      [dayEndHour]="dayEndHour"
+      (hourSegmentClicked)="onHourSegmentClicked($event)"
+      (eventClicked)="handleEventClicked($event)">
+    </mwl-calendar-day-view>
   </div>
 </div>
 

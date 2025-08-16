@@ -34,6 +34,9 @@ export class ClientsComponent implements OnInit {
   dataHistoryToShow$!: Observable<HistoryEntry[]>;
   appointmentHistoryToShow$!: Observable<Appointment[]>;
 
+  // Control de opciones en mobile
+  optionsClientId: string | null = null;
+
   constructor(
     private clientsService: ClientsService,
     private appointmentsService: AppointmentsService,
@@ -102,5 +105,9 @@ export class ClientsComponent implements OnInit {
 
   closeHistoryModal() {
     this.showHistoryModal = false;
+  }
+
+  toggleOptions(clientId: string) {
+    this.optionsClientId = this.optionsClientId === clientId ? null : clientId;
   }
 }
