@@ -62,7 +62,10 @@ export class DashboardComponent implements OnInit {
         // 1. Calculamos las estadísticas
         this.stats.totalClients = clients.length;
         this.stats.totalServices = services.length;
-        this.stats.pendingAppointments = appointments.filter(apt => apt.status === 'pending').length;
+        const now = new Date();
+        this.stats.pendingAppointments = appointments
+          .filter(apt => apt.status === 'pending' && apt.start.toDate() > now)
+          .length;
         this.clientsMap = new Map(clients.map(client => [client.id!, client.name]));
         
         // Es importante forzar la detección de cambios aquí para las estadísticas
