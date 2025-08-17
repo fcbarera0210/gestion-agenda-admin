@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -16,7 +17,7 @@ import { TimeBlockFormComponent } from '../../components/time-block-form-compone
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, AppointmentFormComponent, TimeBlockFormComponent],
+  imports: [CommonModule, RouterModule, AppointmentFormComponent, TimeBlockFormComponent],
   templateUrl: './dashboard-component.html',
 })
 export class DashboardComponent implements OnInit {
