@@ -185,9 +185,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     const services = await firstValueFrom(this.services$);
     const serviceId = this.appointmentForm.get('serviceId')?.value;
     const selectedService = services.find(s => s.id === serviceId);
-    if (!selectedService) {
-      return;
-    }
+    const duration = selectedService ? selectedService.duration : 30;
 
     const baseDate = parseISO(`${date}T00:00:00`);
     const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
@@ -201,8 +199,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
     const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
 
-    while (addMinutes(slotStart, selectedService.duration) <= workEnd) {
-      if (this.isSlotAvailable(slotStart, selectedService.duration, daySchedule)) {
+    while (addMinutes(slotStart, duration) <= workEnd) {
+      if (this.isSlotAvailable(slotStart, duration, daySchedule)) {
         this.availableTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
       }
       slotStart = addMinutes(slotStart, 30);
