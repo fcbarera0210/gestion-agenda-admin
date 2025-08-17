@@ -31,6 +31,12 @@ export class DashboardComponent implements OnInit {
     pendingAppointments: 0,
   };
 
+  private statusLabels: Record<Appointment['status'], string> = {
+    confirmed: 'Confirmada',
+    pending: 'Pendiente',
+    cancelled: 'Cancelada',
+  };
+
   // Propiedades para los modales de acción rápida
   showAppointmentModal = false;
   showTimeBlockModal = false;
@@ -116,6 +122,10 @@ export class DashboardComponent implements OnInit {
     this.selectedAppointment = appointment;
     this.selectedDate = appointment.start.toDate();
     this.showAppointmentModal = true;
+  }
+
+  getStatusLabel(status: Appointment['status']): string {
+    return this.statusLabels[status] ?? status;
   }
   
   // Reutilizamos la lógica de guardado de la agenda

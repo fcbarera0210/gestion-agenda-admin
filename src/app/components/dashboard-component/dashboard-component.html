@@ -73,7 +73,7 @@
                       'bg-yellow-100 text-yellow-800': apt.status === 'pending',
                       'bg-red-100 text-red-800': apt.status === 'cancelled'
                     }">
-                {{ apt.status }}
+                {{ getStatusLabel(apt.status) }}
               </span>
             </div>
           </div>
@@ -93,7 +93,7 @@
                 <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
               </div>
             </div>
-            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ apt.status }}</span>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ getStatusLabel(apt.status) }}</span>
           </div>
         </div>
         <ng-template #emptyPending><p class="text-center text-gray-500">No hay citas pendientes.</p></ng-template>
