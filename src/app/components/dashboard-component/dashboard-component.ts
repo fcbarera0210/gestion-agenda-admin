@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -16,7 +17,7 @@ import { TimeBlockFormComponent } from '../../components/time-block-form-compone
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, AppointmentFormComponent, TimeBlockFormComponent],
+  imports: [CommonModule, RouterModule, AppointmentFormComponent, TimeBlockFormComponent],
   templateUrl: './dashboard-component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -61,7 +62,10 @@ export class DashboardComponent implements OnInit {
         // 1. Calculamos las estadísticas
         this.stats.totalClients = clients.length;
         this.stats.totalServices = services.length;
-        this.stats.pendingAppointments = appointments.filter(apt => apt.status === 'pending').length;
+        const now = new Date();
+        this.stats.pendingAppointments = appointments
+          .filter(apt => apt.status === 'pending' && apt.start.toDate() > now)
+          .length;
         this.clientsMap = new Map(clients.map(client => [client.id!, client.name]));
         
         // Es importante forzar la detección de cambios aquí para las estadísticas

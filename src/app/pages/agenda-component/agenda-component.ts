@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CalendarModule, DateAdapter, CalendarEvent } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
@@ -20,7 +21,7 @@ import { NotificationService } from '../../services/notification-service';
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -104,7 +105,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
           end: apt.end.toDate(),
           title: `<b>${apt.title}</b><br>${clientsMap.get(apt.clientId) || 'Cliente Desconocido'}`,
           color: apt.color,
-          meta: { ...apt, type: 'appointment' },
+          meta: { ...apt, eventType: 'appointment' },
         }));
 
         const timeBlockEvents = timeBlocks.map(block => ({
@@ -112,7 +113,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
           end: block.end.toDate(),
           title: `<i>${block.title}</i>`,
           color: block.color,
-          meta: { ...block, type: 'timeBlock' },
+          meta: { ...block, eventType: 'timeBlock' },
         }));
 
         const breakEvents: CalendarEvent[] = [];
@@ -137,7 +138,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
                   end: setMinutes(setHours(dateInWeek, endHour), endMinute),
                   title: '<i>Descanso</i>',
                   color: { primary: '#6c757d', secondary: '#e9ecef' }, // Mismo color que los bloqueos
-                  meta: { type: 'break' }, // Un tipo distinto por si lo necesitamos
+                  meta: { eventType: 'break' }, // Un tipo distinto por si lo necesitamos
                 });
               });
             }
@@ -190,6 +191,11 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.viewDate$.next(this.viewDate);
   }
 
+  onDateChange(dateString: string): void {
+    this.viewDate = new Date(dateString);
+    this.viewDate$.next(this.viewDate);
+  }
+
   // --- Manejadores de Eventos del Calendario ---
 
   onHourSegmentClicked(event: { date: Date }): void {
@@ -198,11 +204,11 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
 
   handleEventClicked({ event }: { event: CalendarEvent<any> }): void {
-    if (event.meta.type === 'appointment') {
+    if (event.meta.eventType === 'appointment') {
       this.selectedAppointment = event.meta;
       this.selectedDate = event.start;
       this.showAppointmentModal = true;
-    } else if (event.meta.type === 'timeBlock') {
+    } else if (event.meta.eventType === 'timeBlock') {
       this.selectedTimeBlock = event.meta;
       this.selectedDate = event.start;
       this.showTimeBlockModal = true;

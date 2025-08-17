@@ -4,7 +4,7 @@
       <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Agenda Semanal</h1>
       <p class="mt-1 text-gray-600">Consulta y gestiona tus citas semanales.</p>
     </div>
-    <div class="flex items-center space-x-2">
+    <div class="hidden md:flex items-center space-x-2">
       <button (click)="previousWeek()" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700" title="Semana anterior">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
       </button>
@@ -17,34 +17,57 @@
     </div>
   </div>
 
-  <div class="p-4 md:p-8 bg-white rounded-lg shadow">
-    <div class="h-[60vh] md:h-[70vh] overflow-y-auto">
-      <mwl-calendar-week-view
-        class="hidden md:block"
-        *ngIf="isCalendarReady"
-        [viewDate]="viewDate"
-        [events]="events"
-        [weekStartsOn]="1"
-        [locale]="locale"
-        [hourSegments]="2"
-        [dayStartHour]="dayStartHour"
-        [dayEndHour]="dayEndHour"
-        [excludeDays]="excludeDays"
-        (hourSegmentClicked)="onHourSegmentClicked($event)"
-        (eventClicked)="handleEventClicked($event)">
-      </mwl-calendar-week-view>
+  <div>
+    <div class="md:hidden flex justify-between w-full mb-4">
+      <button (click)="previousWeek()" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-white shadow hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600" title="Día anterior">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      </button>
+      <button (click)="today()" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white shadow rounded-md hover:bg-gray-100 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+        Hoy
+      </button>
+      <button (click)="nextWeek()" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-white shadow hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600" title="Día siguiente">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </button>
+    </div>
 
-      <mwl-calendar-day-view
-        class="md:hidden"
-        *ngIf="isCalendarReady"
-        [viewDate]="viewDate"
-        [events]="events"
-        [hourSegments]="2"
-        [dayStartHour]="dayStartHour"
-        [dayEndHour]="dayEndHour"
-        (hourSegmentClicked)="onHourSegmentClicked($event)"
-        (eventClicked)="handleEventClicked($event)">
-      </mwl-calendar-day-view>
+    <div class="p-4 md:p-8 bg-white rounded-lg shadow">
+      <div class="md:hidden flex items-center justify-between mb-4">
+        <p class="text-gray-600 font-medium">{{ viewDate | date:'fullDate':'':'es' }}</p>
+        <input
+          type="date"
+          class="p-2 border border-gray-300 rounded-md"
+          [ngModel]="viewDate | date:'yyyy-MM-dd'"
+          (ngModelChange)="onDateChange($event)"
+        />
+      </div>
+      <div class="h-[60vh] md:h-[70vh] overflow-y-auto">
+        <mwl-calendar-week-view
+          class="hidden md:block"
+          *ngIf="isCalendarReady"
+          [viewDate]="viewDate"
+          [events]="events"
+          [weekStartsOn]="1"
+          [locale]="locale"
+          [hourSegments]="2"
+          [dayStartHour]="dayStartHour"
+          [dayEndHour]="dayEndHour"
+          [excludeDays]="excludeDays"
+          (hourSegmentClicked)="onHourSegmentClicked($event)"
+          (eventClicked)="handleEventClicked($event)">
+        </mwl-calendar-week-view>
+
+        <mwl-calendar-day-view
+          class="md:hidden"
+          *ngIf="isCalendarReady"
+          [viewDate]="viewDate"
+          [events]="events"
+          [hourSegments]="2"
+          [dayStartHour]="dayStartHour"
+          [dayEndHour]="dayEndHour"
+          (hourSegmentClicked)="onHourSegmentClicked($event)"
+          (eventClicked)="handleEventClicked($event)">
+        </mwl-calendar-day-view>
+      </div>
     </div>
   </div>
 </div>
@@ -59,7 +82,17 @@
 
 <div *ngIf="showChoiceModal" (click)="closeAllModals()" class="fixed inset-0 z-40 bg-black bg-opacity-50"></div>
 <div *ngIf="showChoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg space-y-6">
+  <div class="relative w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg space-y-6">
+    <button
+      (click)="closeAllModals()"
+      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      aria-label="Cerrar"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
     <h2 class="text-2xl font-bold text-center text-gray-800">¿Qué deseas hacer?</h2>
     <div class="flex flex-col space-y-4">
       <button (click)="openAppointmentForm()" class="px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">

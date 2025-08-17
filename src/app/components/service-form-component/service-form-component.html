@@ -55,20 +55,20 @@
         </div>
       </div>
 
-      <div class="flex justify-end pt-4 space-x-4">
-        <button type="button" (click)="cancel()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-          Cancelar
-        </button>
-        <button type="submit"
-                class="px-4 py-2 font-semibold text-white rounded-lg transition-colors"
-                [ngClass]="{
-                  'bg-primary hover:bg-opacity-90': serviceForm.valid,
-                  'bg-gray-400 cursor-not-allowed': !serviceForm.valid
-                }"
-                [disabled]="serviceForm.invalid">
-          Guardar
-        </button>
-      </div>
-    </form>
+        <div class="flex flex-col sm:flex-row sm:justify-end pt-4 space-y-4 sm:space-y-0 sm:space-x-4">
+          <button type="button" (click)="cancel()" class="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 sm:w-auto">
+            Cancelar
+          </button>
+          <button type="submit"
+                  class="w-full px-4 py-2 font-semibold text-white rounded-lg transition-colors sm:w-32"
+                  [ngClass]="{
+                    'bg-primary hover:bg-opacity-90': serviceForm.valid,
+                    'bg-gray-400 cursor-not-allowed': !serviceForm.valid
+                  }"
+                  [disabled]="serviceForm.invalid">
+            Guardar
+          </button>
+        </div>
+      </form>
   </div>
 </div>
