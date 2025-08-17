@@ -10,10 +10,10 @@
         <label for="current-password" class="sr-only">Contraseña Actual</label>
           <input id="current-password" type="password" formControlName="password" class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
       </div>
-      <div class="flex justify-end pt-4 space-x-4">
-        <button type="button" (click)="cancel()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg">Cancelar</button>
-        <button type="submit" [disabled]="reauthForm.invalid" class="px-4 py-2 font-semibold text-white bg-primary rounded-lg">Confirmar</button>
-      </div>
-    </form>
+        <div class="flex flex-col sm:flex-row sm:justify-end pt-4 space-y-4 sm:space-y-0 sm:space-x-4">
+          <button type="button" (click)="cancel()" class="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg sm:w-auto">Cancelar</button>
+          <button type="submit" [disabled]="reauthForm.invalid" class="w-full px-4 py-2 font-semibold text-white bg-primary rounded-lg sm:w-48">Confirmar</button>
+        </div>
+      </form>
   </div>
 </div>
