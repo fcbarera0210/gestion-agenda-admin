@@ -37,8 +37,8 @@ export class DashboardComponent implements OnInit {
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
 
-  // Control de vista de citas pendientes
-  showPendingList = false;
+  // Control de la lista mostrada en la tarjeta principal
+  activeView: 'today' | 'pending' = 'today';
 
   constructor(
     private appointmentsService: AppointmentsService,
@@ -108,8 +108,8 @@ export class DashboardComponent implements OnInit {
     this.selectedDate = null;
   }
 
-  togglePendingList(): void {
-    this.showPendingList = !this.showPendingList;
+  selectView(view: 'today' | 'pending'): void {
+    this.activeView = view;
   }
 
   openEditAppointment(appointment: Appointment): void {

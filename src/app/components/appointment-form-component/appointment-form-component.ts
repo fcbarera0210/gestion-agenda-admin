@@ -111,7 +111,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     }
     const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
     const today = new Date();
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 21; i++) {
       const date = addDays(today, i);
       const dayName = daysOfWeek[date.getDay()];
       const daySchedule = this.workSchedule[dayName];
@@ -134,7 +134,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][new Date(date).getDay()];
+    const baseDate = parseISO(`${date}T00:00:00`);
+    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
     const daySchedule = this.workSchedule[dayName];
     if (!daySchedule || !daySchedule.isActive) {
       return;
@@ -142,8 +143,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
 
     const [startHour, startMinute] = daySchedule.workHours.start.split(':').map(Number);
     const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
-    let slotStart = setMinutes(setHours(new Date(date), startHour), startMinute);
-    const workEnd = setMinutes(setHours(new Date(date), endHour), endMinute);
+    let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
+    const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
 
     while (addMinutes(slotStart, selectedService.duration) <= workEnd) {
       if (this.isSlotAvailable(slotStart, selectedService.duration, daySchedule)) {
