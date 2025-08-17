@@ -38,6 +38,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   filteredServices$: Observable<Service[]>;
   clientSearch = new FormControl('');
   serviceSearch = new FormControl('');
+  private clients: Client[] = [];
+  private services: Service[] = [];
 
   isLoading = false;
   isEditMode = false;
@@ -89,6 +91,36 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
         services.filter(s => s.name.toLowerCase().includes((term || '').toLowerCase()))
       )
     );
+
+    this.clients$.subscribe(list => {
+      this.clients = list;
+      if (this.appointment) {
+        const current = list.find(c => c.id === this.appointment!.clientId);
+        if (current) {
+          this.clientSearch.setValue(current.name, { emitEvent: false });
+        }
+      }
+    });
+
+    this.services$.subscribe(list => {
+      this.services = list;
+      if (this.appointment) {
+        const current = list.find(s => s.id === this.appointment!.serviceId);
+        if (current) {
+          this.serviceSearch.setValue(current.name, { emitEvent: false });
+        }
+      }
+    });
+
+    this.clientSearch.valueChanges.subscribe(name => {
+      const client = this.clients.find(c => c.name.toLowerCase() === (name || '').toLowerCase());
+      this.appointmentForm.get('clientId')?.setValue(client ? client.id : '');
+    });
+
+    this.serviceSearch.valueChanges.subscribe(name => {
+      const service = this.services.find(s => s.name.toLowerCase() === (name || '').toLowerCase());
+      this.appointmentForm.get('serviceId')?.setValue(service ? service.id : '');
+    });
   }
 
   ngOnInit(): void {
@@ -272,6 +304,14 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
         type: this.appointment!.type,
         notes: this.appointment!.notes || ''
       });
+      const client = this.clients.find(c => c.id === this.appointment!.clientId);
+      if (client) {
+        this.clientSearch.setValue(client.name, { emitEvent: false });
+      }
+      const service = this.services.find(s => s.id === this.appointment!.serviceId);
+      if (service) {
+        this.serviceSearch.setValue(service.name, { emitEvent: false });
+      }
     } else {
       this.isEditMode = false;
       this.appointmentForm.reset();
@@ -283,7 +323,29 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
         status: 'confirmed',
         type: 'presencial'
       });
+      this.clientSearch.setValue('', { emitEvent: false });
+      this.serviceSearch.setValue('', { emitEvent: false });
     }
+  }
+
+  onClientBlur(): void {
+    const name = this.clientSearch.value || '';
+    const client = this.clients.find(c => c.name.toLowerCase() === name.toLowerCase());
+    if (!client) {
+      this.appointmentForm.get('clientId')?.setValue('');
+      this.clientSearch.setValue('', { emitEvent: false });
+    }
+    this.appointmentForm.get('clientId')?.markAsTouched();
+  }
+
+  onServiceBlur(): void {
+    const name = this.serviceSearch.value || '';
+    const service = this.services.find(s => s.name.toLowerCase() === name.toLowerCase());
+    if (!service) {
+      this.appointmentForm.get('serviceId')?.setValue('');
+      this.serviceSearch.setValue('', { emitEvent: false });
+    }
+    this.appointmentForm.get('serviceId')?.markAsTouched();
   }
 
   async save(): Promise<void> {

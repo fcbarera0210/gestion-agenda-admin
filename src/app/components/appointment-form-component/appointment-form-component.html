@@ -11,26 +11,24 @@
       
       <div>
         <label for="client" class="text-sm font-medium text-gray-700">Cliente</label>
-        <input type="text" placeholder="Buscar cliente..." [formControl]="clientSearch" class="w-full px-4 py-2 mt-1 mb-2 text-gray-700 bg-gray-100 border rounded-lg" />
-        <select id="client" formControlName="clientId" class="w-full px-4 py-3 text-gray-700 bg-gray-100 border rounded-lg"
-                [attr.aria-invalid]="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched"
-                [attr.aria-describedby]="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched ? 'client-error' : null">
-          <option value="" disabled>Selecciona un cliente...</option>
-          <option *ngFor="let client of filteredClients$ | async" [value]="client.id">{{ client.name }}</option>
-        </select>
+        <input id="client" type="text" placeholder="Buscar cliente..." list="clients-list" [formControl]="clientSearch" (blur)="onClientBlur()"
+               class="w-full px-4 py-2 mt-1 text-gray-700 bg-gray-100 border rounded-lg" />
+        <datalist id="clients-list">
+          <option *ngFor="let client of filteredClients$ | async" [value]="client.name"></option>
+        </datalist>
+        <input type="hidden" formControlName="clientId">
         <div id="client-error" *ngIf="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched" class="mt-1 text-sm text-red-600">
           El cliente es obligatorio.
         </div>
       </div>
       <div>
         <label for="service" class="text-sm font-medium text-gray-700">Servicio</label>
-        <input type="text" placeholder="Buscar servicio..." [formControl]="serviceSearch" class="w-full px-4 py-2 mt-1 mb-2 text-gray-700 bg-gray-100 border rounded-lg" />
-        <select id="service" formControlName="serviceId" class="w-full px-4 py-3 text-gray-700 bg-gray-100 border rounded-lg"
-                [attr.aria-invalid]="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched"
-                [attr.aria-describedby]="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched ? 'service-error' : null">
-          <option value="" disabled>Selecciona un servicio...</option>
-          <option *ngFor="let service of filteredServices$ | async" [value]="service.id">{{ service.name }} ({{ service.duration }} min)</option>
-        </select>
+        <input id="service" type="text" placeholder="Buscar servicio..." list="services-list" [formControl]="serviceSearch" (blur)="onServiceBlur()"
+               class="w-full px-4 py-2 mt-1 text-gray-700 bg-gray-100 border rounded-lg" />
+        <datalist id="services-list">
+          <option *ngFor="let service of filteredServices$ | async" [value]="service.name">{{ service.name }} ({{ service.duration }} min)</option>
+        </datalist>
+        <input type="hidden" formControlName="serviceId">
         <div id="service-error" *ngIf="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched" class="mt-1 text-sm text-red-600">
           El servicio es obligatorio.
         </div>
@@ -40,13 +38,13 @@
         <label class="text-sm font-medium text-gray-700">Estado de la Cita</label>
         <div class="flex mt-1 space-x-2">
           <button type="button" class="flex-1 px-4 py-2 rounded-lg border"
-                  [ngClass]="appointmentForm.get('status')?.value === 'confirmed' ? 'bg-primary text-white border-primary' : 'bg-gray-100 text-gray-700 border-gray-300'"
+                  [ngClass]="appointmentForm.get('status')?.value === 'confirmed' ? 'bg-blue-500 text-white border-blue-500' : 'bg-blue-50 text-blue-700 border-blue-200'"
                   (click)="setStatus('confirmed')">Confirmada</button>
           <button type="button" class="flex-1 px-4 py-2 rounded-lg border"
-                  [ngClass]="appointmentForm.get('status')?.value === 'pending' ? 'bg-primary text-white border-primary' : 'bg-gray-100 text-gray-700 border-gray-300'"
+                  [ngClass]="appointmentForm.get('status')?.value === 'pending' ? 'bg-yellow-500 text-white border-yellow-500' : 'bg-yellow-50 text-yellow-700 border-yellow-200'"
                   (click)="setStatus('pending')">Pendiente</button>
           <button type="button" class="flex-1 px-4 py-2 rounded-lg border"
-                  [ngClass]="appointmentForm.get('status')?.value === 'cancelled' ? 'bg-primary text-white border-primary' : 'bg-gray-100 text-gray-700 border-gray-300'"
+                  [ngClass]="appointmentForm.get('status')?.value === 'cancelled' ? 'bg-red-500 text-white border-red-500' : 'bg-red-50 text-red-700 border-red-200'"
                   (click)="setStatus('cancelled')">Cancelada</button>
         </div>
         <div id="status-error" *ngIf="appointmentForm.get('status')?.invalid && appointmentForm.get('status')?.touched" class="mt-1 text-sm text-red-600">
