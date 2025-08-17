@@ -105,7 +105,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
           end: apt.end.toDate(),
           title: `<b>${apt.title}</b><br>${clientsMap.get(apt.clientId) || 'Cliente Desconocido'}`,
           color: apt.color,
-          meta: { ...apt, type: 'appointment' },
+          meta: { ...apt, eventType: 'appointment' },
         }));
 
         const timeBlockEvents = timeBlocks.map(block => ({
@@ -113,7 +113,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
           end: block.end.toDate(),
           title: `<i>${block.title}</i>`,
           color: block.color,
-          meta: { ...block, type: 'timeBlock' },
+          meta: { ...block, eventType: 'timeBlock' },
         }));
 
         const breakEvents: CalendarEvent[] = [];
@@ -138,7 +138,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
                   end: setMinutes(setHours(dateInWeek, endHour), endMinute),
                   title: '<i>Descanso</i>',
                   color: { primary: '#6c757d', secondary: '#e9ecef' }, // Mismo color que los bloqueos
-                  meta: { type: 'break' }, // Un tipo distinto por si lo necesitamos
+                  meta: { eventType: 'break' }, // Un tipo distinto por si lo necesitamos
                 });
               });
             }
@@ -204,11 +204,11 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
 
   handleEventClicked({ event }: { event: CalendarEvent<any> }): void {
-    if (event.meta.type === 'appointment') {
+    if (event.meta.eventType === 'appointment') {
       this.selectedAppointment = event.meta;
       this.selectedDate = event.start;
       this.showAppointmentModal = true;
-    } else if (event.meta.type === 'timeBlock') {
+    } else if (event.meta.eventType === 'timeBlock') {
       this.selectedTimeBlock = event.meta;
       this.selectedDate = event.start;
       this.showTimeBlockModal = true;

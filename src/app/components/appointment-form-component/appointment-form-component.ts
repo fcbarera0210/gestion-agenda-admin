@@ -7,7 +7,7 @@ import { addMinutes, parseISO } from 'date-fns';
 
 import { Client, ClientsService } from '../../services/clients-service';
 import { Service, ServicesService } from '../../services/services-service';
-import { Appointment, AppointmentStatus } from '../../services/appointments-service';
+import { Appointment, AppointmentStatus, AppointmentType } from '../../services/appointments-service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog-component/confirmation-dialog-component';
 
 @Component({
@@ -48,6 +48,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       serviceId: ['', Validators.required],
       start: ['', Validators.required],
       status: ['confirmed' as AppointmentStatus, Validators.required],
+      type: ['presencial' as AppointmentType, Validators.required],
       notes: ['']
     });
 
@@ -89,14 +90,16 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
           serviceId: this.appointment!.serviceId,
           start: formatDate(this.appointment!.start.toDate(), 'yyyy-MM-ddTHH:mm', 'en-US'),
           status: this.appointment!.status,
+          type: this.appointment!.type,
           notes: this.appointment!.notes || ''
         });
     } else {
       this.isEditMode = false;
-      this.appointmentForm.reset(); 
+      this.appointmentForm.reset();
       this.appointmentForm.patchValue({
         start: formatDate(this.startDate, 'yyyy-MM-ddTHH:mm', 'en-US'),
-        status: 'confirmed'
+        status: 'confirmed',
+        type: 'presencial'
       });
     }
   }
@@ -132,6 +135,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       title: `${selectedService.name}`,
       color: this.statusColors[formValue.status as AppointmentStatus],
       status: formValue.status,
+      type: formValue.type,
       notes: formValue.notes
     };
 

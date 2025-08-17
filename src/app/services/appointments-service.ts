@@ -7,6 +7,8 @@ import emailjs from '@emailjs/browser';
 
 export type AppointmentStatus = 'confirmed' | 'pending' | 'cancelled';
 
+export type AppointmentType = 'presencial' | 'online';
+
 // Interfaz para el objeto de Cita
 export interface Appointment {
   id?: string;
@@ -15,12 +17,13 @@ export interface Appointment {
   serviceId: string;
   start: Timestamp;
   end: Timestamp;
-  title: string; 
+  title: string;
   color?: {
     primary: string;
     secondary: string;
   };
   status: AppointmentStatus;
+  type: AppointmentType;
   notes?: string;
 }
 
