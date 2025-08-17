@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CalendarModule, DateAdapter, CalendarEvent } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
@@ -20,7 +21,7 @@ import { NotificationService } from '../../services/notification-service';
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -187,6 +188,11 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
   nextWeek(): void {
     this.viewDate = addDays(this.viewDate, this.isMobile ? 1 : 7);
+    this.viewDate$.next(this.viewDate);
+  }
+
+  onDateChange(dateString: string): void {
+    this.viewDate = new Date(dateString);
     this.viewDate$.next(this.viewDate);
   }
 
