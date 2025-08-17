@@ -82,7 +82,17 @@
 
 <div *ngIf="showChoiceModal" (click)="closeAllModals()" class="fixed inset-0 z-40 bg-black bg-opacity-50"></div>
 <div *ngIf="showChoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg space-y-6">
+  <div class="relative w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg space-y-6">
+    <button
+      (click)="closeAllModals()"
+      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      aria-label="Cerrar"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
     <h2 class="text-2xl font-bold text-center text-gray-800">¿Qué deseas hacer?</h2>
     <div class="flex flex-col space-y-4">
       <button (click)="openAppointmentForm()" class="px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
