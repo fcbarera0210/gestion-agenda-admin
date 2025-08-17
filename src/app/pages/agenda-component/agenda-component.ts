@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalendarModule, DateAdapter, CalendarEvent } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
-import { map, combineLatest, firstValueFrom } from 'rxjs';
+import { map, combineLatest, firstValueFrom, BehaviorSubject, Subscription } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
 import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays } from 'date-fns';
 
@@ -26,17 +26,19 @@ import { NotificationService } from '../../services/notification-service';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AgendaComponent implements OnInit {
+export class AgendaComponent implements OnInit, OnDestroy {
 
   // --- Propiedades del Calendario ---
   locale: string = 'es';
   viewDate: Date = new Date();
+  viewDate$ = new BehaviorSubject<Date>(this.viewDate);
   events: CalendarEvent<Appointment | TimeBlock>[] = [];
   excludeDays: number[] = [];
   dayStartHour = 8;
   dayEndHour = 20;
   isCalendarReady = false;
   isMobile = false;
+  private eventsSub?: Subscription;
 
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
@@ -65,6 +67,10 @@ export class AgendaComponent implements OnInit {
     this.loadEvents();
   }
 
+  ngOnDestroy(): void {
+    this.eventsSub?.unsubscribe();
+  }
+
   updateIsMobile(): void {
     this.isMobile = window.innerWidth < 768;
   }
@@ -82,13 +88,15 @@ export class AgendaComponent implements OnInit {
   }
 
   loadEvents(): void {
-    combineLatest([
+    this.eventsSub?.unsubscribe();
+    this.eventsSub = combineLatest([
       this.appointmentsService.getAppointments(),
       this.clientsService.getClients(),
       this.timeBlockService.getTimeBlocks(),
-      this.settingsService.getProfessionalProfile()
+      this.settingsService.getProfessionalProfile(),
+      this.viewDate$
     ]).pipe(
-      map(([appointments, clients, timeBlocks, profile]) => {
+      map(([appointments, clients, timeBlocks, profile, viewDate]) => {
         const clientsMap = new Map(clients.map(client => [client.id, client.name]));
         
         const appointmentEvents = appointments.map(apt => ({
@@ -111,7 +119,7 @@ export class AgendaComponent implements OnInit {
         if (profile && profile.workSchedule) {
           const schedule: WorkSchedule = profile.workSchedule;
           const weekStartsOn = 1; // 1 = Lunes
-          const startOfView = startOfWeek(this.viewDate, { weekStartsOn });
+          const startOfView = startOfWeek(viewDate, { weekStartsOn });
           const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 
           for (let i = 0; i < 7; i++) {
@@ -169,9 +177,18 @@ export class AgendaComponent implements OnInit {
 
   // --- Navegación del Calendario ---
 
-  previousWeek(): void { this.viewDate = subDays(this.viewDate, this.isMobile ? 1 : 7); }
-  today(): void { this.viewDate = new Date(); }
-  nextWeek(): void { this.viewDate = addDays(this.viewDate, this.isMobile ? 1 : 7); }
+  previousWeek(): void {
+    this.viewDate = subDays(this.viewDate, this.isMobile ? 1 : 7);
+    this.viewDate$.next(this.viewDate);
+  }
+  today(): void {
+    this.viewDate = new Date();
+    this.viewDate$.next(this.viewDate);
+  }
+  nextWeek(): void {
+    this.viewDate = addDays(this.viewDate, this.isMobile ? 1 : 7);
+    this.viewDate$.next(this.viewDate);
+  }
 
   // --- Manejadores de Eventos del Calendario ---
 
