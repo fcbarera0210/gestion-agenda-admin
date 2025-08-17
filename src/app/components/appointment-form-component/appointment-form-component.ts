@@ -348,6 +348,16 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     this.appointmentForm.get('serviceId')?.markAsTouched();
   }
 
+  clearClient(): void {
+    this.clientSearch.setValue('');
+    this.appointmentForm.get('clientId')?.setValue('');
+  }
+
+  clearService(): void {
+    this.serviceSearch.setValue('');
+    this.appointmentForm.get('serviceId')?.setValue('');
+  }
+
   async save(): Promise<void> {
     if (this.appointmentForm.invalid) {
       this.appointmentForm.markAllAsTouched();
