@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
 import { Observable, firstValueFrom, combineLatest } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { Timestamp } from '@angular/fire/firestore';
 import { addMinutes, parseISO, addDays, setHours, setMinutes, areIntervalsOverlapping } from 'date-fns';
 
@@ -33,6 +34,10 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   appointmentForm: FormGroup;
   clients$: Observable<Client[]>;
   services$: Observable<Service[]>;
+  filteredClients$: Observable<Client[]>;
+  filteredServices$: Observable<Service[]>;
+  clientSearch = new FormControl('');
+  serviceSearch = new FormControl('');
 
   isLoading = false;
   isEditMode = false;
@@ -66,6 +71,24 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
 
     this.clients$ = this.clientsService.getClients();
     this.services$ = this.servicesService.getServices();
+
+    this.filteredClients$ = combineLatest([
+      this.clients$,
+      this.clientSearch.valueChanges.pipe(startWith(''))
+    ]).pipe(
+      map(([clients, term]) =>
+        clients.filter(c => c.name.toLowerCase().includes((term || '').toLowerCase()))
+      )
+    );
+
+    this.filteredServices$ = combineLatest([
+      this.services$,
+      this.serviceSearch.valueChanges.pipe(startWith(''))
+    ]).pipe(
+      map(([services, term]) =>
+        services.filter(s => s.name.toLowerCase().includes((term || '').toLowerCase()))
+      )
+    );
   }
 
   ngOnInit(): void {
@@ -205,6 +228,16 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
 
   onDateChange(date: string): void {
     this.generateAvailableTimes(date);
+  }
+
+  setStatus(status: AppointmentStatus): void {
+    this.appointmentForm.get('status')?.setValue(status);
+    this.appointmentForm.get('status')?.markAsTouched();
+  }
+
+  setType(type: AppointmentType): void {
+    this.appointmentForm.get('type')?.setValue(type);
+    this.appointmentForm.get('type')?.markAsTouched();
   }
 
   // --- Lógica de Eliminación ---
