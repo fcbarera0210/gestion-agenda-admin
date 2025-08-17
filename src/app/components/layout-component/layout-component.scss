@@ -19,7 +19,7 @@ aside.collapsed .nav-text {
 }
 
 aside.collapsed .nav-link {
-  @apply justify-center w-10 h-10 p-0 mx-auto;
+  @apply justify-start w-full h-10 p-0 pl-2 mx-0;
 }
 
 aside.collapsed .logo-container {
@@ -38,7 +38,7 @@ aside:not(.collapsed) .nav-link {
 
 @media (min-width: 768px) {
   aside.collapsed:hover {
-    width: 16rem;
+    width: 14rem;
   }
   aside.collapsed:hover nav {
     @apply items-start;

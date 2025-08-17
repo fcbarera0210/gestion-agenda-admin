@@ -16,12 +16,22 @@ export class HistoryModalComponent {
   @Input() showAppointmentHistoryTab = false; 
   @Output() onCancel = new EventEmitter<void>();
 
-  activeTab: 'data' | 'appointments' = 'data'; // La pestaña activa por defecto
+  activeTab: 'data' | 'appointments' = 'appointments'; // La pestaña activa por defecto
+
+  private statusLabels: Record<string, string> = {
+    confirmed: 'confirmada',
+    pending: 'pendiente',
+    cancelled: 'cancelada',
+  };
 
   constructor() {}
 
   selectTab(tab: 'data' | 'appointments'): void {
     this.activeTab = tab;
+  }
+
+  translateStatus(status: string): string {
+    return this.statusLabels[status] || status;
   }
 
   cancel(): void {
