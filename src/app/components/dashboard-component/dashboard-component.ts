@@ -23,6 +23,7 @@ import { TimeBlockFormComponent } from '../../components/time-block-form-compone
 export class DashboardComponent implements OnInit {
 
   upcomingAppointments$!: Observable<Appointment[]>;
+  pendingAppointments: Appointment[] = [];
   clientsMap = new Map<string, string>();
   stats = {
     totalClients: 0,
@@ -34,6 +35,10 @@ export class DashboardComponent implements OnInit {
   showAppointmentModal = false;
   showTimeBlockModal = false;
   selectedDate: Date | null = null;
+  selectedAppointment: Appointment | null = null;
+
+  // Control de vista de citas pendientes
+  showPendingList = false;
 
   constructor(
     private appointmentsService: AppointmentsService,
@@ -59,15 +64,16 @@ export class DashboardComponent implements OnInit {
       this.appointmentsService.getAppointments()
     ]).pipe(
       map(([clients, services, appointments]) => {
-        // 1. Calculamos las estadísticas
+        // 1. Calculamos las estadísticas y mapas
         this.stats.totalClients = clients.length;
         this.stats.totalServices = services.length;
         const now = new Date();
-        this.stats.pendingAppointments = appointments
+        this.pendingAppointments = appointments
           .filter(apt => apt.status === 'pending' && apt.start.toDate() > now)
-          .length;
+          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+        this.stats.pendingAppointments = this.pendingAppointments.length;
         this.clientsMap = new Map(clients.map(client => [client.id!, client.name]));
-        
+
         // Es importante forzar la detección de cambios aquí para las estadísticas
         this.cdr.markForCheck();
 
@@ -85,6 +91,7 @@ export class DashboardComponent implements OnInit {
   // --- Lógica para los Modales de Acción Rápida ---
 
   openNewAppointmentModal(): void {
+    this.selectedAppointment = null;
     this.selectedDate = new Date(); // La cita por defecto es "ahora"
     this.showAppointmentModal = true;
   }
@@ -97,7 +104,18 @@ export class DashboardComponent implements OnInit {
   closeAllModals(): void {
     this.showAppointmentModal = false;
     this.showTimeBlockModal = false;
+    this.selectedAppointment = null;
     this.selectedDate = null;
+  }
+
+  togglePendingList(): void {
+    this.showPendingList = !this.showPendingList;
+  }
+
+  openEditAppointment(appointment: Appointment): void {
+    this.selectedAppointment = appointment;
+    this.selectedDate = appointment.start.toDate();
+    this.showAppointmentModal = true;
   }
   
   // Reutilizamos la lógica de guardado de la agenda
