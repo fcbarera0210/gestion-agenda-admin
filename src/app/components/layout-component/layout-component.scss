@@ -38,7 +38,7 @@ aside:not(.collapsed) .nav-link {
 
 @media (min-width: 768px) {
   aside.collapsed:hover {
-    width: 14rem;
+    width: max-content;
   }
   aside.collapsed:hover nav {
     @apply items-start;
