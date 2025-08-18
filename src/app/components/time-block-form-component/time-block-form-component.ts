@@ -20,7 +20,7 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   @Input() startDate!: Date;
   @Input() timeBlock: TimeBlock | null = null;
   @Input() isDeleting = false;
-  @Output() onSave = new EventEmitter<TimeBlock>();
+  @Input() onSave!: (blockData: TimeBlock) => Promise<any>;
   @Output() onCancel = new EventEmitter<void>();
   @Output() onDelete = new EventEmitter<string>();
 
@@ -304,11 +304,8 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
       blockData.id = this.timeBlock?.id;
     }
 
-    (this.onSave.emit(blockData as TimeBlock) as unknown as Promise<any>)
-      .then(() => {
-        this.isLoading = false;
-      })
-      .catch(() => {
+    this.onSave(blockData as TimeBlock)
+      .finally(() => {
         this.isLoading = false;
       });
   }
