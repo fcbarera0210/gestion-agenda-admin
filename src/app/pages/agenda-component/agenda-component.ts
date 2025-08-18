@@ -426,7 +426,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
       });
   }
 
-  handleSaveTimeBlock(blockData: TimeBlock): void {
+  handleSaveTimeBlock(blockData: TimeBlock): Promise<any> {
     const promise = blockData.id
       ? this.timeBlockService.updateTimeBlock(blockData)
       : this.timeBlockService.addTimeBlock(blockData);
@@ -434,12 +434,16 @@ export class AgendaComponent implements OnInit, OnDestroy {
     promise
       .then(() => {
         this.toastService.show('Horario bloqueado guardado con éxito', 'success');
-        this.closeAllModals();
       })
       .catch(err => {
         this.toastService.show('Error al guardar el bloqueo', 'error');
         console.error(err);
+      })
+      .finally(() => {
+        this.closeAllModals();
       });
+
+    return promise;
   }
   
   handleDeleteTimeBlock(blockId: string): void {

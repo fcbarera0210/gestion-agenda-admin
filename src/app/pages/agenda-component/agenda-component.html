@@ -154,7 +154,7 @@
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
   [timeBlock]="selectedTimeBlock"
-  [isDeleting]="isDeletingBlock" (onSave)="handleSaveTimeBlock($event)"
+  [isDeleting]="isDeletingBlock" [onSave]="handleSaveTimeBlock.bind(this)"
   (onDelete)="handleDeleteTimeBlock($event)"
   (onCancel)="closeAllModals()">
 </app-time-block-form>
