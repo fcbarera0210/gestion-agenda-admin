@@ -25,6 +25,7 @@ export class DashboardComponent implements OnInit {
   upcomingAppointments$!: Observable<Appointment[]>;
   weekAppointments$!: Observable<Appointment[]>;
   monthAppointments$!: Observable<Appointment[]>;
+  pendingMonthAppointments$!: Observable<Appointment[]>;
   pendingAppointments: Appointment[] = [];
   clientsMap = new Map<string, string>();
   stats = {
@@ -46,7 +47,7 @@ export class DashboardComponent implements OnInit {
   selectedAppointment: Appointment | null = null;
 
   // Control de la lista mostrada en la tarjeta principal
-  activeView: 'day' | 'week' | 'month' = 'day';
+  activeView: 'day' | 'week' | 'month' | 'pending' = 'day';
 
   constructor(
     private appointmentsService: AppointmentsService,
@@ -115,13 +116,16 @@ export class DashboardComponent implements OnInit {
           })
           .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
 
-        return { day, week, month };
+        const pendingMonth = month.filter(apt => apt.status === 'pending');
+
+        return { day, week, month, pendingMonth };
       })
     );
 
     this.upcomingAppointments$ = combined$.pipe(map(data => data.day));
     this.weekAppointments$ = combined$.pipe(map(data => data.week));
     this.monthAppointments$ = combined$.pipe(map(data => data.month));
+    this.pendingMonthAppointments$ = combined$.pipe(map(data => data.pendingMonth));
   }
 
   // --- Lógica para los Modales de Acción Rápida ---
@@ -144,7 +148,7 @@ export class DashboardComponent implements OnInit {
     this.selectedDate = null;
   }
 
-  selectView(view: 'day' | 'week' | 'month'): void {
+  selectView(view: 'day' | 'week' | 'month' | 'pending'): void {
     this.activeView = view;
   }
 
