@@ -83,12 +83,29 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
       this.appointments = appointments;
       this.timeBlocks = blocks;
       this.generateAvailableDates();
-      const date = this.blockForm.get('date')?.value;
+
+      const dateControl = this.blockForm.get('date');
+      if (!dateControl?.value && this.availableDates.length) {
+        dateControl?.setValue(this.availableDates[0]);
+      }
+      const date = dateControl?.value;
       if (date) {
-        this.generateAvailableStartTimes(date);
-        const start = this.blockForm.get('startTime')?.value;
+        if (!this.availableStartTimes.length) {
+          this.generateAvailableStartTimes(date);
+        }
+        const startControl = this.blockForm.get('startTime');
+        if (!startControl?.value && this.availableStartTimes.length) {
+          startControl?.setValue(this.availableStartTimes[0]);
+        }
+        const start = startControl?.value;
         if (start) {
-          this.generateAvailableEndTimes(date, start);
+          if (!this.availableEndTimes.length) {
+            this.generateAvailableEndTimes(date, start);
+          }
+          const endControl = this.blockForm.get('endTime');
+          if (!endControl?.value && this.availableEndTimes.length) {
+            endControl?.setValue(this.availableEndTimes[0]);
+          }
         }
       }
     });
