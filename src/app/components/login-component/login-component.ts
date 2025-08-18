@@ -6,6 +6,7 @@ import { ToastContainerComponent } from '../toast-container-component/toast-cont
 import { ToastService } from '../../services/toast-service';
 import { ForgotPasswordModalComponent } from '../forgot-password-modal-component/forgot-password-modal-component';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../../services/theme-service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,8 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private themeService: ThemeService
   ) {
     this.formLogin = new FormGroup({
       email: new FormControl(),
@@ -65,5 +67,9 @@ export class LoginComponent {
           console.error(error);
         }
       );
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 }
