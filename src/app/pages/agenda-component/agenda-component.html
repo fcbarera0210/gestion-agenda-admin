@@ -14,6 +14,29 @@
       <button (click)="nextWeek()" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700" title="Semana siguiente">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
       </button>
+      <div class="flex items-center space-x-1 ml-2">
+        <button
+          (click)="setView(CalendarView.Day)"
+          class="px-3 py-2 rounded-md text-sm"
+          [ngClass]="view === CalendarView.Day ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+        >
+          Día
+        </button>
+        <button
+          (click)="setView(CalendarView.Week)"
+          class="px-3 py-2 rounded-md text-sm"
+          [ngClass]="view === CalendarView.Week ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+        >
+          Semana
+        </button>
+        <button
+          (click)="setView(CalendarView.Month)"
+          class="px-3 py-2 rounded-md text-sm"
+          [ngClass]="view === CalendarView.Month ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+        >
+          Mes
+        </button>
+      </div>
     </div>
   </div>
 
@@ -29,6 +52,29 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
       </button>
     </div>
+    <div class="md:hidden flex justify-center mb-4 space-x-2">
+      <button
+        (click)="setView(CalendarView.Day)"
+        class="px-3 py-2 rounded-md text-sm"
+        [ngClass]="view === CalendarView.Day ? 'bg-primary text-white' : 'bg-white shadow text-gray-700 dark:text-gray-200 dark:bg-gray-700'"
+      >
+        Día
+      </button>
+      <button
+        (click)="setView(CalendarView.Week)"
+        class="px-3 py-2 rounded-md text-sm"
+        [ngClass]="view === CalendarView.Week ? 'bg-primary text-white' : 'bg-white shadow text-gray-700 dark:text-gray-200 dark:bg-gray-700'"
+      >
+        Semana
+      </button>
+      <button
+        (click)="setView(CalendarView.Month)"
+        class="px-3 py-2 rounded-md text-sm"
+        [ngClass]="view === CalendarView.Month ? 'bg-primary text-white' : 'bg-white shadow text-gray-700 dark:text-gray-200 dark:bg-gray-700'"
+      >
+        Mes
+      </button>
+    </div>
 
     <div class="p-4 md:p-8 bg-white rounded-lg shadow">
       <div class="md:hidden flex items-center justify-between mb-4">
@@ -40,10 +86,20 @@
           (ngModelChange)="onDateChange($event)"
         />
       </div>
-      <div class="h-[60vh] md:h-[70vh] overflow-y-auto">
+      <div class="h-[60vh] md:h-[70vh] overflow-y-auto" *ngIf="isCalendarReady" [ngSwitch]="view">
+        <mwl-calendar-day-view
+          *ngSwitchCase="CalendarView.Day"
+          [viewDate]="viewDate"
+          [events]="events"
+          [hourSegments]="2"
+          [dayStartHour]="dayStartHour"
+          [dayEndHour]="dayEndHour"
+          (hourSegmentClicked)="onHourSegmentClicked($event)"
+          (eventClicked)="handleEventClicked($event)">
+        </mwl-calendar-day-view>
+
         <mwl-calendar-week-view
-          class="hidden md:block"
-          *ngIf="isCalendarReady"
+          *ngSwitchCase="CalendarView.Week"
           [viewDate]="viewDate"
           [events]="events"
           [weekStartsOn]="1"
@@ -56,17 +112,27 @@
           (eventClicked)="handleEventClicked($event)">
         </mwl-calendar-week-view>
 
-        <mwl-calendar-day-view
-          class="md:hidden"
-          *ngIf="isCalendarReady"
+        <mwl-calendar-month-view
+          *ngSwitchCase="CalendarView.Month"
           [viewDate]="viewDate"
           [events]="events"
-          [hourSegments]="2"
-          [dayStartHour]="dayStartHour"
-          [dayEndHour]="dayEndHour"
-          (hourSegmentClicked)="onHourSegmentClicked($event)"
+          [weekStartsOn]="1"
+          [locale]="locale"
+          [excludeDays]="excludeDays"
+          (dayClicked)="onHourSegmentClicked({ date: $event.day.date })"
           (eventClicked)="handleEventClicked($event)">
-        </mwl-calendar-day-view>
+        </mwl-calendar-month-view>
+      </div>
+    </div>
+    <div class="monthly-counts">
+      <div>Completas: {{ monthlyCounts.confirmed }}</div>
+      <div>Pendientes: {{ monthlyCounts.pending }}</div>
+      <div>Canceladas: {{ monthlyCounts.cancelled }}</div>
+    </div>
+    <div class="status-legend">
+      <div class="status-legend-item" *ngFor="let item of statusLegend">
+        <span class="status-legend-color" [style.background-color]="item.color.primary"></span>
+        <span>{{ item.label }}</span>
       </div>
     </div>
   </div>

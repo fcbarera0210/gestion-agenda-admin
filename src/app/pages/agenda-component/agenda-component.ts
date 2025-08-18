@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CalendarModule, DateAdapter, CalendarEvent } from 'angular-calendar';
+import { CalendarModule, DateAdapter, CalendarEvent, CalendarView } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
 import { map, combineLatest, firstValueFrom, BehaviorSubject, Subscription } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
-import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays } from 'date-fns';
+import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 
 // Componentes y Servicios
 import { SettingsService, WorkSchedule } from '../../services/settings-service';
@@ -39,7 +39,28 @@ export class AgendaComponent implements OnInit, OnDestroy {
   dayEndHour = 20;
   isCalendarReady = false;
   isMobile = false;
+  CalendarView = CalendarView;
+  view: CalendarView = this.isMobile ? CalendarView.Day : CalendarView.Week;
   private eventsSub?: Subscription;
+
+  // --- Leyenda de estados ---
+  private statusColors: any = {
+    confirmed: { primary: '#1e90ff', secondary: '#D1E8FF' }, // Azul
+    pending: { primary: '#ffc107', secondary: '#FFF3CD' }, // Amarillo
+    cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo
+    blocked: { primary: '#6c757d', secondary: '#e9ecef' }, // Gris
+    nonWork: { primary: '#e6e0ff', secondary: '#e6e0ff' }, // Morado
+  };
+
+  statusLegend = [
+    { status: 'confirmed', label: 'Confirmada', color: this.statusColors.confirmed },
+    { status: 'pending', label: 'Pendiente', color: this.statusColors.pending },
+    { status: 'cancelled', label: 'Cancelada', color: this.statusColors.cancelled },
+    { status: 'blocked', label: 'Descanso/Bloqueado', color: this.statusColors.blocked },
+    { status: 'nonWork', label: 'No laborable', color: this.statusColors.nonWork },
+  ];
+
+  monthlyCounts = { confirmed: 0, pending: 0, cancelled: 0 };
 
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
@@ -64,6 +85,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.updateIsMobile();
     window.addEventListener('resize', () => this.updateIsMobile());
+    this.view = this.isMobile ? CalendarView.Day : CalendarView.Week;
     this.loadWorkSchedule();
     this.loadEvents();
   }
@@ -99,7 +121,22 @@ export class AgendaComponent implements OnInit, OnDestroy {
     ]).pipe(
       map(([appointments, clients, timeBlocks, profile, viewDate]) => {
         const clientsMap = new Map(clients.map(client => [client.id, client.name]));
-        
+
+        const startMonth = startOfMonth(viewDate);
+        const endMonth = endOfMonth(viewDate);
+        const counts: Record<'confirmed' | 'pending' | 'cancelled', number> = {
+          confirmed: 0,
+          pending: 0,
+          cancelled: 0,
+        };
+        appointments.forEach(apt => {
+          const startDate = apt.start.toDate();
+          if (startDate >= startMonth && startDate <= endMonth) {
+            counts[apt.status]++;
+          }
+        });
+        this.monthlyCounts = counts;
+
         const appointmentEvents = appointments.map(apt => ({
           start: apt.start.toDate(),
           end: apt.end.toDate(),
@@ -228,10 +265,20 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.dayEndHour = maxHour === 0 ? 20 : Math.min(23, maxHour + 1);
   }
 
+  setView(view: CalendarView): void {
+    this.view = view;
+  }
+
   // --- Navegación del Calendario ---
 
   previousWeek(): void {
-    this.viewDate = subDays(this.viewDate, this.isMobile ? 1 : 7);
+    if (this.view === CalendarView.Day) {
+      this.viewDate = subDays(this.viewDate, 1);
+    } else if (this.view === CalendarView.Week) {
+      this.viewDate = subDays(this.viewDate, 7);
+    } else {
+      this.viewDate = subMonths(this.viewDate, 1);
+    }
     this.viewDate$.next(this.viewDate);
   }
   today(): void {
@@ -239,7 +286,13 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.viewDate$.next(this.viewDate);
   }
   nextWeek(): void {
-    this.viewDate = addDays(this.viewDate, this.isMobile ? 1 : 7);
+    if (this.view === CalendarView.Day) {
+      this.viewDate = addDays(this.viewDate, 1);
+    } else if (this.view === CalendarView.Week) {
+      this.viewDate = addDays(this.viewDate, 7);
+    } else {
+      this.viewDate = addMonths(this.viewDate, 1);
+    }
     this.viewDate$.next(this.viewDate);
   }
 
