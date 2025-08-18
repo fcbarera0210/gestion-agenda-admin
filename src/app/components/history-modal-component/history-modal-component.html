@@ -26,7 +26,7 @@
                   'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'data'
                 }"
                 class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-          Historial de Datos
+          Historial de Cambios
         </button>
       </nav>
     </div>
@@ -51,7 +51,9 @@
       <div *ngIf="activeTab === 'appointments'">
         <ng-container *ngIf="appointmentHistory$ | async as appointments; else loading">
           <div *ngIf="appointments.length > 0; else emptyAppointments" class="space-y-4">
-            <div *ngFor="let apt of appointments" class="p-4 border rounded-lg">
+            <div *ngFor="let apt of appointments"
+                 (click)="openAppointmentDetail(apt)"
+                 class="p-4 border rounded-lg cursor-pointer transition-colors hover:bg-gray-50">
               <div class="flex justify-between items-start">
                 <div>
                   <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
@@ -77,3 +79,9 @@
     </div>
   </div>
 </div>
+
+<app-appointment-detail-modal
+  *ngIf="showAppointmentDetailModal && selectedAppointment"
+  [appointment]="selectedAppointment"
+  (onClose)="closeAppointmentDetail()">
+</app-appointment-detail-modal>

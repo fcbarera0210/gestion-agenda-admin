@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { Observable, map, BehaviorSubject, combineLatest } from 'rxjs';
 import { Client, ClientsService, HistoryEntry } from '../../services/clients-service';
 import { ToastService } from '../../services/toast-service';
 import { ClientFormComponent } from '../../components/client-form-component/client-form-component';
@@ -11,11 +12,14 @@ import { Appointment, AppointmentsService } from '../../services/appointments-se
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, ClientFormComponent, ConfirmationDialogComponent, HistoryModalComponent],
+  imports: [CommonModule, FormsModule, ClientFormComponent, ConfirmationDialogComponent, HistoryModalComponent],
   templateUrl: './clients-component.html',
 })
 export class ClientsComponent implements OnInit {
-  clients$: Observable<Client[]>;
+  private clients$: Observable<Client[]>;
+  searchTerm = '';
+  searchTerm$ = new BehaviorSubject<string>('');
+  filteredClients$!: Observable<Client[]>;
 
   // Control para el formulario de cliente
   showClientModal = false;
@@ -43,6 +47,17 @@ export class ClientsComponent implements OnInit {
     private toastService: ToastService
   ) {
     this.clients$ = this.clientsService.getClients();
+    this.filteredClients$ = combineLatest([
+      this.clients$,
+      this.searchTerm$
+    ]).pipe(
+      map(([clients, term]) =>
+        clients.filter(c =>
+          c.name.toLowerCase().includes(term.toLowerCase()) ||
+          c.email.toLowerCase().includes(term.toLowerCase())
+        )
+      )
+    );
   }
 
   ngOnInit(): void {}
@@ -98,7 +113,8 @@ export class ClientsComponent implements OnInit {
   }
 
   openHistoryModal(clientId: string) {
-    this.dataHistoryToShow$ = this.clientsService.getHistory(clientId);
+    this.dataHistoryToShow$ = this.clientsService.getHistory(clientId)
+      .pipe(map(entries => entries.filter(e => !e.changes.includes('createdAt'))));
     this.appointmentHistoryToShow$ = this.appointmentsService.getAppointmentsForClient(clientId);
     this.showHistoryModal = true;
   }

@@ -3,11 +3,12 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { HistoryEntry } from '../../services/clients-service';
 import { Appointment } from '../../services/appointments-service';
+import { AppointmentDetailModalComponent } from '../appointment-detail-modal-component/appointment-detail-modal-component';
 
 @Component({
   selector: 'app-history-modal',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, AppointmentDetailModalComponent],
   templateUrl: './history-modal-component.html',
 })
 export class HistoryModalComponent implements OnInit {
@@ -18,6 +19,8 @@ export class HistoryModalComponent implements OnInit {
   @Output() onCancel = new EventEmitter<void>();
 
   activeTab: 'data' | 'appointments' = 'data';
+  selectedAppointment?: Appointment;
+  showAppointmentDetailModal = false;
 
   ngOnInit(): void {
     this.activeTab = this.showAppointmentHistoryTab ? 'appointments' : 'data';
@@ -37,6 +40,16 @@ export class HistoryModalComponent implements OnInit {
 
   selectTab(tab: 'data' | 'appointments'): void {
     this.activeTab = tab;
+  }
+
+  openAppointmentDetail(appointment: Appointment): void {
+    this.selectedAppointment = appointment;
+    this.showAppointmentDetailModal = true;
+  }
+
+  closeAppointmentDetail(): void {
+    this.showAppointmentDetailModal = false;
+    this.selectedAppointment = undefined;
   }
 
   translateStatus(status: string): string {
