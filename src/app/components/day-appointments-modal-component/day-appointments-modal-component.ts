@@ -13,7 +13,7 @@ export class DayAppointmentsModalComponent {
   @Input() events: CalendarEvent[] = [];
   @Output() onClose = new EventEmitter<void>();
 
-  private readonly statusTranslations: Record<string, string> = {
+  private readonly statusLabels: Record<string, string> = {
     confirmed: 'Confirmada',
     pending: 'Pendiente',
     cancelled: 'Cancelada',
@@ -30,19 +30,39 @@ export class DayAppointmentsModalComponent {
     presencial: 'bg-green-100 text-green-800',
   };
 
+  private normalizeStatus(status: string = ''): string {
+    switch (status.toLowerCase()) {
+      case 'confirmada':
+      case 'confirmed':
+        return 'confirmed';
+      case 'pendiente':
+      case 'pending':
+        return 'pending';
+      case 'cancelada':
+      case 'canceled':
+      case 'cancelled':
+        return 'cancelled';
+      default:
+        return status.toLowerCase();
+    }
+  }
+
   close(): void {
     this.onClose.emit();
   }
 
-  getStatusLabel(status: string): string {
-    return this.statusTranslations[status] || status;
+  getStatusLabel(status: string = ''): string {
+    const key = this.normalizeStatus(status);
+    return this.statusLabels[key] || status;
   }
 
-  getStatusClass(status: string): string {
-    return `px-2 py-0.5 rounded ${this.statusClasses[status] || 'bg-gray-100 text-gray-800'}`;
+  getStatusClass(status: string = ''): string {
+    const key = this.normalizeStatus(status);
+    return `px-2 py-0.5 rounded ${this.statusClasses[key] || 'bg-gray-100 text-gray-800'}`;
   }
 
-  getTypeClass(type: string): string {
-    return `px-2 py-0.5 rounded ${this.typeClasses[type] || 'bg-gray-100 text-gray-800'}`;
+  getTypeClass(type: string = ''): string {
+    const key = type.toLowerCase();
+    return `px-2 py-0.5 rounded ${this.typeClasses[key] || 'bg-gray-100 text-gray-800'}`;
   }
 }
