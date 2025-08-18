@@ -224,16 +224,21 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  handleSaveTimeBlock(blockData: TimeBlock): void {
-    this.timeBlockService
-      .addTimeBlock(blockData)
+  handleSaveTimeBlock(blockData: TimeBlock): Promise<any> {
+    const promise = this.timeBlockService.addTimeBlock(blockData);
+
+    promise
       .then(() => {
         this.toastService.show('Horario bloqueado con éxito', 'success');
-        this.closeAllModals();
       })
       .catch((err) => {
         this.toastService.show('Error al guardar el bloqueo', 'error');
         console.error(err);
+      })
+      .finally(() => {
+        this.closeAllModals();
       });
+
+    return promise;
   }
 }

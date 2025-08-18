@@ -1,9 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
-import { addMinutes, parseISO } from 'date-fns';
-import { TimeBlock } from '../../services/time-block-service';
+import { addMinutes, parseISO, addDays, setHours, setMinutes, areIntervalsOverlapping } from 'date-fns';
+import { combineLatest } from 'rxjs';
+
+import { Appointment, AppointmentsService } from '../../services/appointments-service';
+import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
+import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog-component/confirmation-dialog-component';
 
 @Component({
@@ -12,60 +16,245 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog-component/co
   imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent],
   templateUrl: './time-block-form-component.html',
 })
-export class TimeBlockFormComponent implements OnInit {
+export class TimeBlockFormComponent implements OnInit, OnChanges {
   @Input() startDate!: Date;
-  @Input() timeBlock: TimeBlock | null = null; // Puede recibir un bloqueo para editar
+  @Input() timeBlock: TimeBlock | null = null;
   @Input() isDeleting = false;
   @Output() onSave = new EventEmitter<TimeBlock>();
   @Output() onCancel = new EventEmitter<void>();
-  @Output() onDelete = new EventEmitter<string>(); // Nuevo evento para eliminar
+  @Output() onDelete = new EventEmitter<string>();
 
   blockForm: FormGroup;
   isLoading = false;
   isEditMode = false;
   showConfirmationDialog = false;
 
-  constructor(private fb: FormBuilder) {
+  availableDates: string[] = [];
+  availableStartTimes: string[] = [];
+  availableEndTimes: string[] = [];
+  workSchedule: WorkSchedule | null = null;
+  appointments: Appointment[] = [];
+  timeBlocks: TimeBlock[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private appointmentsService: AppointmentsService,
+    private timeBlockService: TimeBlockService,
+    private settingsService: SettingsService
+  ) {
     this.blockForm = this.fb.group({
       title: ['Horario Bloqueado', Validators.required],
-      start: ['', Validators.required],
-      end: ['', Validators.required],
+      date: ['', Validators.required],
+      startTime: ['', Validators.required],
+      endTime: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
-    // Rellena el formulario con la hora de inicio seleccionada
-    // y una hora de fin por defecto (ej. 30 minutos después)
-    const endDate = addMinutes(this.startDate, 30);
-    this.blockForm.patchValue({
-      start: formatDate(this.startDate, 'yyyy-MM-ddTHH:mm', 'en-US'),
-      end: formatDate(endDate, 'yyyy-MM-ddTHH:mm', 'en-US'),
+    this.loadData();
+    this.blockForm.get('date')?.valueChanges.subscribe(date => {
+      if (date) {
+        this.generateAvailableStartTimes(date);
+        this.blockForm.get('startTime')?.setValue('');
+        this.availableEndTimes = [];
+      }
+    });
+    this.blockForm.get('startTime')?.valueChanges.subscribe(time => {
+      const date = this.blockForm.get('date')?.value;
+      if (time && date) {
+        this.generateAvailableEndTimes(date, time);
+      } else {
+        this.availableEndTimes = [];
+      }
     });
   }
 
-   ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.configureFormForMode();
+  }
+
+  private loadData(): void {
+    combineLatest([
+      this.settingsService.getProfessionalProfile(),
+      this.appointmentsService.getAppointments(),
+      this.timeBlockService.getTimeBlocks()
+    ]).subscribe(([profile, appointments, blocks]) => {
+      this.workSchedule = profile?.workSchedule || null;
+      this.appointments = appointments;
+      this.timeBlocks = blocks;
+      this.generateAvailableDates();
+      const date = this.blockForm.get('date')?.value;
+      if (date) {
+        this.generateAvailableStartTimes(date);
+        const start = this.blockForm.get('startTime')?.value;
+        if (start) {
+          this.generateAvailableEndTimes(date, start);
+        }
+      }
+    });
+  }
+
+  private generateAvailableDates(): void {
+    this.availableDates = [];
+    if (!this.workSchedule) {
+      return;
+    }
+    const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const today = new Date();
+    for (let i = 0; i < 21; i++) {
+      const date = addDays(today, i);
+      const dayName = daysOfWeek[date.getDay()];
+      const daySchedule = this.workSchedule[dayName];
+      if (daySchedule && daySchedule.isActive) {
+        this.availableDates.push(formatDate(date, 'yyyy-MM-dd', 'en-US'));
+      }
+    }
+  }
+
+  private generateAvailableStartTimes(date: string): void {
+    this.availableStartTimes = [];
+    if (!this.workSchedule) {
+      return;
+    }
+    const baseDate = parseISO(`${date}T00:00:00`);
+    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
+    const daySchedule = this.workSchedule[dayName];
+    if (!daySchedule || !daySchedule.isActive) {
+      return;
+    }
+    const [startHour, startMinute] = daySchedule.workHours.start.split(':').map(Number);
+    const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
+    let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
+    const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
+
+    while (addMinutes(slotStart, 30) <= workEnd) {
+      const slotEnd = addMinutes(slotStart, 30);
+      if (this.isIntervalAvailable(slotStart, slotEnd, daySchedule)) {
+        this.availableStartTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
+      }
+      slotStart = addMinutes(slotStart, 30);
+    }
+
+    if (this.isEditMode && this.timeBlock) {
+      const currentDate = formatDate(this.timeBlock.start.toDate(), 'yyyy-MM-dd', 'en-US');
+      const currentStart = formatDate(this.timeBlock.start.toDate(), 'HH:mm', 'en-US');
+      if (currentDate === date && !this.availableStartTimes.includes(currentStart)) {
+        this.availableStartTimes.push(currentStart);
+        this.availableStartTimes.sort();
+      }
+    }
+  }
+
+  private generateAvailableEndTimes(date: string, startTime: string): void {
+    this.availableEndTimes = [];
+    if (!this.workSchedule) {
+      return;
+    }
+    const start = parseISO(`${date}T${startTime}`);
+    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][start.getDay()];
+    const daySchedule = this.workSchedule[dayName];
+    if (!daySchedule || !daySchedule.isActive) {
+      return;
+    }
+    const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
+    const workEnd = setMinutes(setHours(parseISO(`${date}T00:00:00`), endHour), endMinute);
+
+    let slotEnd = addMinutes(start, 30);
+    while (slotEnd <= workEnd && this.isIntervalAvailable(start, slotEnd, daySchedule)) {
+      this.availableEndTimes.push(formatDate(slotEnd, 'HH:mm', 'en-US'));
+      slotEnd = addMinutes(slotEnd, 30);
+    }
+
+    if (this.isEditMode && this.timeBlock) {
+      const currentDate = formatDate(this.timeBlock.start.toDate(), 'yyyy-MM-dd', 'en-US');
+      const currentStart = formatDate(this.timeBlock.start.toDate(), 'HH:mm', 'en-US');
+      const currentEnd = formatDate(this.timeBlock.end.toDate(), 'HH:mm', 'en-US');
+      if (currentDate === date && currentStart === startTime && !this.availableEndTimes.includes(currentEnd)) {
+        this.availableEndTimes.push(currentEnd);
+        this.availableEndTimes.sort();
+      }
+    }
+  }
+
+  private isIntervalAvailable(start: Date, end: Date, daySchedule: DaySchedule): boolean {
+    const interval = { start, end };
+    if (daySchedule.breaks) {
+      for (const brk of daySchedule.breaks) {
+        const [bsHour, bsMinute] = brk.start.split(':').map(Number);
+        const [beHour, beMinute] = brk.end.split(':').map(Number);
+        const breakStart = setMinutes(setHours(new Date(start), bsHour), bsMinute);
+        const breakEnd = setMinutes(setHours(new Date(start), beHour), beMinute);
+        if (areIntervalsOverlapping(interval, { start: breakStart, end: breakEnd })) {
+          return false;
+        }
+      }
+    }
+
+    for (const apt of this.appointments) {
+      const aptStart = apt.start.toDate();
+      const aptEnd = apt.end.toDate();
+      if (formatDate(aptStart, 'yyyy-MM-dd', 'en-US') === formatDate(start, 'yyyy-MM-dd', 'en-US')) {
+        if (areIntervalsOverlapping(interval, { start: aptStart, end: aptEnd })) {
+          return false;
+        }
+      }
+    }
+
+    for (const block of this.timeBlocks) {
+      if (this.isEditMode && block.id === this.timeBlock?.id) continue;
+      const blockStart = block.start.toDate();
+      const blockEnd = block.end.toDate();
+      if (formatDate(blockStart, 'yyyy-MM-dd', 'en-US') === formatDate(start, 'yyyy-MM-dd', 'en-US')) {
+        if (areIntervalsOverlapping(interval, { start: blockStart, end: blockEnd })) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  onDateChange(date: string): void {
+    this.generateAvailableStartTimes(date);
+  }
+
+  onStartTimeChange(time: string): void {
+    const date = this.blockForm.get('date')?.value;
+    if (date) {
+      this.generateAvailableEndTimes(date, time);
+    }
   }
 
   private configureFormForMode(): void {
     if (this.timeBlock) {
-      // --- MODO EDICIÓN ---
       this.isEditMode = true;
+      const start = this.timeBlock.start.toDate();
+      const end = this.timeBlock.end.toDate();
+      const dateStr = formatDate(start, 'yyyy-MM-dd', 'en-US');
+      const startStr = formatDate(start, 'HH:mm', 'en-US');
+      const endStr = formatDate(end, 'HH:mm', 'en-US');
       this.blockForm.patchValue({
         title: this.timeBlock.title,
-        start: formatDate(this.timeBlock.start.toDate(), 'yyyy-MM-ddTHH:mm', 'en-US'),
-        end: formatDate(this.timeBlock.end.toDate(), 'yyyy-MM-ddTHH:mm', 'en-US'),
+        date: dateStr,
+        startTime: startStr,
+        endTime: endStr,
       });
+      this.generateAvailableStartTimes(dateStr);
+      this.generateAvailableEndTimes(dateStr, startStr);
     } else {
-      // --- MODO CREACIÓN ---
       this.isEditMode = false;
       this.blockForm.reset();
-      const endDate = addMinutes(this.startDate, 30);
+      const dateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
+      const startStr = formatDate(this.startDate, 'HH:mm', 'en-US');
+      const endStr = formatDate(addMinutes(this.startDate, 30), 'HH:mm', 'en-US');
       this.blockForm.patchValue({
         title: 'Horario Bloqueado',
-        start: formatDate(this.startDate, 'yyyy-MM-ddTHH:mm', 'en-US'),
-        end: formatDate(endDate, 'yyyy-MM-ddTHH:mm', 'en-US'),
+        date: dateStr,
+        startTime: startStr,
+        endTime: endStr,
       });
+      this.generateAvailableStartTimes(dateStr);
+      this.generateAvailableEndTimes(dateStr, startStr);
     }
   }
 
@@ -73,8 +262,8 @@ export class TimeBlockFormComponent implements OnInit {
     if (this.blockForm.invalid) return;
     this.isLoading = true;
     const formValue = this.blockForm.value;
-    const startDate = parseISO(formValue.start);
-    const endDate = parseISO(formValue.end);
+    const startDate = parseISO(`${formValue.date}T${formValue.startTime}`);
+    const endDate = parseISO(`${formValue.date}T${formValue.endTime}`);
 
     const blockData: any = {
       title: formValue.title,
@@ -87,10 +276,15 @@ export class TimeBlockFormComponent implements OnInit {
       blockData.id = this.timeBlock?.id;
     }
 
-    this.onSave.emit(blockData as TimeBlock);
+    (this.onSave.emit(blockData as TimeBlock) as unknown as Promise<any>)
+      .then(() => {
+        this.isLoading = false;
+      })
+      .catch(() => {
+        this.isLoading = false;
+      });
   }
 
-  // --- Lógica de Eliminación ---
   requestDelete(): void {
     this.showConfirmationDialog = true;
   }
