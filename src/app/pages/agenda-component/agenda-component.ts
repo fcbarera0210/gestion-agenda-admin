@@ -130,14 +130,17 @@ export class AgendaComponent implements OnInit, OnDestroy {
             const daySchedule = schedule[dayName];
 
             const dayStart = setMinutes(setHours(dateInWeek, this.dayStartHour), 0);
-            const dayEnd = setMinutes(setHours(dateInWeek, this.dayEndHour), 0);
+            const dayEnd = setMinutes(
+              setHours(dateInWeek, Math.min(24, this.dayEndHour + 1)),
+              0
+            );
 
             if (!daySchedule || !daySchedule.isActive || !daySchedule.workHours) {
               nonWorkEvents.push({
                 start: dayStart,
                 end: dayEnd,
                 title: '<i>No laborable</i>',
-                color: { primary: '#f0f0f0', secondary: '#f0f0f0' },
+                color: { primary: '#e6e0ff', secondary: '#e6e0ff' },
                 cssClass: 'cal-non-work',
                 draggable: false,
                 resizable: { beforeStart: false, afterEnd: false },
@@ -156,7 +159,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
                 start: dayStart,
                 end: workStart,
                 title: '<i>No laborable</i>',
-                color: { primary: '#f0f0f0', secondary: '#f0f0f0' },
+                color: { primary: '#e6e0ff', secondary: '#e6e0ff' },
                 cssClass: 'cal-non-work',
                 draggable: false,
                 resizable: { beforeStart: false, afterEnd: false },
@@ -169,7 +172,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
                 start: workEnd,
                 end: dayEnd,
                 title: '<i>No laborable</i>',
-                color: { primary: '#f0f0f0', secondary: '#f0f0f0' },
+                color: { primary: '#e6e0ff', secondary: '#e6e0ff' },
                 cssClass: 'cal-non-work',
                 draggable: false,
                 resizable: { beforeStart: false, afterEnd: false },
