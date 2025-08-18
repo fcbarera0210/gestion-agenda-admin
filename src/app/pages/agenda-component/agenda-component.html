@@ -127,7 +127,7 @@
           [weekStartsOn]="1"
           [locale]="locale"
           [excludeDays]="excludeDays"
-          (dayClicked)="onHourSegmentClicked({ date: $event.day.date })"
+          (dayClicked)="openDayAppointmentsModal($event.day.date)"
           (eventClicked)="handleEventClicked($event)">
         </mwl-calendar-month-view>
       </div>
@@ -177,8 +177,16 @@
 <app-time-block-form
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
-  [timeBlock]="selectedTimeBlock" 
+  [timeBlock]="selectedTimeBlock"
   [isDeleting]="isDeletingBlock" (onSave)="handleSaveTimeBlock($event)"
-  (onDelete)="handleDeleteTimeBlock($event)" 
+  (onDelete)="handleDeleteTimeBlock($event)"
   (onCancel)="closeAllModals()">
 </app-time-block-form>
+
+<app-day-appointments-modal
+  *ngIf="showDayAppointmentsModal"
+  [date]="selectedDate!"
+  [events]="dayAppointments"
+  (onClose)="closeAllModals()"
+></app-day-appointments-modal>
+

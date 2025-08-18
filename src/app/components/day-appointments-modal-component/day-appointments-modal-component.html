@@ -1,0 +1,17 @@
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="close()"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg space-y-4">
+    <h2 class="text-xl font-bold text-gray-800">{{ date | date:'fullDate' }}</h2>
+    <div *ngIf="events.length; else noEvents" class="space-y-2">
+      <div *ngFor="let event of events" class="p-2 border-b last:border-b-0">
+        <p class="font-semibold">{{ event.title }}</p>
+        <p class="text-sm text-gray-600" *ngIf="event.start">{{ event.start | date:'shortTime' }}<span *ngIf="event.end"> - {{ event.end | date:'shortTime' }}</span></p>
+      </div>
+    </div>
+    <ng-template #noEvents>
+      <p class="text-gray-600">No hay eventos para este día</p>
+    </ng-template>
+    <button (click)="close()" class="w-full px-4 py-2 font-semibold text-white rounded-lg bg-primary hover:bg-opacity-90">Cerrar</button>
+  </div>
+</div>
+

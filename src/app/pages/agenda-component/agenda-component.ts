@@ -6,7 +6,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
 import { map, combineLatest, firstValueFrom, BehaviorSubject, Subscription } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
-import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
+import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth, addMonths, subMonths, isSameDay } from 'date-fns';
 
 // Componentes y Servicios
 import { SettingsService, WorkSchedule } from '../../services/settings-service';
@@ -15,6 +15,7 @@ import { ClientsService } from '../../services/clients-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
+import { DayAppointmentsModalComponent } from '../../components/day-appointments-modal-component/day-appointments-modal-component';
 import { ViewDateFormatPipe } from '../../pipes/view-date-format.pipe';
 import { ToastService } from '../../services/toast-service';
 import { NotificationService } from '../../services/notification-service';
@@ -22,7 +23,7 @@ import { NotificationService } from '../../services/notification-service';
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent, ViewDateFormatPipe],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -67,9 +68,11 @@ export class AgendaComponent implements OnInit, OnDestroy {
   showChoiceModal = false;
   showAppointmentModal = false;
   showTimeBlockModal = false;
+  showDayAppointmentsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
   selectedTimeBlock: TimeBlock | null = null;
+  dayAppointments: CalendarEvent[] = [];
   isDeletingAppointment = false;
   isDeletingBlock = false;
 
@@ -430,14 +433,23 @@ export class AgendaComponent implements OnInit, OnDestroy {
         this.isDeletingBlock = false;
       });
   }
-  
+
+  openDayAppointmentsModal(date: Date): void {
+    this.selectedDate = date;
+    this.dayAppointments = this.events.filter(event => isSameDay(event.start, date));
+    this.showDayAppointmentsModal = true;
+    this.cdr.markForCheck();
+  }
+
   closeAllModals(): void {
     this.showChoiceModal = false;
     this.showAppointmentModal = false;
     this.showTimeBlockModal = false;
+    this.showDayAppointmentsModal = false;
     this.selectedDate = null;
     this.selectedAppointment = null;
     this.selectedTimeBlock = null;
+    this.dayAppointments = [];
     this.cdr.markForCheck();
   }
 }
