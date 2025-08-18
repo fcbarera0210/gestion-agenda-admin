@@ -6,9 +6,16 @@
       <div *ngIf="events.length; else noEvents" class="space-y-2">
         <div *ngFor="let event of events" class="p-2 border-b last:border-b-0">
           <p class="font-semibold" [innerHTML]="event.title"></p>
-          <p class="text-sm text-gray-600" *ngIf="event.start">{{ event.start | date:'shortTime' }}<span *ngIf="event.end"> - {{ event.end | date:'shortTime' }}</span></p>
-          <p class="text-xs text-gray-500" *ngIf="event.meta?.eventType === 'appointment'">
-            {{ event.meta.type === 'online' ? 'Online' : 'Presencial' }} - {{ event.meta.status | titlecase }}
+          <p class="text-sm text-gray-600" *ngIf="event.start">
+            {{ event.start | date:'shortTime' }}<span *ngIf="event.end"> - {{ event.end | date:'shortTime' }}</span>
+          </p>
+          <p class="text-xs flex gap-1 items-center" *ngIf="event.meta?.eventType === 'appointment'">
+            <span [ngClass]="getTypeClass(event.meta.type)">
+              {{ event.meta.type === 'online' ? 'Online' : 'Presencial' }}
+            </span>
+            <span [ngClass]="getStatusClass(event.meta.status)">
+              {{ getStatusLabel(event.meta.status) }}
+            </span>
           </p>
         </div>
       </div>
