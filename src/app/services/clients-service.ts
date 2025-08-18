@@ -12,6 +12,7 @@ export interface Client {
   phone: string;
   notes?: string;
   professionalId?: string;
+  createdAt?: any;
 }
 
 // Interfaz para la entrada de historial
@@ -96,7 +97,7 @@ export class ClientsService {
 
       // Comparamos campo por campo para construir la descripción de cambios
       (Object.keys(client) as Array<keyof Client>).forEach(key => {
-        if (key !== 'id' && key !== 'professionalId' && oldData[key] !== client[key]) {
+        if (key !== 'id' && key !== 'professionalId' && key !== 'createdAt' && oldData[key] !== client[key]) {
           changesDescription += `Se actualizó '${key}' de '${oldData[key] || ""}' a '${client[key]}'.\n`;
         }
       });

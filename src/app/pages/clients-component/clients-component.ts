@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Client, ClientsService, HistoryEntry } from '../../services/clients-service';
 import { ToastService } from '../../services/toast-service';
 import { ClientFormComponent } from '../../components/client-form-component/client-form-component';
@@ -98,7 +98,8 @@ export class ClientsComponent implements OnInit {
   }
 
   openHistoryModal(clientId: string) {
-    this.dataHistoryToShow$ = this.clientsService.getHistory(clientId);
+    this.dataHistoryToShow$ = this.clientsService.getHistory(clientId)
+      .pipe(map(entries => entries.filter(e => !e.changes.includes('createdAt'))));
     this.appointmentHistoryToShow$ = this.appointmentsService.getAppointmentsForClient(clientId);
     this.showHistoryModal = true;
   }
