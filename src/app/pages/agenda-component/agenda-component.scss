@@ -19,3 +19,8 @@
   white-space: normal !important;
   font-size: 0.8rem; // Ajusta el tamaño de la fuente si es necesario
 }
+
+::ng-deep .cal-non-work {
+  background: #e6e0ff !important;
+  color: #5a4a8f !important;
+}
