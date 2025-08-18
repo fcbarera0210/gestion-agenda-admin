@@ -561,6 +561,13 @@
 >
 </app-appointment-form>
 
+<app-appointment-details-modal
+  *ngIf="showAppointmentDetailsModal"
+  [appointment]="selectedAppointment!"
+  (onSave)="handleSaveAppointment($event)"
+  (onCancel)="closeAllModals()"
+></app-appointment-details-modal>
+
 <app-time-block-form
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
