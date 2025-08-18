@@ -1,0 +1,21 @@
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="close()"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg space-y-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-bold text-gray-800">{{ appointment.title }}</h2>
+      <button (click)="close()" class="p-2 text-gray-400 rounded-full hover:bg-gray-100">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div class="space-y-2">
+      <p><span class="font-semibold">Fecha:</span> {{ appointment.start.toDate() | date:'fullDate' }}</p>
+      <p><span class="font-semibold">Hora:</span> {{ appointment.start.toDate() | date:'shortTime' }}</p>
+      <p><span class="font-semibold">Estado:</span> {{ translateStatus(appointment.status) | titlecase }}</p>
+      <p><span class="font-semibold">Tipo:</span> {{ appointment.type | titlecase }}</p>
+      <div *ngIf="appointment.notes" class="pt-2 border-t mt-2">
+        <p class="font-semibold text-sm">Notas:</p>
+        <p class="text-gray-700 whitespace-pre-wrap">{{ appointment.notes }}</p>
+      </div>
+    </div>
+  </div>
+</div>
