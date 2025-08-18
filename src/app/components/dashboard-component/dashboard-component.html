@@ -72,8 +72,8 @@
               <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                   <div class="text-center sm:text-left">
-                    <p class="font-bold text-primary">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }}</p>
-                    <p class="text-xs text-gray-500">{{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
+                    <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
+                    <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
                   </div>
                   <div class="text-center sm:text-left">
                     <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
@@ -128,7 +128,7 @@
                 <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
                   <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                     <div class="text-center sm:text-left">
-                      <p class="font-bold text-primary">{{ apt.start.toDate() | date:"EEEE dd 'de' MMMM":undefined:'es' }}</p>
+                      <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
                       <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
                     </div>
                     <div class="text-center sm:text-left">
@@ -156,7 +156,7 @@
                 <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
                   <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                     <div class="text-center sm:text-left">
-                      <p class="font-bold text-primary">{{ apt.start.toDate() | date:"EEEE dd 'de' MMMM":undefined:'es' }}</p>
+                      <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
                       <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
                     </div>
                     <div class="text-center sm:text-left">
