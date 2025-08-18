@@ -20,14 +20,14 @@ export class DayAppointmentsModalComponent {
   };
 
   private readonly statusClasses: Record<string, string> = {
-    confirmed: 'bg-blue-500 text-white',
-    pending: 'bg-yellow-500 text-white',
-    cancelled: 'bg-red-500 text-white',
+    confirmed: 'bg-blue-100 text-blue-800',
+    pending: 'bg-[#FEF9C3] text-[#884E0F]',
+    cancelled: 'bg-red-100 text-red-800',
   };
 
   private readonly typeClasses: Record<string, string> = {
-    online: 'bg-purple-500 text-white',
-    presencial: 'bg-green-500 text-white',
+    online: 'bg-purple-100 text-purple-800',
+    presencial: 'bg-[#DCFCE7] text-[#166536]',
   };
 
   private normalizeStatus(status: string = ''): string {
