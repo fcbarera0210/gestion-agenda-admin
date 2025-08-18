@@ -1,7 +1,8 @@
 /* Responsive styling handled with Tailwind utility classes. */
 
 aside {
-  transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+  transition: width 0.3s ease-in-out, padding 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
 }
 
 aside .logo-container,
