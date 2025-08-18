@@ -41,6 +41,19 @@ export class AgendaComponent implements OnInit, OnDestroy {
   isMobile = false;
   private eventsSub?: Subscription;
 
+  // --- Leyenda de estados ---
+  private statusColors: any = {
+    confirmed: { primary: '#1e90ff', secondary: '#D1E8FF' }, // Azul
+    pending: { primary: '#ffc107', secondary: '#FFF3CD' }, // Amarillo
+    cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo
+  };
+
+  statusLegend = [
+    { status: 'confirmed', label: 'Confirmada', color: this.statusColors.confirmed },
+    { status: 'pending', label: 'Pendiente', color: this.statusColors.pending },
+    { status: 'cancelled', label: 'Cancelada', color: this.statusColors.cancelled },
+  ];
+
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
   showAppointmentModal = false;

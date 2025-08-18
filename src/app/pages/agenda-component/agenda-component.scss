@@ -24,3 +24,24 @@
   background: #e6e0ff !important;
   color: #5a4a8f !important;
 }
+
+.status-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #374151; /* text-gray-700 */
+}
+
+.status-legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.status-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 4px;
+}
