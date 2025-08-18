@@ -21,6 +21,7 @@ export class AppointmentDetailsModalComponent implements OnInit {
   client?: Client;
   serviceName = '';
   form: FormGroup;
+  isLoading = false;
 
   constructor(
     private clientsService: ClientsService,
@@ -56,6 +57,7 @@ export class AppointmentDetailsModalComponent implements OnInit {
   }
 
   save(): void {
+    this.isLoading = true;
     const updated: Appointment = {
       ...this.appointment,
       status: this.form.value.status,
