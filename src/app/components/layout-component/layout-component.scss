@@ -43,6 +43,9 @@ aside:not(.collapsed) .nav-link {
   aside.collapsed:hover nav {
     @apply items-start;
   }
+  aside.collapsed:hover .bottom-nav {
+    @apply items-start;
+  }
   aside.collapsed:hover .nav-text {
     display: inline;
   }
