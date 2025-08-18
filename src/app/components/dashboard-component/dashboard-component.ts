@@ -58,12 +58,11 @@ export class DashboardComponent implements OnInit {
   // Propiedades para los modales de acción rápida
   showAppointmentModal = false;
   showTimeBlockModal = false;
-  showCancelledPanel = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
 
   // Control de la lista mostrada en la tarjeta principal
-  activeView: 'day' | 'week' | 'month' | 'pending' = 'day';
+  activeView: 'day' | 'week' | 'month' | 'pending' | 'cancelled' = 'day';
 
   constructor(
     private appointmentsService: AppointmentsService,
@@ -179,10 +178,6 @@ export class DashboardComponent implements OnInit {
     this.showTimeBlockModal = true;
   }
 
-  toggleCancelledPanel(): void {
-    this.showCancelledPanel = !this.showCancelledPanel;
-  }
-
   closeAllModals(): void {
     this.showAppointmentModal = false;
     this.showTimeBlockModal = false;
@@ -190,7 +185,7 @@ export class DashboardComponent implements OnInit {
     this.selectedDate = null;
   }
 
-  selectView(view: 'day' | 'week' | 'month' | 'pending'): void {
+  selectView(view: 'day' | 'week' | 'month' | 'pending' | 'cancelled'): void {
     this.activeView = view;
   }
 
