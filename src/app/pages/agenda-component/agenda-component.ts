@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CalendarModule, DateAdapter, CalendarEvent } from 'angular-calendar';
+import { CalendarModule, DateAdapter, CalendarEvent, CalendarView } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
 import { map, combineLatest, firstValueFrom, BehaviorSubject, Subscription } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
-import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth } from 'date-fns';
+import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 
 // Componentes y Servicios
 import { SettingsService, WorkSchedule } from '../../services/settings-service';
@@ -39,6 +39,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
   dayEndHour = 20;
   isCalendarReady = false;
   isMobile = false;
+  CalendarView = CalendarView;
+  view: CalendarView = this.isMobile ? CalendarView.Day : CalendarView.Week;
   private eventsSub?: Subscription;
 
   // --- Leyenda de estados ---
@@ -83,6 +85,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.updateIsMobile();
     window.addEventListener('resize', () => this.updateIsMobile());
+    this.view = this.isMobile ? CalendarView.Day : CalendarView.Week;
     this.loadWorkSchedule();
     this.loadEvents();
   }
@@ -262,10 +265,20 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.dayEndHour = maxHour === 0 ? 20 : Math.min(23, maxHour + 1);
   }
 
+  setView(view: CalendarView): void {
+    this.view = view;
+  }
+
   // --- Navegación del Calendario ---
 
   previousWeek(): void {
-    this.viewDate = subDays(this.viewDate, this.isMobile ? 1 : 7);
+    if (this.view === CalendarView.Day) {
+      this.viewDate = subDays(this.viewDate, 1);
+    } else if (this.view === CalendarView.Week) {
+      this.viewDate = subDays(this.viewDate, 7);
+    } else {
+      this.viewDate = subMonths(this.viewDate, 1);
+    }
     this.viewDate$.next(this.viewDate);
   }
   today(): void {
@@ -273,7 +286,13 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.viewDate$.next(this.viewDate);
   }
   nextWeek(): void {
-    this.viewDate = addDays(this.viewDate, this.isMobile ? 1 : 7);
+    if (this.view === CalendarView.Day) {
+      this.viewDate = addDays(this.viewDate, 1);
+    } else if (this.view === CalendarView.Week) {
+      this.viewDate = addDays(this.viewDate, 7);
+    } else {
+      this.viewDate = addMonths(this.viewDate, 1);
+    }
     this.viewDate$.next(this.viewDate);
   }
 
