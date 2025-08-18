@@ -293,23 +293,33 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   private configureFormForMode(): void {
     if (this.appointment) {
       this.isEditMode = true;
+
+      const dateStr = formatDate(this.appointment!.start.toDate(), 'yyyy-MM-dd', 'en-US');
+      const timeStr = formatDate(this.appointment!.start.toDate(), 'HH:mm', 'en-US');
+
       this.appointmentForm.patchValue({
         clientId: this.appointment!.clientId,
         serviceId: this.appointment!.serviceId,
-        date: formatDate(this.appointment!.start.toDate(), 'yyyy-MM-dd', 'en-US'),
-        time: formatDate(this.appointment!.start.toDate(), 'HH:mm', 'en-US'),
+        date: dateStr,
+        time: timeStr,
         status: this.appointment!.status,
         type: this.appointment!.type,
         notes: this.appointment!.notes || ''
       });
+
       const client = this.clients.find(c => c.id === this.appointment!.clientId);
       if (client) {
         this.clientSearch.setValue(client.name, { emitEvent: false });
       }
+
       const service = this.services.find(s => s.id === this.appointment!.serviceId);
       if (service) {
         this.serviceSearch.setValue(service.name, { emitEvent: false });
       }
+
+      this.generateAvailableTimes(dateStr).then(() => {
+        this.appointmentForm.get('time')?.setValue(timeStr);
+      });
     } else {
       this.isEditMode = false;
       this.appointmentForm.reset();
