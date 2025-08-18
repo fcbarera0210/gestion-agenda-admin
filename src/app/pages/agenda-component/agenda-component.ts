@@ -6,7 +6,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
 import { map, combineLatest, firstValueFrom, BehaviorSubject, Subscription } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
-import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
+import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth, addMonths, subMonths, isSameDay, startOfDay, endOfDay } from 'date-fns';
 
 // Componentes y Servicios
 import { SettingsService, WorkSchedule } from '../../services/settings-service';
@@ -15,13 +15,15 @@ import { ClientsService } from '../../services/clients-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
+import { DayAppointmentsModalComponent } from '../../components/day-appointments-modal-component/day-appointments-modal-component';
+import { ViewDateFormatPipe } from '../../pipes/view-date-format.pipe';
 import { ToastService } from '../../services/toast-service';
 import { NotificationService } from '../../services/notification-service';
 
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -44,7 +46,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   private eventsSub?: Subscription;
 
   // --- Leyenda de estados ---
-  private statusColors: any = {
+  statusColors: any = {
     confirmed: { primary: '#1e90ff', secondary: '#D1E8FF' }, // Azul
     pending: { primary: '#ffc107', secondary: '#FFF3CD' }, // Amarillo
     cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo
@@ -60,15 +62,17 @@ export class AgendaComponent implements OnInit, OnDestroy {
     { status: 'nonWork', label: 'No laborable', color: this.statusColors.nonWork },
   ];
 
-  monthlyCounts = { confirmed: 0, pending: 0, cancelled: 0 };
+  viewCounts = { confirmed: 0, pending: 0, cancelled: 0 };
 
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
   showAppointmentModal = false;
   showTimeBlockModal = false;
+  showDayAppointmentsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
   selectedTimeBlock: TimeBlock | null = null;
+  dayAppointments: CalendarEvent[] = [];
   isDeletingAppointment = false;
   isDeletingBlock = false;
 
@@ -121,21 +125,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
     ]).pipe(
       map(([appointments, clients, timeBlocks, profile, viewDate]) => {
         const clientsMap = new Map(clients.map(client => [client.id, client.name]));
-
-        const startMonth = startOfMonth(viewDate);
-        const endMonth = endOfMonth(viewDate);
-        const counts: Record<'confirmed' | 'pending' | 'cancelled', number> = {
-          confirmed: 0,
-          pending: 0,
-          cancelled: 0,
-        };
-        appointments.forEach(apt => {
-          const startDate = apt.start.toDate();
-          if (startDate >= startMonth && startDate <= endMonth) {
-            counts[apt.status]++;
-          }
-        });
-        this.monthlyCounts = counts;
 
         const appointmentEvents = appointments.map(apt => ({
           start: apt.start.toDate(),
@@ -238,8 +227,42 @@ export class AgendaComponent implements OnInit, OnDestroy {
       })
     ).subscribe(calendarEvents => {
       this.events = calendarEvents;
+      this.updateCounts();
       this.cdr.markForCheck();
     });
+  }
+
+  updateCounts(): void {
+    const counts: Record<'confirmed' | 'pending' | 'cancelled', number> = {
+      confirmed: 0,
+      pending: 0,
+      cancelled: 0,
+    };
+
+    let rangeStart: Date;
+    let rangeEnd: Date;
+    if (this.view === CalendarView.Day) {
+      rangeStart = startOfDay(this.viewDate);
+      rangeEnd = endOfDay(this.viewDate);
+    } else if (this.view === CalendarView.Week) {
+      const weekStart = startOfWeek(this.viewDate, { weekStartsOn: 1 });
+      rangeStart = startOfDay(weekStart);
+      rangeEnd = endOfDay(addDays(weekStart, 6));
+    } else {
+      rangeStart = startOfMonth(this.viewDate);
+      rangeEnd = endOfMonth(this.viewDate);
+    }
+
+    this.events.forEach(ev => {
+      if (ev.meta?.eventType === 'appointment' && ev.start >= rangeStart && ev.start <= rangeEnd) {
+        const status = ev.meta.status as 'confirmed' | 'pending' | 'cancelled';
+        if (counts[status] !== undefined) {
+          counts[status]++;
+        }
+      }
+    });
+
+    this.viewCounts = counts;
   }
 
   processWorkSchedule(schedule: WorkSchedule): void {
@@ -267,6 +290,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
 
   setView(view: CalendarView): void {
     this.view = view;
+    this.updateCounts();
   }
 
   // --- Navegación del Calendario ---
@@ -280,10 +304,12 @@ export class AgendaComponent implements OnInit, OnDestroy {
       this.viewDate = subMonths(this.viewDate, 1);
     }
     this.viewDate$.next(this.viewDate);
+    this.updateCounts();
   }
   today(): void {
     this.viewDate = new Date();
     this.viewDate$.next(this.viewDate);
+    this.updateCounts();
   }
   nextWeek(): void {
     if (this.view === CalendarView.Day) {
@@ -294,11 +320,13 @@ export class AgendaComponent implements OnInit, OnDestroy {
       this.viewDate = addMonths(this.viewDate, 1);
     }
     this.viewDate$.next(this.viewDate);
+    this.updateCounts();
   }
 
   onDateChange(dateString: string): void {
     this.viewDate = new Date(dateString);
     this.viewDate$.next(this.viewDate);
+    this.updateCounts();
   }
 
   // --- Manejadores de Eventos del Calendario ---
@@ -429,14 +457,28 @@ export class AgendaComponent implements OnInit, OnDestroy {
         this.isDeletingBlock = false;
       });
   }
-  
+
+  openDayAppointmentsModal(date: Date): void {
+    this.selectedDate = date;
+    this.dayAppointments = this.events.filter(
+      event =>
+        isSameDay(event.start, date) &&
+        event.meta?.eventType !== 'nonWork' &&
+        event.meta?.eventType !== 'break'
+    );
+    this.showDayAppointmentsModal = true;
+    this.cdr.markForCheck();
+  }
+
   closeAllModals(): void {
     this.showChoiceModal = false;
     this.showAppointmentModal = false;
     this.showTimeBlockModal = false;
+    this.showDayAppointmentsModal = false;
     this.selectedDate = null;
     this.selectedAppointment = null;
     this.selectedTimeBlock = null;
+    this.dayAppointments = [];
     this.cdr.markForCheck();
   }
 }

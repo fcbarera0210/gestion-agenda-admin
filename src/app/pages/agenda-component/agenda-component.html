@@ -1,8 +1,8 @@
 <div class="space-y-8">
-  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+  <div class="md:flex md:items-center md:justify-between">
     <div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Agenda Semanal</h1>
-      <p class="mt-1 text-gray-600">Consulta y gestiona tus citas semanales.</p>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de calendario</h1>
+      <p class="mt-1 text-gray-600">Consulta y gestiona tus citas en el calendario.</p>
     </div>
     <div class="hidden md:flex items-center space-x-2">
       <button (click)="previousWeek()" class="p-2 text-gray-500 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700" title="Semana anterior">
@@ -52,39 +52,23 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
       </button>
     </div>
-    <div class="md:hidden flex justify-center mb-4 space-x-2">
-      <button
-        (click)="setView(CalendarView.Day)"
-        class="px-3 py-2 rounded-md text-sm"
-        [ngClass]="view === CalendarView.Day ? 'bg-primary text-white' : 'bg-white shadow text-gray-700 dark:text-gray-200 dark:bg-gray-700'"
-      >
-        Día
-      </button>
-      <button
-        (click)="setView(CalendarView.Week)"
-        class="px-3 py-2 rounded-md text-sm"
-        [ngClass]="view === CalendarView.Week ? 'bg-primary text-white' : 'bg-white shadow text-gray-700 dark:text-gray-200 dark:bg-gray-700'"
-      >
-        Semana
-      </button>
-      <button
-        (click)="setView(CalendarView.Month)"
-        class="px-3 py-2 rounded-md text-sm"
-        [ngClass]="view === CalendarView.Month ? 'bg-primary text-white' : 'bg-white shadow text-gray-700 dark:text-gray-200 dark:bg-gray-700'"
-      >
-        Mes
-      </button>
-    </div>
 
     <div class="p-4 md:p-8 bg-white rounded-lg shadow">
-      <div class="md:hidden flex items-center justify-between mb-4">
-        <p class="text-gray-600 font-medium">{{ viewDate | date:'fullDate':'':'es' }}</p>
-        <input
-          type="date"
-          class="p-2 border border-gray-300 rounded-md"
-          [ngModel]="viewDate | date:'yyyy-MM-dd'"
-          (ngModelChange)="onDateChange($event)"
-        />
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div class="view-counts flex gap-2 w-full md:w-auto mb-2 md:mb-0">
+          <span class="count-badge flex-1 md:flex-none text-center" [ngStyle]="{ 'background-color': statusColors.confirmed.primary }">Completas: {{ viewCounts.confirmed }}</span>
+          <span class="count-badge flex-1 md:flex-none text-center" [ngStyle]="{ 'background-color': statusColors.pending.primary }">Pendientes: {{ viewCounts.pending }}</span>
+          <span class="count-badge flex-1 md:flex-none text-center" [ngStyle]="{ 'background-color': statusColors.cancelled.primary }">Canceladas: {{ viewCounts.cancelled }}</span>
+        </div>
+        <div class="flex items-center gap-4 w-full md:w-auto justify-between">
+          <p class="text-gray-600 font-medium">{{ viewDate | viewDateFormat:view }}</p>
+          <input
+            type="date"
+            class="p-2 border border-gray-300 rounded-md md:hidden"
+            [ngModel]="viewDate | date:'yyyy-MM-dd'"
+            (ngModelChange)="onDateChange($event)"
+          />
+        </div>
       </div>
       <div class="h-[60vh] md:h-[70vh] overflow-y-auto" *ngIf="isCalendarReady" [ngSwitch]="view">
         <mwl-calendar-day-view
@@ -119,15 +103,10 @@
           [weekStartsOn]="1"
           [locale]="locale"
           [excludeDays]="excludeDays"
-          (dayClicked)="onHourSegmentClicked({ date: $event.day.date })"
+          (dayClicked)="openDayAppointmentsModal($event.day.date)"
           (eventClicked)="handleEventClicked($event)">
         </mwl-calendar-month-view>
       </div>
-    </div>
-    <div class="monthly-counts">
-      <div>Completas: {{ monthlyCounts.confirmed }}</div>
-      <div>Pendientes: {{ monthlyCounts.pending }}</div>
-      <div>Canceladas: {{ monthlyCounts.cancelled }}</div>
     </div>
     <div class="status-legend">
       <div class="status-legend-item" *ngFor="let item of statusLegend">
@@ -174,8 +153,16 @@
 <app-time-block-form
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
-  [timeBlock]="selectedTimeBlock" 
+  [timeBlock]="selectedTimeBlock"
   [isDeleting]="isDeletingBlock" (onSave)="handleSaveTimeBlock($event)"
-  (onDelete)="handleDeleteTimeBlock($event)" 
+  (onDelete)="handleDeleteTimeBlock($event)"
   (onCancel)="closeAllModals()">
 </app-time-block-form>
+
+<app-day-appointments-modal
+  *ngIf="showDayAppointmentsModal"
+  [date]="selectedDate!"
+  [events]="dayAppointments"
+  (onClose)="closeAllModals()"
+></app-day-appointments-modal>
+
