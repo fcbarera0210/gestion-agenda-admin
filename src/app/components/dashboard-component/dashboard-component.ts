@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 // Componentes y Servicios
 import { AppointmentsService, Appointment } from '../../services/appointments-service';
@@ -23,6 +23,8 @@ import { TimeBlockFormComponent } from '../../components/time-block-form-compone
 export class DashboardComponent implements OnInit {
 
   upcomingAppointments$!: Observable<Appointment[]>;
+  weekAppointments$!: Observable<Appointment[]>;
+  monthAppointments$!: Observable<Appointment[]>;
   pendingAppointments: Appointment[] = [];
   clientsMap = new Map<string, string>();
   stats = {
@@ -44,7 +46,7 @@ export class DashboardComponent implements OnInit {
   selectedAppointment: Appointment | null = null;
 
   // Control de la lista mostrada en la tarjeta principal
-  activeView: 'today' | 'pending' = 'today';
+  activeView: 'day' | 'week' | 'month' = 'day';
 
   constructor(
     private appointmentsService: AppointmentsService,
@@ -60,11 +62,15 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    const todayStart = startOfDay(new Date());
-    const todayEnd = endOfDay(new Date());
+    const now = new Date();
+    const todayStart = startOfDay(now);
+    const todayEnd = endOfDay(now);
+    const weekStart = startOfWeek(now);
+    const weekEnd = endOfWeek(now);
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
 
-    // Combinamos la carga de clientes, servicios y citas
-    this.upcomingAppointments$ = combineLatest([
+    const combined$ = combineLatest([
       this.clientsService.getClients(),
       this.servicesService.getServices(),
       this.appointmentsService.getAppointments()
@@ -73,9 +79,9 @@ export class DashboardComponent implements OnInit {
         // 1. Calculamos las estadísticas y mapas
         this.stats.totalClients = clients.length;
         this.stats.totalServices = services.length;
-        const now = new Date();
+        const nowInner = new Date();
         this.pendingAppointments = appointments
-          .filter(apt => apt.status === 'pending' && apt.start.toDate() > now)
+          .filter(apt => apt.status === 'pending' && apt.start.toDate() > nowInner)
           .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
         this.stats.pendingAppointments = this.pendingAppointments.length;
         this.clientsMap = new Map(clients.map(client => [client.id!, client.name]));
@@ -83,15 +89,39 @@ export class DashboardComponent implements OnInit {
         // Es importante forzar la detección de cambios aquí para las estadísticas
         this.cdr.markForCheck();
 
-        // 2. Filtramos y ordenamos las citas de hoy
-        return appointments
+        const futureAppointments = appointments.filter(apt => {
+          const aptDate = apt.start.toDate();
+          return aptDate >= nowInner && apt.status !== 'cancelled';
+        });
+
+        const day = futureAppointments
           .filter(apt => {
             const aptDate = apt.start.toDate();
-            return aptDate >= todayStart && aptDate <= todayEnd && apt.status !== 'cancelled';
+            return aptDate >= todayStart && aptDate <= todayEnd;
           })
           .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+
+        const week = futureAppointments
+          .filter(apt => {
+            const aptDate = apt.start.toDate();
+            return aptDate >= weekStart && aptDate <= weekEnd;
+          })
+          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+
+        const month = futureAppointments
+          .filter(apt => {
+            const aptDate = apt.start.toDate();
+            return aptDate >= monthStart && aptDate <= monthEnd;
+          })
+          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+
+        return { day, week, month };
       })
     );
+
+    this.upcomingAppointments$ = combined$.pipe(map(data => data.day));
+    this.weekAppointments$ = combined$.pipe(map(data => data.week));
+    this.monthAppointments$ = combined$.pipe(map(data => data.month));
   }
 
   // --- Lógica para los Modales de Acción Rápida ---
@@ -114,7 +144,7 @@ export class DashboardComponent implements OnInit {
     this.selectedDate = null;
   }
 
-  selectView(view: 'today' | 'pending'): void {
+  selectView(view: 'day' | 'week' | 'month'): void {
     this.activeView = view;
   }
 
