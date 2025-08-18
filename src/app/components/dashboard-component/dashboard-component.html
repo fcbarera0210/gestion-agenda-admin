@@ -16,8 +16,8 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <div class="p-6 bg-white rounded-lg shadow-md flex items-center justify-between cursor-pointer"
-         (click)="selectView('today')"
-         [ngClass]="{'ring-2 ring-primary bg-blue-50': activeView === 'today'}">
+         (click)="selectView('day')"
+         [ngClass]="{'ring-2 ring-primary bg-blue-50': activeView !== 'pending'}">
       <div>
         <span class="text-sm font-medium text-gray-500">Citas para Hoy</span>
         <p class="text-3xl font-bold text-gray-800">{{ (upcomingAppointments$ | async)?.length || 0 }}</p>
@@ -29,7 +29,7 @@
          [ngClass]="{'ring-2 ring-yellow-500 bg-yellow-50': activeView === 'pending'}">
       <div>
         <span class="text-sm font-medium text-gray-500">Citas Pendientes</span>
-        <p class="text-3xl font-bold text-yellow-500">{{ stats.pendingAppointments }}</p>
+        <p class="text-3xl font-bold text-yellow-500">{{ (pendingMonthAppointments$ | async)?.length || 0 }}</p>
       </div>
       <div class="p-3 rounded-full bg-yellow-100 text-yellow-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
     </div>
@@ -49,59 +49,133 @@
     </div>
   </div>
 
-  <div class="p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-xl font-semibold text-gray-700" *ngIf="activeView === 'today'">Citas para Hoy</h2>
-    <h2 class="text-xl font-semibold text-gray-700" *ngIf="activeView === 'pending'">Citas Pendientes</h2>
-    <div class="mt-4">
-      <ng-container *ngIf="activeView === 'today'">
-        <ng-container *ngIf="upcomingAppointments$ | async as appointments; else loading">
-          <div *ngIf="appointments.length > 0; else empty" class="space-y-4">
-            <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
-              <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
-                <div class="text-center sm:text-left">
-                  <p class="font-bold text-primary">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }}</p>
-                  <p class="text-xs text-gray-500">{{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
-                </div>
-                <div class="text-center sm:text-left">
-                  <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                  <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
-                </div>
-              </div>
-              <span class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
-                    [ngClass]="{
-                      'bg-blue-100 text-blue-800': apt.status === 'confirmed',
-                      'bg-yellow-100 text-yellow-800': apt.status === 'pending',
-                      'bg-red-100 text-red-800': apt.status === 'cancelled'
-                    }">
-                {{ getStatusLabel(apt.status) }}
-              </span>
-            </div>
-          </div>
-          <ng-template #empty><p class="text-center text-gray-500">No tienes citas programadas para hoy.</p></ng-template>
-        </ng-container>
-      </ng-container>
-
-      <ng-container *ngIf="activeView === 'pending'">
-        <div *ngIf="pendingAppointments.length > 0; else emptyPending" class="space-y-4">
-          <div *ngFor="let apt of pendingAppointments" (click)="openEditAppointment(apt)" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg cursor-pointer gap-2">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
-              <div class="text-center sm:text-left">
-                <p class="font-bold text-primary">{{ apt.start.toDate() | date:"EEEE dd 'de' MMMM yyyy":undefined:'es' }}</p>
-                <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
-              </div>
-              <div class="text-center sm:text-left">
-                <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
-              </div>
-            </div>
-            <span class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ getStatusLabel(apt.status) }}</span>
-          </div>
+    <div class="p-6 bg-white rounded-lg shadow-md">
+      <div class="flex items-center border-b mb-4">
+        <div class="flex space-x-4" *ngIf="activeView !== 'pending'">
+          <button (click)="selectView('day')" class="pb-2" [ngClass]="{'border-b-2 border-primary text-primary': activeView === 'day'}">Hoy</button>
+          <button (click)="selectView('week')" class="pb-2" [ngClass]="{'border-b-2 border-primary text-primary': activeView === 'week'}">Semana</button>
+          <button (click)="selectView('month')" class="pb-2" [ngClass]="{'border-b-2 border-primary text-primary': activeView === 'month'}">Mes</button>
         </div>
-        <ng-template #emptyPending><p class="text-center text-gray-500">No hay citas pendientes.</p></ng-template>
-      </ng-container>
-      <ng-template #loading><p class="text-gray-500">Cargando citas...</p></ng-template>
+        <div class="ml-auto text-sm text-gray-600">
+          <ng-container [ngSwitch]="activeView">
+            <span *ngSwitchCase="'day'">{{ (upcomingAppointments$ | async)?.length || 0 }} citas</span>
+            <span *ngSwitchCase="'week'">{{ (weekAppointments$ | async)?.length || 0 }} citas</span>
+            <span *ngSwitchCase="'month'">{{ (monthAppointments$ | async)?.length || 0 }} citas</span>
+            <span *ngSwitchCase="'pending'">{{ (pendingMonthAppointments$ | async)?.length || 0 }} citas</span>
+          </ng-container>
+        </div>
+      </div>
+      <div class="mt-4">
+        <ng-container *ngIf="activeView === 'day'">
+          <ng-container *ngIf="upcomingAppointments$ | async as appointments; else loading">
+            <div *ngIf="appointments.length > 0; else emptyDay" class="space-y-4">
+              <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+                  <div class="text-center sm:text-left">
+                    <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
+                    <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
+                  </div>
+                  <div class="text-center sm:text-left">
+                    <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
+                    <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
+                  </div>
+                </div>
+                <span class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
+                      [ngClass]="{
+                        'bg-blue-100 text-blue-800': apt.status === 'confirmed',
+                        'bg-yellow-100 text-yellow-800': apt.status === 'pending',
+                        'bg-red-100 text-red-800': apt.status === 'cancelled'
+                      }">
+                  {{ getStatusLabel(apt.status) }}
+                </span>
+              </div>
+            </div>
+            <ng-template #emptyDay><p class="text-center text-gray-500">No tienes citas programadas para hoy.</p></ng-template>
+          </ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="activeView === 'week'">
+          <ng-container *ngIf="weekAppointments$ | async as appointments; else loading">
+            <div *ngIf="appointments.length > 0; else emptyWeek" class="space-y-4">
+              <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+                  <div class="text-center sm:text-left">
+                    <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
+                    <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
+                  </div>
+                  <div class="text-center sm:text-left">
+                    <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
+                    <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
+                  </div>
+                </div>
+                <span class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
+                      [ngClass]="{
+                        'bg-blue-100 text-blue-800': apt.status === 'confirmed',
+                        'bg-yellow-100 text-yellow-800': apt.status === 'pending',
+                        'bg-red-100 text-red-800': apt.status === 'cancelled'
+                      }">
+                  {{ getStatusLabel(apt.status) }}
+                </span>
+              </div>
+            </div>
+            <ng-template #emptyWeek><p class="text-center text-gray-500">No tienes citas programadas esta semana.</p></ng-template>
+          </ng-container>
+        </ng-container>
+
+          <ng-container *ngIf="activeView === 'month'">
+            <ng-container *ngIf="monthAppointments$ | async as appointments; else loading">
+              <div *ngIf="appointments.length > 0; else emptyMonth" class="space-y-4">
+                <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
+                  <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+                    <div class="text-center sm:text-left">
+                      <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
+                      <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
+                    </div>
+                    <div class="text-center sm:text-left">
+                      <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
+                      <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
+                    </div>
+                  </div>
+                  <span class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
+                        [ngClass]="{
+                          'bg-blue-100 text-blue-800': apt.status === 'confirmed',
+                          'bg-yellow-100 text-yellow-800': apt.status === 'pending',
+                          'bg-red-100 text-red-800': apt.status === 'cancelled'
+                        }">
+                    {{ getStatusLabel(apt.status) }}
+                  </span>
+                </div>
+              </div>
+              <ng-template #emptyMonth><p class="text-center text-gray-500">No tienes citas programadas este mes.</p></ng-template>
+            </ng-container>
+          </ng-container>
+
+          <ng-container *ngIf="activeView === 'pending'">
+            <ng-container *ngIf="pendingMonthAppointments$ | async as appointments; else loading">
+              <div *ngIf="appointments.length > 0; else emptyPending" class="space-y-4">
+                <div *ngFor="let apt of appointments" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2">
+                  <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+                    <div class="text-center sm:text-left">
+                      <p class="font-bold text-primary">{{ apt.start.toDate() | date:'EEE dd/MM':undefined:'es' }}</p>
+                      <p class="text-xs text-gray-500">{{ apt.start.toDate() | date:'shortTime':undefined:'es' }} - {{ apt.end.toDate() | date:'shortTime':undefined:'es' }}</p>
+                    </div>
+                    <div class="text-center sm:text-left">
+                      <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
+                      <p class="text-sm text-gray-500">{{ clientsMap.get(apt.clientId) || 'Cliente Desconocido' }}</p>
+                    </div>
+                  </div>
+                  <span class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                    Pendiente
+                  </span>
+                </div>
+              </div>
+              <ng-template #emptyPending><p class="text-center text-gray-500">No tienes citas pendientes este mes.</p></ng-template>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #loading><p class="text-gray-500">Cargando citas...</p></ng-template>
+      </div>
     </div>
-  </div>
 </div>
 
 <app-appointment-form

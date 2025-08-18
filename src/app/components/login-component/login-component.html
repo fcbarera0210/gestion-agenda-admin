@@ -1,6 +1,27 @@
-<div class="flex items-center justify-center min-h-screen bg-slate-100">
+<div class="relative flex items-center justify-center min-h-screen bg-[var(--bg-color)]">
 
-  <div class="relative w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-lg">
+  <button
+    (click)="toggleTheme()"
+    aria-label="Cambiar tema"
+    class="absolute top-4 right-4 p-2 rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-color)] hover:bg-primary hover:text-white transition-colors"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364-6.364l.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"
+      />
+    </svg>
+  </button>
+
+  <div class="relative w-full max-w-md p-8 space-y-8 rounded-2xl shadow-lg bg-[var(--card-bg)]">
     
     <div class="text-center">
       <h1 class="text-3xl font-bold text-gray-800">Bienvenido de Nuevo</h1>
