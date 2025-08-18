@@ -46,12 +46,16 @@ export class AgendaComponent implements OnInit, OnDestroy {
     confirmed: { primary: '#1e90ff', secondary: '#D1E8FF' }, // Azul
     pending: { primary: '#ffc107', secondary: '#FFF3CD' }, // Amarillo
     cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo
+    blocked: { primary: '#6c757d', secondary: '#e9ecef' }, // Gris
+    nonWork: { primary: '#e6e0ff', secondary: '#e6e0ff' }, // Morado
   };
 
   statusLegend = [
     { status: 'confirmed', label: 'Confirmada', color: this.statusColors.confirmed },
     { status: 'pending', label: 'Pendiente', color: this.statusColors.pending },
     { status: 'cancelled', label: 'Cancelada', color: this.statusColors.cancelled },
+    { status: 'blocked', label: 'Descanso/Bloqueado', color: this.statusColors.blocked },
+    { status: 'nonWork', label: 'No laborable', color: this.statusColors.nonWork },
   ];
 
   // --- Propiedades de Estado de los Modales ---
