@@ -6,7 +6,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { es } from 'date-fns/locale/es';
 import { map, combineLatest, firstValueFrom, BehaviorSubject, Subscription } from 'rxjs';
 import { Timestamp } from '@angular/fire/firestore';
-import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays } from 'date-fns';
+import { addDays, getDay, setHours, setMinutes, startOfWeek, subDays, startOfMonth, endOfMonth } from 'date-fns';
 
 // Componentes y Servicios
 import { SettingsService, WorkSchedule } from '../../services/settings-service';
@@ -57,6 +57,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
     { status: 'blocked', label: 'Descanso/Bloqueado', color: this.statusColors.blocked },
     { status: 'nonWork', label: 'No laborable', color: this.statusColors.nonWork },
   ];
+
+  monthlyCounts = { confirmed: 0, pending: 0, cancelled: 0 };
 
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
@@ -116,7 +118,22 @@ export class AgendaComponent implements OnInit, OnDestroy {
     ]).pipe(
       map(([appointments, clients, timeBlocks, profile, viewDate]) => {
         const clientsMap = new Map(clients.map(client => [client.id, client.name]));
-        
+
+        const startMonth = startOfMonth(viewDate);
+        const endMonth = endOfMonth(viewDate);
+        const counts: Record<'confirmed' | 'pending' | 'cancelled', number> = {
+          confirmed: 0,
+          pending: 0,
+          cancelled: 0,
+        };
+        appointments.forEach(apt => {
+          const startDate = apt.start.toDate();
+          if (startDate >= startMonth && startDate <= endMonth) {
+            counts[apt.status]++;
+          }
+        });
+        this.monthlyCounts = counts;
+
         const appointmentEvents = appointments.map(apt => ({
           start: apt.start.toDate(),
           end: apt.end.toDate(),

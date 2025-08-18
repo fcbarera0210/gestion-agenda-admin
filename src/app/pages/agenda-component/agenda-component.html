@@ -69,6 +69,11 @@
         </mwl-calendar-day-view>
       </div>
     </div>
+    <div class="monthly-counts">
+      <div>Completas: {{ monthlyCounts.confirmed }}</div>
+      <div>Pendientes: {{ monthlyCounts.pending }}</div>
+      <div>Canceladas: {{ monthlyCounts.cancelled }}</div>
+    </div>
     <div class="status-legend">
       <div class="status-legend-item" *ngFor="let item of statusLegend">
         <span class="status-legend-color" [style.background-color]="item.color.primary"></span>
