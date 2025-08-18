@@ -4,7 +4,7 @@
     <h2 class="text-xl font-bold text-gray-800">{{ date | date:'fullDate' }}</h2>
     <div *ngIf="events.length; else noEvents" class="space-y-2">
       <div *ngFor="let event of events" class="p-2 border-b last:border-b-0">
-        <p class="font-semibold">{{ event.title }}</p>
+        <p class="font-semibold" [innerHTML]="event.title"></p>
         <p class="text-sm text-gray-600" *ngIf="event.start">{{ event.start | date:'shortTime' }}<span *ngIf="event.end"> - {{ event.end | date:'shortTime' }}</span></p>
       </div>
     </div>

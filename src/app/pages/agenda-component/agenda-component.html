@@ -34,17 +34,6 @@
           Mes
         </button>
       </div>
-      <div class="monthly-counts ml-4">
-        <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.confirmed.primary }">
-          Completas: {{ monthlyCounts.confirmed }}
-        </span>
-        <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.pending.primary }">
-          Pendientes: {{ monthlyCounts.pending }}
-        </span>
-        <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.cancelled.primary }">
-          Canceladas: {{ monthlyCounts.cancelled }}
-        </span>
-      </div>
     </div>
   </div>
 
@@ -87,12 +76,25 @@
       <div class="p-4 md:p-8 bg-white rounded-lg shadow">
         <div class="flex items-center justify-between mb-4">
           <p class="text-gray-600 font-medium">{{ viewDate | viewDateFormat:view }}</p>
-          <input
-            type="date"
-            class="p-2 border border-gray-300 rounded-md"
-            [ngModel]="viewDate | date:'yyyy-MM-dd'"
-            (ngModelChange)="onDateChange($event)"
-          />
+          <div class="flex items-center gap-4">
+            <div class="monthly-counts">
+              <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.confirmed.primary }">
+                Completas: {{ monthlyCounts.confirmed }}
+              </span>
+              <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.pending.primary }">
+                Pendientes: {{ monthlyCounts.pending }}
+              </span>
+              <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.cancelled.primary }">
+                Canceladas: {{ monthlyCounts.cancelled }}
+              </span>
+            </div>
+            <input
+              type="date"
+              class="p-2 border border-gray-300 rounded-md md:hidden"
+              [ngModel]="viewDate | date:'yyyy-MM-dd'"
+              (ngModelChange)="onDateChange($event)"
+            />
+          </div>
         </div>
       <div class="h-[60vh] md:h-[70vh] overflow-y-auto" *ngIf="isCalendarReady" [ngSwitch]="view">
         <mwl-calendar-day-view
