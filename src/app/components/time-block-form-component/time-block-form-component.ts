@@ -114,6 +114,8 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   private generateAvailableDates(): void {
     this.availableDates = [];
     if (!this.workSchedule) {
+      const startDateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
+      this.availableDates.push(startDateStr);
       return;
     }
     const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -126,70 +128,76 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
         this.availableDates.push(formatDate(date, 'yyyy-MM-dd', 'en-US'));
       }
     }
+    const startDateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
+    if (!this.availableDates.includes(startDateStr)) {
+      this.availableDates.push(startDateStr);
+      this.availableDates.sort();
+    }
   }
 
   private generateAvailableStartTimes(date: string): void {
     this.availableStartTimes = [];
-    if (!this.workSchedule) {
-      return;
-    }
     const baseDate = parseISO(`${date}T00:00:00`);
-    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
-    const daySchedule = this.workSchedule[dayName];
-    if (!daySchedule || !daySchedule.isActive) {
-      return;
-    }
-    const [startHour, startMinute] = daySchedule.workHours.start.split(':').map(Number);
-    const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
-    let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
-    const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
+    if (this.workSchedule) {
+      const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
+      const daySchedule = this.workSchedule[dayName];
+      if (daySchedule && daySchedule.isActive) {
+        const [startHour, startMinute] = daySchedule.workHours.start.split(':').map(Number);
+        const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
+        let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
+        const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
 
-    while (addMinutes(slotStart, 30) <= workEnd) {
-      const slotEnd = addMinutes(slotStart, 30);
-      if (this.isIntervalAvailable(slotStart, slotEnd, daySchedule)) {
-        this.availableStartTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
+        while (addMinutes(slotStart, 30) <= workEnd) {
+          const slotEnd = addMinutes(slotStart, 30);
+          if (this.isIntervalAvailable(slotStart, slotEnd, daySchedule)) {
+            this.availableStartTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
+          }
+          slotStart = addMinutes(slotStart, 30);
+        }
       }
-      slotStart = addMinutes(slotStart, 30);
     }
 
-    if (this.isEditMode && this.timeBlock) {
-      const currentDate = formatDate(this.timeBlock.start.toDate(), 'yyyy-MM-dd', 'en-US');
-      const currentStart = formatDate(this.timeBlock.start.toDate(), 'HH:mm', 'en-US');
-      if (currentDate === date && !this.availableStartTimes.includes(currentStart)) {
-        this.availableStartTimes.push(currentStart);
-        this.availableStartTimes.sort();
-      }
+    let selectedStart = this.blockForm.get('startTime')?.value as string | undefined;
+    if (!selectedStart && this.startDate && formatDate(this.startDate, 'yyyy-MM-dd', 'en-US') === date) {
+      selectedStart = formatDate(this.startDate, 'HH:mm', 'en-US');
+    }
+    if (selectedStart && !this.availableStartTimes.includes(selectedStart)) {
+      this.availableStartTimes.push(selectedStart);
+      this.availableStartTimes.sort();
     }
   }
 
   private generateAvailableEndTimes(date: string, startTime: string): void {
     this.availableEndTimes = [];
-    if (!this.workSchedule) {
-      return;
-    }
-    const start = parseISO(`${date}T${startTime}`);
-    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][start.getDay()];
-    const daySchedule = this.workSchedule[dayName];
-    if (!daySchedule || !daySchedule.isActive) {
-      return;
-    }
-    const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
-    const workEnd = setMinutes(setHours(parseISO(`${date}T00:00:00`), endHour), endMinute);
+    let daySchedule: DaySchedule | undefined;
+    if (this.workSchedule) {
+      const start = parseISO(`${date}T${startTime}`);
+      const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][start.getDay()];
+      daySchedule = this.workSchedule[dayName];
+      if (daySchedule && daySchedule.isActive) {
+        const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
+        const workEnd = setMinutes(setHours(parseISO(`${date}T00:00:00`), endHour), endMinute);
 
-    let slotEnd = addMinutes(start, 30);
-    while (slotEnd <= workEnd && this.isIntervalAvailable(start, slotEnd, daySchedule)) {
-      this.availableEndTimes.push(formatDate(slotEnd, 'HH:mm', 'en-US'));
-      slotEnd = addMinutes(slotEnd, 30);
-    }
-
-    if (this.isEditMode && this.timeBlock) {
-      const currentDate = formatDate(this.timeBlock.start.toDate(), 'yyyy-MM-dd', 'en-US');
-      const currentStart = formatDate(this.timeBlock.start.toDate(), 'HH:mm', 'en-US');
-      const currentEnd = formatDate(this.timeBlock.end.toDate(), 'HH:mm', 'en-US');
-      if (currentDate === date && currentStart === startTime && !this.availableEndTimes.includes(currentEnd)) {
-        this.availableEndTimes.push(currentEnd);
-        this.availableEndTimes.sort();
+        let slotEnd = addMinutes(start, 30);
+        while (slotEnd <= workEnd && this.isIntervalAvailable(start, slotEnd, daySchedule)) {
+          this.availableEndTimes.push(formatDate(slotEnd, 'HH:mm', 'en-US'));
+          slotEnd = addMinutes(slotEnd, 30);
+        }
       }
+    }
+
+    let selectedEnd = this.blockForm.get('endTime')?.value as string | undefined;
+    if (
+      !selectedEnd &&
+      this.startDate &&
+      formatDate(this.startDate, 'yyyy-MM-dd', 'en-US') === date &&
+      formatDate(this.startDate, 'HH:mm', 'en-US') === startTime
+    ) {
+      selectedEnd = formatDate(addMinutes(this.startDate, 30), 'HH:mm', 'en-US');
+    }
+    if (selectedEnd && !this.availableEndTimes.includes(selectedEnd)) {
+      this.availableEndTimes.push(selectedEnd);
+      this.availableEndTimes.sort();
     }
   }
 
