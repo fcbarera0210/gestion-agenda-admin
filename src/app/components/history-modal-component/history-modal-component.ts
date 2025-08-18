@@ -10,13 +10,22 @@ import { Appointment } from '../../services/appointments-service';
   imports: [CommonModule, DatePipe],
   templateUrl: './history-modal-component.html',
 })
-export class HistoryModalComponent {
+export class HistoryModalComponent implements OnInit {
   @Input() dataHistory$!: Observable<HistoryEntry[]>;
-  @Input() appointmentHistory$: Observable<Appointment[]> = of([]); 
-  @Input() showAppointmentHistoryTab = false; 
+  @Input() appointmentHistory$: Observable<Appointment[]> = of([]);
+  @Input() showAppointmentHistoryTab = false;
+  @Input() title = 'Historial del Cliente';
   @Output() onCancel = new EventEmitter<void>();
 
-  activeTab: 'data' | 'appointments' = 'appointments'; // La pestaña activa por defecto
+  activeTab: 'data' | 'appointments' = 'data';
+
+  ngOnInit(): void {
+    this.activeTab = this.showAppointmentHistoryTab ? 'appointments' : 'data';
+  }
+
+  get entityLabel(): string {
+    return this.title.toLowerCase().includes('servicio') ? 'servicio' : 'cliente';
+  }
 
   private statusLabels: Record<string, string> = {
     confirmed: 'confirmada',
