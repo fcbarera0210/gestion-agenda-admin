@@ -33,7 +33,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   locale: string = 'es';
   viewDate: Date = new Date();
   viewDate$ = new BehaviorSubject<Date>(this.viewDate);
-  events: CalendarEvent<Appointment | TimeBlock>[] = [];
+  events: CalendarEvent[] = [];
   excludeDays: number[] = [];
   dayStartHour = 8;
   dayEndHour = 20;
@@ -117,6 +117,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
         }));
 
         const breakEvents: CalendarEvent[] = [];
+        const nonWorkEvents: CalendarEvent[] = [];
         if (profile && profile.workSchedule) {
           const schedule: WorkSchedule = profile.workSchedule;
           const weekStartsOn = 1; // 1 = Lunes
@@ -128,7 +129,55 @@ export class AgendaComponent implements OnInit, OnDestroy {
             const dayName = daysOfWeek[getDay(dateInWeek)];
             const daySchedule = schedule[dayName];
 
-            if (daySchedule && daySchedule.isActive && daySchedule.breaks) {
+            const dayStart = setMinutes(setHours(dateInWeek, this.dayStartHour), 0);
+            const dayEnd = setMinutes(setHours(dateInWeek, this.dayEndHour), 0);
+
+            if (!daySchedule || !daySchedule.isActive || !daySchedule.workHours) {
+              nonWorkEvents.push({
+                start: dayStart,
+                end: dayEnd,
+                title: '<i>No laborable</i>',
+                color: { primary: '#f0f0f0', secondary: '#f0f0f0' },
+                cssClass: 'cal-non-work',
+                draggable: false,
+                resizable: { beforeStart: false, afterEnd: false },
+                meta: { eventType: 'nonWork' },
+              });
+              continue;
+            }
+
+            const [workStartHour, workStartMinute] = daySchedule.workHours.start.split(':').map(Number);
+            const [workEndHour, workEndMinute] = daySchedule.workHours.end.split(':').map(Number);
+            const workStart = setMinutes(setHours(dateInWeek, workStartHour), workStartMinute);
+            const workEnd = setMinutes(setHours(dateInWeek, workEndHour), workEndMinute);
+
+            if (workStart > dayStart) {
+              nonWorkEvents.push({
+                start: dayStart,
+                end: workStart,
+                title: '<i>No laborable</i>',
+                color: { primary: '#f0f0f0', secondary: '#f0f0f0' },
+                cssClass: 'cal-non-work',
+                draggable: false,
+                resizable: { beforeStart: false, afterEnd: false },
+                meta: { eventType: 'nonWork' },
+              });
+            }
+
+            if (workEnd < dayEnd) {
+              nonWorkEvents.push({
+                start: workEnd,
+                end: dayEnd,
+                title: '<i>No laborable</i>',
+                color: { primary: '#f0f0f0', secondary: '#f0f0f0' },
+                cssClass: 'cal-non-work',
+                draggable: false,
+                resizable: { beforeStart: false, afterEnd: false },
+                meta: { eventType: 'nonWork' },
+              });
+            }
+
+            if (daySchedule.breaks) {
               daySchedule.breaks.forEach(breakSlot => {
                 const [startHour, startMinute] = breakSlot.start.split(':').map(Number);
                 const [endHour, endMinute] = breakSlot.end.split(':').map(Number);
@@ -144,8 +193,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
             }
           }
         }
-        
-        return [...appointmentEvents, ...timeBlockEvents, ...breakEvents];
+
+        return [...appointmentEvents, ...timeBlockEvents, ...breakEvents, ...nonWorkEvents];
       })
     ).subscribe(calendarEvents => {
       this.events = calendarEvents;
@@ -207,6 +256,10 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
 
   handleEventClicked({ event }: { event: CalendarEvent<any> }): void {
+    if (event.meta?.eventType === 'nonWork') {
+      return;
+    }
+
     if (event.meta.eventType === 'appointment') {
       this.selectedAppointment = event.meta;
       this.selectedDate = event.start;
