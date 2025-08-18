@@ -23,6 +23,7 @@ import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { ToastService } from '../../services/toast-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
+import { AppointmentDetailsModalComponent } from '../../components/appointment-details-modal-component/appointment-details-modal-component';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,6 +33,7 @@ import { TimeBlockFormComponent } from '../../components/time-block-form-compone
     RouterModule,
     AppointmentFormComponent,
     TimeBlockFormComponent,
+    AppointmentDetailsModalComponent,
   ],
   templateUrl: './dashboard-component.html',
 })
@@ -58,6 +60,7 @@ export class DashboardComponent implements OnInit {
   // Propiedades para los modales de acción rápida
   showAppointmentModal = false;
   showTimeBlockModal = false;
+  showAppointmentDetailsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
 
@@ -181,6 +184,7 @@ export class DashboardComponent implements OnInit {
   closeAllModals(): void {
     this.showAppointmentModal = false;
     this.showTimeBlockModal = false;
+    this.showAppointmentDetailsModal = false;
     this.selectedAppointment = null;
     this.selectedDate = null;
   }
@@ -192,11 +196,15 @@ export class DashboardComponent implements OnInit {
   openEditAppointment(appointment: Appointment): void {
     this.selectedAppointment = appointment;
     this.selectedDate = appointment.start.toDate();
-    this.showAppointmentModal = true;
+    this.showAppointmentDetailsModal = true;
   }
 
   getStatusLabel(status: Appointment['status']): string {
     return this.statusLabels[status] ?? status;
+  }
+
+  getTypeLabel(type: Appointment['type']): string {
+    return type === 'online' ? 'Online' : 'Presencial';
   }
 
   // Reutilizamos la lógica de guardado de la agenda
