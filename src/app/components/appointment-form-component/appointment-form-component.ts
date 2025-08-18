@@ -147,14 +147,18 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       this.settingsService.getProfessionalProfile(),
       this.appointmentsService.getAppointments(),
       this.timeBlockService.getTimeBlocks()
-    ]).subscribe(([profile, appointments, blocks]) => {
+    ]).subscribe(async ([profile, appointments, blocks]) => {
       this.workSchedule = profile?.workSchedule || null;
       this.appointments = appointments;
       this.timeBlocks = blocks;
       this.generateAvailableDates();
       const date = this.appointmentForm.get('date')?.value;
       if (date) {
-        this.generateAvailableTimes(date);
+        await this.generateAvailableTimes(date);
+        if (this.isEditMode && this.appointment) {
+          const timeStr = formatDate(this.appointment.start.toDate(), 'HH:mm', 'en-US');
+          this.appointmentForm.get('time')?.setValue(timeStr);
+        }
       }
     });
   }
