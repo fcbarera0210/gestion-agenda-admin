@@ -147,14 +147,18 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       this.settingsService.getProfessionalProfile(),
       this.appointmentsService.getAppointments(),
       this.timeBlockService.getTimeBlocks()
-    ]).subscribe(([profile, appointments, blocks]) => {
+    ]).subscribe(async ([profile, appointments, blocks]) => {
       this.workSchedule = profile?.workSchedule || null;
       this.appointments = appointments;
       this.timeBlocks = blocks;
       this.generateAvailableDates();
       const date = this.appointmentForm.get('date')?.value;
       if (date) {
-        this.generateAvailableTimes(date);
+        await this.generateAvailableTimes(date);
+        if (this.isEditMode && this.appointment) {
+          const timeStr = formatDate(this.appointment.start.toDate(), 'HH:mm', 'en-US');
+          this.appointmentForm.get('time')?.setValue(timeStr);
+        }
       }
     });
   }
@@ -185,9 +189,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     const services = await firstValueFrom(this.services$);
     const serviceId = this.appointmentForm.get('serviceId')?.value;
     const selectedService = services.find(s => s.id === serviceId);
-    if (!selectedService) {
-      return;
-    }
+    const duration = selectedService ? selectedService.duration : 30;
 
     const baseDate = parseISO(`${date}T00:00:00`);
     const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
@@ -201,8 +203,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
     const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
 
-    while (addMinutes(slotStart, selectedService.duration) <= workEnd) {
-      if (this.isSlotAvailable(slotStart, selectedService.duration, daySchedule)) {
+    while (addMinutes(slotStart, duration) <= workEnd) {
+      if (this.isSlotAvailable(slotStart, duration, daySchedule)) {
         this.availableTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
       }
       slotStart = addMinutes(slotStart, 30);
@@ -295,23 +297,33 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   private configureFormForMode(): void {
     if (this.appointment) {
       this.isEditMode = true;
+
+      const dateStr = formatDate(this.appointment!.start.toDate(), 'yyyy-MM-dd', 'en-US');
+      const timeStr = formatDate(this.appointment!.start.toDate(), 'HH:mm', 'en-US');
+
       this.appointmentForm.patchValue({
         clientId: this.appointment!.clientId,
         serviceId: this.appointment!.serviceId,
-        date: formatDate(this.appointment!.start.toDate(), 'yyyy-MM-dd', 'en-US'),
-        time: formatDate(this.appointment!.start.toDate(), 'HH:mm', 'en-US'),
+        date: dateStr,
+        time: timeStr,
         status: this.appointment!.status,
         type: this.appointment!.type,
         notes: this.appointment!.notes || ''
       });
+
       const client = this.clients.find(c => c.id === this.appointment!.clientId);
       if (client) {
         this.clientSearch.setValue(client.name, { emitEvent: false });
       }
+
       const service = this.services.find(s => s.id === this.appointment!.serviceId);
       if (service) {
         this.serviceSearch.setValue(service.name, { emitEvent: false });
       }
+
+      this.generateAvailableTimes(dateStr).then(() => {
+        this.appointmentForm.get('time')?.setValue(timeStr);
+      });
     } else {
       this.isEditMode = false;
       this.appointmentForm.reset();

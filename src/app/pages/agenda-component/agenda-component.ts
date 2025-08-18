@@ -199,8 +199,11 @@ export class AgendaComponent implements OnInit, OnDestroy {
   // --- Manejadores de Eventos del Calendario ---
 
   onHourSegmentClicked(event: { date: Date }): void {
-    this.selectedDate = event.date;
+    this.selectedAppointment = null;
+    this.selectedTimeBlock = null;
+    this.selectedDate = new Date(event.date);
     this.showChoiceModal = true;
+    this.cdr.markForCheck();
   }
 
   handleEventClicked({ event }: { event: CalendarEvent<any> }): void {
@@ -218,8 +221,10 @@ export class AgendaComponent implements OnInit, OnDestroy {
   // --- Manejadores de Acciones de los Modales ---
 
   openAppointmentForm(): void {
+    this.selectedAppointment = null;
     this.showChoiceModal = false;
     this.showAppointmentModal = true;
+    this.cdr.markForCheck();
   }
 
   openTimeBlockForm(): void {
