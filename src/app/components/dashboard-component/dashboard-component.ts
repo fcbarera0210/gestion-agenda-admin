@@ -3,10 +3,20 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import {
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+} from 'date-fns';
 
 // Componentes y Servicios
-import { AppointmentsService, Appointment } from '../../services/appointments-service';
+import {
+  AppointmentsService,
+  Appointment,
+} from '../../services/appointments-service';
 import { ClientsService } from '../../services/clients-service';
 import { ServicesService } from '../../services/services-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
@@ -17,16 +27,21 @@ import { TimeBlockFormComponent } from '../../components/time-block-form-compone
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, AppointmentFormComponent, TimeBlockFormComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    AppointmentFormComponent,
+    TimeBlockFormComponent,
+  ],
   templateUrl: './dashboard-component.html',
 })
 export class DashboardComponent implements OnInit {
-
   upcomingAppointments$!: Observable<Appointment[]>;
   weekAppointments$!: Observable<Appointment[]>;
   monthAppointments$!: Observable<Appointment[]>;
   pendingMonthAppointments$!: Observable<Appointment[]>;
   pendingAppointments: Appointment[] = [];
+  cancelledAppointments: Appointment[] = [];
   clientsMap = new Map<string, string>();
   stats = {
     totalClients: 0,
@@ -43,6 +58,7 @@ export class DashboardComponent implements OnInit {
   // Propiedades para los modales de acción rápida
   showAppointmentModal = false;
   showTimeBlockModal = false;
+  showCancelledPanel = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
 
@@ -55,7 +71,7 @@ export class DashboardComponent implements OnInit {
     private servicesService: ServicesService,
     private timeBlockService: TimeBlockService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -74,7 +90,7 @@ export class DashboardComponent implements OnInit {
     const combined$ = combineLatest([
       this.clientsService.getClients(),
       this.servicesService.getServices(),
-      this.appointmentsService.getAppointments()
+      this.appointmentsService.getAppointments(),
     ]).pipe(
       map(([clients, services, appointments]) => {
         // 1. Calculamos las estadísticas y mapas
@@ -82,50 +98,72 @@ export class DashboardComponent implements OnInit {
         this.stats.totalServices = services.length;
         const nowInner = new Date();
         this.pendingAppointments = appointments
-          .filter(apt => apt.status === 'pending' && apt.start.toDate() > nowInner)
-          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+          .filter(
+            (apt) => apt.status === 'pending' && apt.start.toDate() > nowInner,
+          )
+          .sort(
+            (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime(),
+          );
         this.stats.pendingAppointments = this.pendingAppointments.length;
-        this.clientsMap = new Map(clients.map(client => [client.id!, client.name]));
+        this.cancelledAppointments = appointments
+          .filter(
+            (apt) =>
+              apt.status === 'cancelled' && apt.start.toDate() > nowInner,
+          )
+          .sort(
+            (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime(),
+          );
+        this.clientsMap = new Map(
+          clients.map((client) => [client.id!, client.name]),
+        );
 
         // Es importante forzar la detección de cambios aquí para las estadísticas
         this.cdr.markForCheck();
 
-        const futureAppointments = appointments.filter(apt => {
+        const futureAppointments = appointments.filter((apt) => {
           const aptDate = apt.start.toDate();
           return aptDate >= nowInner && apt.status !== 'cancelled';
         });
 
         const day = futureAppointments
-          .filter(apt => {
+          .filter((apt) => {
             const aptDate = apt.start.toDate();
             return aptDate >= todayStart && aptDate <= todayEnd;
           })
-          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+          .sort(
+            (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime(),
+          );
 
         const week = futureAppointments
-          .filter(apt => {
+          .filter((apt) => {
             const aptDate = apt.start.toDate();
             return aptDate >= weekStart && aptDate <= weekEnd;
           })
-          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+          .sort(
+            (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime(),
+          );
 
         const month = futureAppointments
-          .filter(apt => {
+          .filter((apt) => {
             const aptDate = apt.start.toDate();
             return aptDate >= monthStart && aptDate <= monthEnd;
           })
-          .sort((a, b) => a.start.toDate().getTime() - b.start.toDate().getTime());
+          .sort(
+            (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime(),
+          );
 
-        const pendingMonth = month.filter(apt => apt.status === 'pending');
+        const pendingMonth = month.filter((apt) => apt.status === 'pending');
 
         return { day, week, month, pendingMonth };
-      })
+      }),
     );
 
-    this.upcomingAppointments$ = combined$.pipe(map(data => data.day));
-    this.weekAppointments$ = combined$.pipe(map(data => data.week));
-    this.monthAppointments$ = combined$.pipe(map(data => data.month));
-    this.pendingMonthAppointments$ = combined$.pipe(map(data => data.pendingMonth));
+    this.upcomingAppointments$ = combined$.pipe(map((data) => data.day));
+    this.weekAppointments$ = combined$.pipe(map((data) => data.week));
+    this.monthAppointments$ = combined$.pipe(map((data) => data.month));
+    this.pendingMonthAppointments$ = combined$.pipe(
+      map((data) => data.pendingMonth),
+    );
   }
 
   // --- Lógica para los Modales de Acción Rápida ---
@@ -139,6 +177,10 @@ export class DashboardComponent implements OnInit {
   openNewBlockModal(): void {
     this.selectedDate = new Date(); // El bloqueo por defecto es "ahora"
     this.showTimeBlockModal = true;
+  }
+
+  toggleCancelledPanel(): void {
+    this.showCancelledPanel = !this.showCancelledPanel;
   }
 
   closeAllModals(): void {
@@ -161,7 +203,7 @@ export class DashboardComponent implements OnInit {
   getStatusLabel(status: Appointment['status']): string {
     return this.statusLabels[status] ?? status;
   }
-  
+
   // Reutilizamos la lógica de guardado de la agenda
   handleSaveAppointment(appointmentData: any): void {
     const promise = appointmentData.id
@@ -173,19 +215,20 @@ export class DashboardComponent implements OnInit {
         this.toastService.show('Cita guardada con éxito', 'success');
         this.closeAllModals();
       })
-      .catch(err => {
+      .catch((err) => {
         this.toastService.show('Error al guardar la cita', 'error');
         console.error(err);
       });
   }
 
   handleSaveTimeBlock(blockData: TimeBlock): void {
-    this.timeBlockService.addTimeBlock(blockData)
+    this.timeBlockService
+      .addTimeBlock(blockData)
       .then(() => {
         this.toastService.show('Horario bloqueado con éxito', 'success');
         this.closeAllModals();
       })
-      .catch(err => {
+      .catch((err) => {
         this.toastService.show('Error al guardar el bloqueo', 'error');
         console.error(err);
       });
