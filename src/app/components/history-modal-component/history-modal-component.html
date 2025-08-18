@@ -3,7 +3,7 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="w-full max-w-2xl p-8 bg-white rounded-2xl shadow-lg">
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-800">Historial del Cliente</h2>
+      <h2 class="text-2xl font-bold text-gray-800">{{ title }}</h2>
       <button (click)="cancel()" class="p-2 text-gray-400 dark:text-gray-300 rounded-full bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700 hover:text-gray-600">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
@@ -44,7 +44,7 @@
               <p class="whitespace-pre-wrap text-base font-normal text-gray-600">{{ entry.changes }}</p>
             </div>
           </div>
-          <ng-template #emptyData><p class="text-center text-gray-500">No hay historial de cambios para este cliente.</p></ng-template>
+          <ng-template #emptyData><p class="text-center text-gray-500">No hay historial de cambios para este {{ entityLabel }}.</p></ng-template>
         </ng-container>
       </div>
 
@@ -69,7 +69,7 @@
               </div>
             </div>
           </div>
-          <ng-template #emptyAppointments><p class="text-center text-gray-500">Este cliente no tiene citas registradas.</p></ng-template>
+          <ng-template #emptyAppointments><p class="text-center text-gray-500">Este {{ entityLabel }} no tiene citas registradas.</p></ng-template>
         </ng-container>
       </div>
 
