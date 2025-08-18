@@ -26,6 +26,11 @@
         <div id="client-error" *ngIf="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched" class="mt-1 text-sm text-red-600">
           El cliente es obligatorio.
         </div>
+        <div *ngIf="selectedClient" class="mt-2 text-sm text-gray-600">
+          <p><strong>Email:</strong> {{ selectedClient.email }}</p>
+          <p><strong>Teléfono:</strong> {{ selectedClient.phone }}</p>
+          <p *ngIf="selectedClient.notes"><strong>Notas:</strong> {{ selectedClient.notes }}</p>
+        </div>
       </div>
 
       <div>

@@ -199,6 +199,10 @@ export class DashboardComponent implements OnInit {
     return this.statusLabels[status] ?? status;
   }
 
+  getTypeLabel(type: Appointment['type']): string {
+    return type === 'online' ? 'Online' : 'Presencial';
+  }
+
   // Reutilizamos la lógica de guardado de la agenda
   handleSaveAppointment(appointmentData: any): void {
     const promise = appointmentData.id

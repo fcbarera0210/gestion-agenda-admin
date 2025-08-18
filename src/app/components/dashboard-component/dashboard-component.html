@@ -229,7 +229,8 @@
           <div *ngIf="appointments.length > 0; else emptyDay" class="space-y-4">
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              (click)="openEditAppointment(apt)"
             >
               <div
                 class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0"
@@ -257,16 +258,26 @@
                   </p>
                 </div>
               </div>
-              <span
-                class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
-                [ngClass]="{
-                  'bg-blue-100 text-blue-800': apt.status === 'confirmed',
-                  'bg-yellow-100 text-yellow-800': apt.status === 'pending',
-                  'bg-red-100 text-red-800': apt.status === 'cancelled',
-                }"
+              <div
+                class="self-start sm:self-auto sm:ml-auto flex items-center gap-2"
               >
-                {{ getStatusLabel(apt.status) }}
-              </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="apt.type === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'"
+                >
+                  {{ getTypeLabel(apt.type) }}
+                </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': apt.status === 'confirmed',
+                    'bg-yellow-100 text-yellow-800': apt.status === 'pending',
+                    'bg-red-100 text-red-800': apt.status === 'cancelled',
+                  }"
+                >
+                  {{ getStatusLabel(apt.status) }}
+                </span>
+              </div>
             </div>
           </div>
           <ng-template #emptyDay
@@ -287,7 +298,8 @@
           >
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              (click)="openEditAppointment(apt)"
             >
               <div
                 class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0"
@@ -315,16 +327,26 @@
                   </p>
                 </div>
               </div>
-              <span
-                class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
-                [ngClass]="{
-                  'bg-blue-100 text-blue-800': apt.status === 'confirmed',
-                  'bg-yellow-100 text-yellow-800': apt.status === 'pending',
-                  'bg-red-100 text-red-800': apt.status === 'cancelled',
-                }"
+              <div
+                class="self-start sm:self-auto sm:ml-auto flex items-center gap-2"
               >
-                {{ getStatusLabel(apt.status) }}
-              </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="apt.type === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'"
+                >
+                  {{ getTypeLabel(apt.type) }}
+                </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': apt.status === 'confirmed',
+                    'bg-yellow-100 text-yellow-800': apt.status === 'pending',
+                    'bg-red-100 text-red-800': apt.status === 'cancelled',
+                  }"
+                >
+                  {{ getStatusLabel(apt.status) }}
+                </span>
+              </div>
             </div>
           </div>
           <ng-template #emptyWeek
@@ -345,7 +367,8 @@
           >
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              (click)="openEditAppointment(apt)"
             >
               <div
                 class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0"
@@ -373,16 +396,26 @@
                   </p>
                 </div>
               </div>
-              <span
-                class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full"
-                [ngClass]="{
-                  'bg-blue-100 text-blue-800': apt.status === 'confirmed',
-                  'bg-yellow-100 text-yellow-800': apt.status === 'pending',
-                  'bg-red-100 text-red-800': apt.status === 'cancelled',
-                }"
+              <div
+                class="self-start sm:self-auto sm:ml-auto flex items-center gap-2"
               >
-                {{ getStatusLabel(apt.status) }}
-              </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="apt.type === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'"
+                >
+                  {{ getTypeLabel(apt.type) }}
+                </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': apt.status === 'confirmed',
+                    'bg-yellow-100 text-yellow-800': apt.status === 'pending',
+                    'bg-red-100 text-red-800': apt.status === 'cancelled',
+                  }"
+                >
+                  {{ getStatusLabel(apt.status) }}
+                </span>
+              </div>
             </div>
           </div>
           <ng-template #emptyMonth
@@ -406,7 +439,8 @@
           >
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              (click)="openEditAppointment(apt)"
             >
               <div
                 class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0"
@@ -434,11 +468,20 @@
                   </p>
                 </div>
               </div>
-              <span
-                class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800"
+              <div
+                class="self-start sm:self-auto sm:ml-auto flex items-center gap-2"
               >
-                Pendiente
-              </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="apt.type === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'"
+                >
+                  {{ getTypeLabel(apt.type) }}
+                </span>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                  >Pendiente</span
+                >
+              </div>
             </div>
           </div>
         <ng-template #emptyPending
@@ -456,7 +499,8 @@
         >
           <div
             *ngFor="let apt of cancelledAppointments"
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2"
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+            (click)="openEditAppointment(apt)"
           >
             <div
               class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0"
@@ -478,10 +522,20 @@
                 </p>
               </div>
             </div>
-            <span
-              class="self-start sm:self-auto sm:ml-auto px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
-              >Cancelada</span
+            <div
+              class="self-start sm:self-auto sm:ml-auto flex items-center gap-2"
             >
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full"
+                [ngClass]="apt.type === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'"
+              >
+                {{ getTypeLabel(apt.type) }}
+              </span>
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
+                >Cancelada</span
+              >
+            </div>
           </div>
         </div>
         <ng-template #emptyCancelled>

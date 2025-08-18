@@ -370,6 +370,11 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     this.appointmentForm.get('serviceId')?.setValue('');
   }
 
+  get selectedClient(): Client | undefined {
+    const clientId = this.appointmentForm.get('clientId')?.value;
+    return this.clients.find(c => c.id === clientId);
+  }
+
   async save(): Promise<void> {
     if (this.appointmentForm.invalid) {
       this.appointmentForm.markAllAsTouched();
