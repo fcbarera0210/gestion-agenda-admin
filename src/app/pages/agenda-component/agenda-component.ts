@@ -44,7 +44,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   private eventsSub?: Subscription;
 
   // --- Leyenda de estados ---
-  private statusColors: any = {
+  statusColors: any = {
     confirmed: { primary: '#1e90ff', secondary: '#D1E8FF' }, // Azul
     pending: { primary: '#ffc107', secondary: '#FFF3CD' }, // Amarillo
     cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo

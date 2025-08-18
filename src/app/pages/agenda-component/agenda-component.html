@@ -37,6 +37,17 @@
           Mes
         </button>
       </div>
+      <div class="monthly-counts ml-4">
+        <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.confirmed.primary }">
+          Completas: {{ monthlyCounts.confirmed }}
+        </span>
+        <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.pending.primary }">
+          Pendientes: {{ monthlyCounts.pending }}
+        </span>
+        <span class="count-badge" [ngStyle]="{ 'background-color': statusColors.cancelled.primary }">
+          Canceladas: {{ monthlyCounts.cancelled }}
+        </span>
+      </div>
     </div>
   </div>
 
@@ -123,11 +134,6 @@
           (eventClicked)="handleEventClicked($event)">
         </mwl-calendar-month-view>
       </div>
-    </div>
-    <div class="monthly-counts">
-      <div>Completas: {{ monthlyCounts.confirmed }}</div>
-      <div>Pendientes: {{ monthlyCounts.pending }}</div>
-      <div>Canceladas: {{ monthlyCounts.cancelled }}</div>
     </div>
     <div class="status-legend">
       <div class="status-legend-item" *ngFor="let item of statusLegend">
