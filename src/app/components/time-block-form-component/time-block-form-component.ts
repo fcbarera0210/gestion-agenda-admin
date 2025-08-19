@@ -117,8 +117,16 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   private generateAvailableDates(): void {
     this.availableDates = [];
     if (!this.workSchedule) {
+      const today = new Date();
+      for (let i = 0; i < 21; i++) {
+        const date = addDays(today, i);
+        this.availableDates.push(formatDate(date, 'yyyy-MM-dd', 'en-US'));
+      }
       const startDateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
-      this.availableDates.push(startDateStr);
+      if (!this.availableDates.includes(startDateStr)) {
+        this.availableDates.push(startDateStr);
+        this.availableDates.sort();
+      }
       return;
     }
     const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -157,6 +165,16 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
           }
           slotStart = addMinutes(slotStart, 30);
         }
+      }
+    } else {
+      let slotStart = baseDate;
+      const dayEnd = setMinutes(setHours(baseDate, 23), 30);
+      while (slotStart <= dayEnd) {
+        const slotEnd = addMinutes(slotStart, 30);
+        if (this.isIntervalAvailable(slotStart, slotEnd)) {
+          this.availableStartTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
+        }
+        slotStart = addMinutes(slotStart, 30);
       }
     }
 
