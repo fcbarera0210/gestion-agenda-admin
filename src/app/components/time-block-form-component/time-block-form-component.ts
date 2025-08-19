@@ -172,21 +172,27 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
 
   private generateAvailableEndTimes(date: string, startTime: string): void {
     this.availableEndTimes = [];
+    const start = parseISO(`${date}T${startTime}`);
+
+    // Si no hay horario laboral definido, permitimos bloquear hasta el final del día
+    let workEnd = setMinutes(setHours(parseISO(`${date}T00:00:00`), 23), 59);
     let daySchedule: DaySchedule | undefined;
+
     if (this.workSchedule) {
-      const start = parseISO(`${date}T${startTime}`);
       const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][start.getDay()];
       daySchedule = this.workSchedule[dayName];
       if (daySchedule && daySchedule.isActive) {
         const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
-        const workEnd = setMinutes(setHours(parseISO(`${date}T00:00:00`), endHour), endMinute);
-
-        let slotEnd = addMinutes(start, 30);
-        while (slotEnd <= workEnd && this.isIntervalAvailable(start, slotEnd, daySchedule)) {
-          this.availableEndTimes.push(formatDate(slotEnd, 'HH:mm', 'en-US'));
-          slotEnd = addMinutes(slotEnd, 30);
-        }
+        workEnd = setMinutes(setHours(parseISO(`${date}T00:00:00`), endHour), endMinute);
       }
+    }
+
+    let slotEnd = addMinutes(start, 30);
+    while (slotEnd <= workEnd) {
+      if (this.isIntervalAvailable(start, slotEnd, daySchedule)) {
+        this.availableEndTimes.push(formatDate(slotEnd, 'HH:mm', 'en-US'));
+      }
+      slotEnd = addMinutes(slotEnd, 30);
     }
 
     let selectedEnd = this.blockForm.get('endTime')?.value as string | undefined;
@@ -204,9 +210,9 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
     }
   }
 
-  private isIntervalAvailable(start: Date, end: Date, daySchedule: DaySchedule): boolean {
+  private isIntervalAvailable(start: Date, end: Date, daySchedule?: DaySchedule): boolean {
     const interval = { start, end };
-    if (daySchedule.breaks) {
+    if (daySchedule?.breaks) {
       for (const brk of daySchedule.breaks) {
         const [bsHour, bsMinute] = brk.start.split(':').map(Number);
         const [beHour, beMinute] = brk.end.split(':').map(Number);
