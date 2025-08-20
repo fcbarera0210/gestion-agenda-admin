@@ -9,37 +9,27 @@
       </p>
     </div>
     <div class="flex items-center space-x-2">
-      <button
-        (click)="openNewBlockModal()"
-          class="px-4 py-2 font-semibold text-neutral-700 bg-neutral-100 border border-neutral-300 rounded-lg shadow-sm hover:bg-neutral-50 dark:text-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 dark:hover:bg-neutral-600"
-      >
-        Bloquear Horario
-      </button>
-      <button
-        (click)="openNewAppointmentModal()"
-        class="px-4 py-2 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90"
-      >
-        + Agendar Cita
-      </button>
+      <app-ui-button (click)="openNewBlockModal()">Bloquear Horario</app-ui-button>
+      <app-ui-button (click)="openNewAppointmentModal()">+ Agendar Cita</app-ui-button>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
     <div
-        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer"
+      class="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-between cursor-pointer transition-shadow hover:shadow-xl"
       (click)="selectView('day')"
       [ngClass]="{
-        'ring-2 ring-primary bg-blue-50':
+        'ring-2 ring-white/70':
           activeView !== 'pending' && activeView !== 'cancelled',
       }"
     >
       <div>
-          <span class="text-sm font-medium text-neutral-500">Citas para Hoy</span>
-          <p class="text-3xl font-bold text-neutral-800">
+        <span class="text-sm font-medium">Citas para Hoy</span>
+        <p class="text-3xl font-bold">
           {{ (upcomingAppointments$ | async)?.length || 0 }}
         </p>
       </div>
-      <div class="p-3 rounded-full bg-blue-100 text-blue-500">
+      <div class="p-3 rounded-full bg-white/20 text-white">
         <svg
           class="w-6 h-6"
           fill="none"
@@ -56,19 +46,19 @@
       </div>
     </div>
     <div
-        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer aspect-square"
+      class="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-between cursor-pointer aspect-square transition-shadow hover:shadow-xl"
       (click)="selectView('pending')"
       [ngClass]="{
-        'ring-2 ring-yellow-500 bg-yellow-50': activeView === 'pending',
+        'ring-2 ring-white/70': activeView === 'pending',
       }"
     >
       <div>
-          <span class="text-sm font-medium text-neutral-500">Citas Pendientes</span>
-        <p class="text-3xl font-bold text-yellow-500">
+        <span class="text-sm font-medium">Citas Pendientes</span>
+        <p class="text-3xl font-bold">
           {{ (pendingMonthAppointments$ | async)?.length || 0 }}
         </p>
       </div>
-      <div class="p-3 rounded-full bg-yellow-100 text-yellow-500">
+      <div class="p-3 rounded-full bg-white/20 text-white">
         <svg
           class="w-6 h-6"
           fill="none"
@@ -85,19 +75,19 @@
       </div>
     </div>
     <div
-        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer aspect-square"
+      class="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-between cursor-pointer aspect-square transition-shadow hover:shadow-xl"
       (click)="selectView('cancelled')"
       [ngClass]="{
-        'ring-2 ring-red-500 bg-red-50': activeView === 'cancelled',
+        'ring-2 ring-white/70': activeView === 'cancelled',
       }"
     >
       <div>
-          <span class="text-sm font-medium text-neutral-500">Citas Canceladas</span>
-        <p class="text-3xl font-bold text-red-500">
+        <span class="text-sm font-medium">Citas Canceladas</span>
+        <p class="text-3xl font-bold">
           {{ cancelledAppointments.length }}
         </p>
       </div>
-      <div class="p-3 rounded-full bg-red-100 text-red-500">
+      <div class="p-3 rounded-full bg-white/20 text-white">
         <svg
           class="w-6 h-6"
           fill="none"
@@ -114,14 +104,14 @@
       </div>
     </div>
     <div
-        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer"
+      class="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-between cursor-pointer transition-shadow hover:shadow-xl"
       routerLink="/clients"
     >
       <div>
-          <span class="text-sm font-medium text-neutral-500">Total de Clientes</span>
-          <p class="text-3xl font-bold text-neutral-800">{{ stats.totalClients }}</p>
+        <span class="text-sm font-medium">Total de Clientes</span>
+        <p class="text-3xl font-bold">{{ stats.totalClients }}</p>
       </div>
-      <div class="p-3 rounded-full bg-green-100 text-green-500">
+      <div class="p-3 rounded-full bg-white/20 text-white">
         <svg
           class="w-6 h-6"
           fill="none"
@@ -138,18 +128,16 @@
       </div>
     </div>
     <div
-        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer"
+      class="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-between cursor-pointer transition-shadow hover:shadow-xl"
       routerLink="/services"
     >
       <div>
-          <span class="text-sm font-medium text-neutral-500"
-          >Servicios Ofrecidos</span
-        >
-          <p class="text-3xl font-bold text-neutral-800">
+        <span class="text-sm font-medium">Servicios Ofrecidos</span>
+        <p class="text-3xl font-bold">
           {{ stats.totalServices }}
         </p>
       </div>
-      <div class="p-3 rounded-full bg-indigo-100 text-indigo-500">
+      <div class="p-3 rounded-full bg-white/20 text-white">
         <svg
           class="w-6 h-6"
           fill="none"
@@ -167,7 +155,7 @@
     </div>
   </div>
 
-  <div class="p-6 bg-neutral-100 rounded-lg shadow-md">
+  <div class="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-neutral-50 to-neutral-100 hover:shadow-xl">
     <div class="flex items-center border-b mb-4">
       <div
         class="flex space-x-4"

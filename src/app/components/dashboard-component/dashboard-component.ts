@@ -24,6 +24,7 @@ import { ToastService } from '../../services/toast-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
 import { AppointmentDetailsModalComponent } from '../../components/appointment-details-modal-component/appointment-details-modal-component';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,6 +35,7 @@ import { AppointmentDetailsModalComponent } from '../../components/appointment-d
     AppointmentFormComponent,
     TimeBlockFormComponent,
     AppointmentDetailsModalComponent,
+    UiButtonComponent,
   ],
   templateUrl: './dashboard-component.html',
 })

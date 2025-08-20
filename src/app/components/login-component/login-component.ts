@@ -7,11 +7,12 @@ import { ToastService } from '../../services/toast-service';
 import { ForgotPasswordModalComponent } from '../forgot-password-modal-component/forgot-password-modal-component';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../services/theme-service';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ToastContainerComponent, ForgotPasswordModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ToastContainerComponent, ForgotPasswordModalComponent, UiButtonComponent],
   templateUrl: './login-component.html',
   styleUrls: ['./login-component.scss'],
 })

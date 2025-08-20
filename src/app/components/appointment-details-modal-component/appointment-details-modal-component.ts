@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 import { combineLatest } from 'rxjs';
 
 import { Appointment } from '../../services/appointments-service';
@@ -10,7 +11,7 @@ import { ServicesService } from '../../services/services-service';
 @Component({
   selector: 'app-appointment-details-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, UiButtonComponent],
   templateUrl: './appointment-details-modal-component.html',
 })
 export class AppointmentDetailsModalComponent implements OnInit {
