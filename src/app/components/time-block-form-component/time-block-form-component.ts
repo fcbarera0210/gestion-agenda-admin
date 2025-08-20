@@ -9,11 +9,12 @@ import { Appointment, AppointmentsService } from '../../services/appointments-se
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog-component/confirmation-dialog-component';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-time-block-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent, UiButtonComponent],
   templateUrl: './time-block-form-component.html',
 })
 export class TimeBlockFormComponent implements OnInit, OnChanges {
