@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
 import { addMinutes, parseISO, addDays, setHours, setMinutes, areIntervalsOverlapping } from 'date-fns';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription, take } from 'rxjs';
 
 import { Appointment, AppointmentsService } from '../../services/appointments-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
@@ -16,7 +16,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog-component/co
   imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent],
   templateUrl: './time-block-form-component.html',
 })
-export class TimeBlockFormComponent implements OnInit, OnChanges {
+export class TimeBlockFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() startDate!: Date;
   @Input() timeBlock: TimeBlock | null = null;
   @Input() isDeleting = false;
@@ -35,6 +35,7 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   workSchedule: WorkSchedule | null = null;
   appointments: Appointment[] = [];
   timeBlocks: TimeBlock[] = [];
+  private dataSub?: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -73,12 +74,16 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
     this.configureFormForMode();
   }
 
+  ngOnDestroy(): void {
+    this.dataSub?.unsubscribe();
+  }
+
   private loadData(): void {
-    combineLatest([
+    this.dataSub = combineLatest([
       this.settingsService.getProfessionalProfile(),
       this.appointmentsService.getAppointments(),
       this.timeBlockService.getTimeBlocks()
-    ]).subscribe(([profile, appointments, blocks]) => {
+    ]).pipe(take(1)).subscribe(([profile, appointments, blocks]) => {
       this.workSchedule = profile?.workSchedule || null;
       this.appointments = appointments;
       this.timeBlocks = blocks;
