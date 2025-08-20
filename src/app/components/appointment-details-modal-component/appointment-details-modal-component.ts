@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UiButtonComponent } from '../ui-button/ui-button.component';
@@ -12,6 +13,16 @@ import { ServicesService } from '../../services/services-service';
   selector: 'app-appointment-details-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, UiButtonComponent],
+  animations: [
+    trigger('backdrop', [
+      transition(':enter', [style({ opacity: 0 }), animate('300ms ease-out', style({ opacity: 1 }))]),
+      transition(':leave', [animate('300ms ease-in', style({ opacity: 0 }))]),
+    ]),
+    trigger('modal', [
+      transition(':enter', [style({ opacity: 0, transform: 'scale(0.95)' }), animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))]),
+      transition(':leave', [animate('300ms ease-in', style({ opacity: 0, transform: 'scale(0.95)' }))]),
+    ]),
+  ],
   templateUrl: './appointment-details-modal-component.html',
 })
 export class AppointmentDetailsModalComponent implements OnInit {
