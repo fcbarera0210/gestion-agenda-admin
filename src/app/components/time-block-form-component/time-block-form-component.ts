@@ -85,29 +85,26 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
       this.generateAvailableDates();
 
       const dateControl = this.blockForm.get('date');
-      if (dateControl && this.availableDates.length) {
-        let selectedDate = dateControl.value as string;
-        if (!selectedDate || !this.availableDates.includes(selectedDate)) {
-          selectedDate = this.availableDates[0];
-        }
-        dateControl.setValue(selectedDate, { emitEvent: false });
+      if (dateControl && this.availableDates.length && !dateControl.value) {
+        dateControl.setValue(this.availableDates[0], { emitEvent: false });
       }
+
       const date = dateControl?.value as string | undefined;
       if (date) {
         this.generateAvailableStartTimes(date);
+
         const startControl = this.blockForm.get('startTime');
-        let start = startControl?.value as string | undefined;
-        if (!start || !this.availableStartTimes.includes(start)) {
-          start = this.availableStartTimes[0];
-          startControl?.setValue(start, { emitEvent: false });
+        if (startControl && !startControl.value && this.availableStartTimes.length) {
+          startControl.setValue(this.availableStartTimes[0], { emitEvent: false });
         }
+
+        const start = startControl?.value as string | undefined;
         if (start) {
           this.generateAvailableEndTimes(date, start);
+
           const endControl = this.blockForm.get('endTime');
-          let end = endControl?.value as string | undefined;
-          if (!end || !this.availableEndTimes.includes(end)) {
-            end = this.availableEndTimes[0];
-            endControl?.setValue(end, { emitEvent: false });
+          if (endControl && !endControl.value && this.availableEndTimes.length) {
+            endControl.setValue(this.availableEndTimes[0], { emitEvent: false });
           }
         }
       }
@@ -264,17 +261,6 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
     }
 
     return true;
-  }
-
-  onDateChange(date: string): void {
-    this.generateAvailableStartTimes(date);
-  }
-
-  onStartTimeChange(time: string): void {
-    const date = this.blockForm.get('date')?.value;
-    if (date) {
-      this.generateAvailableEndTimes(date, time);
-    }
   }
 
   private configureFormForMode(): void {
