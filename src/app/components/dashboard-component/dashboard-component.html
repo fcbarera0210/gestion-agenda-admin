@@ -3,15 +3,15 @@
     class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
   >
     <div>
-      <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
-      <p class="mt-1 text-gray-600">
+      <h1 class="text-3xl font-bold text-secondary">Dashboard</h1>
+      <p class="mt-1 text-neutral-600">
         Bienvenido, aquí tienes un resumen de tu actividad.
       </p>
     </div>
     <div class="flex items-center space-x-2">
       <button
         (click)="openNewBlockModal()"
-        class="px-4 py-2 font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
+          class="px-4 py-2 font-semibold text-neutral-700 bg-neutral-100 border border-neutral-300 rounded-lg shadow-sm hover:bg-neutral-50 dark:text-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 dark:hover:bg-neutral-600"
       >
         Bloquear Horario
       </button>
@@ -26,7 +26,7 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
     <div
-      class="p-6 bg-white rounded-lg shadow-md flex items-center justify-between cursor-pointer"
+        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer"
       (click)="selectView('day')"
       [ngClass]="{
         'ring-2 ring-primary bg-blue-50':
@@ -34,8 +34,8 @@
       }"
     >
       <div>
-        <span class="text-sm font-medium text-gray-500">Citas para Hoy</span>
-        <p class="text-3xl font-bold text-gray-800">
+          <span class="text-sm font-medium text-neutral-500">Citas para Hoy</span>
+          <p class="text-3xl font-bold text-neutral-800">
           {{ (upcomingAppointments$ | async)?.length || 0 }}
         </p>
       </div>
@@ -56,14 +56,14 @@
       </div>
     </div>
     <div
-      class="p-6 bg-white rounded-lg shadow-md flex items-center justify-between cursor-pointer aspect-square"
+        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer aspect-square"
       (click)="selectView('pending')"
       [ngClass]="{
         'ring-2 ring-yellow-500 bg-yellow-50': activeView === 'pending',
       }"
     >
       <div>
-        <span class="text-sm font-medium text-gray-500">Citas Pendientes</span>
+          <span class="text-sm font-medium text-neutral-500">Citas Pendientes</span>
         <p class="text-3xl font-bold text-yellow-500">
           {{ (pendingMonthAppointments$ | async)?.length || 0 }}
         </p>
@@ -85,14 +85,14 @@
       </div>
     </div>
     <div
-      class="p-6 bg-white rounded-lg shadow-md flex items-center justify-between cursor-pointer aspect-square"
+        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer aspect-square"
       (click)="selectView('cancelled')"
       [ngClass]="{
         'ring-2 ring-red-500 bg-red-50': activeView === 'cancelled',
       }"
     >
       <div>
-        <span class="text-sm font-medium text-gray-500">Citas Canceladas</span>
+          <span class="text-sm font-medium text-neutral-500">Citas Canceladas</span>
         <p class="text-3xl font-bold text-red-500">
           {{ cancelledAppointments.length }}
         </p>
@@ -114,12 +114,12 @@
       </div>
     </div>
     <div
-      class="p-6 bg-white rounded-lg shadow-md flex items-center justify-between cursor-pointer"
+        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer"
       routerLink="/clients"
     >
       <div>
-        <span class="text-sm font-medium text-gray-500">Total de Clientes</span>
-        <p class="text-3xl font-bold text-gray-800">{{ stats.totalClients }}</p>
+          <span class="text-sm font-medium text-neutral-500">Total de Clientes</span>
+          <p class="text-3xl font-bold text-neutral-800">{{ stats.totalClients }}</p>
       </div>
       <div class="p-3 rounded-full bg-green-100 text-green-500">
         <svg
@@ -138,14 +138,14 @@
       </div>
     </div>
     <div
-      class="p-6 bg-white rounded-lg shadow-md flex items-center justify-between cursor-pointer"
+        class="p-6 bg-neutral-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer"
       routerLink="/services"
     >
       <div>
-        <span class="text-sm font-medium text-gray-500"
+          <span class="text-sm font-medium text-neutral-500"
           >Servicios Ofrecidos</span
         >
-        <p class="text-3xl font-bold text-gray-800">
+          <p class="text-3xl font-bold text-neutral-800">
           {{ stats.totalServices }}
         </p>
       </div>
@@ -167,7 +167,7 @@
     </div>
   </div>
 
-  <div class="p-6 bg-white rounded-lg shadow-md">
+  <div class="p-6 bg-neutral-100 rounded-lg shadow-md">
     <div class="flex items-center border-b mb-4">
       <div
         class="flex space-x-4"
@@ -201,7 +201,7 @@
           Mes
         </button>
       </div>
-      <div class="ml-auto text-sm text-gray-600">
+        <div class="ml-auto text-sm text-neutral-600">
         <ng-container [ngSwitch]="activeView">
           <span *ngSwitchCase="'day'"
             >{{ (upcomingAppointments$ | async)?.length || 0 }} citas</span
@@ -229,7 +229,7 @@
           <div *ngIf="appointments.length > 0; else emptyDay" class="space-y-4">
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-neutral-50"
               (click)="openEditAppointment(apt)"
             >
               <div
@@ -241,7 +241,7 @@
                       apt.start.toDate() | date: "EEE dd/MM" : undefined : "es"
                     }}
                   </p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-neutral-500">
                     {{
                       apt.start.toDate() | date: "shortTime" : undefined : "es"
                     }}
@@ -252,8 +252,8 @@
                   </p>
                 </div>
                 <div class="text-center sm:text-left">
-                  <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                  <p class="text-sm text-gray-500">
+                  <h3 class="font-semibold text-neutral-800">{{ apt.title }}</h3>
+                  <p class="text-sm text-neutral-500">
                     {{ clientsMap.get(apt.clientId) || "Cliente Desconocido" }}
                   </p>
                 </div>
@@ -281,7 +281,7 @@
             </div>
           </div>
           <ng-template #emptyDay
-            ><p class="text-center text-gray-500">
+            ><p class="text-center text-neutral-500">
               No tienes citas programadas para hoy.
             </p></ng-template
           >
@@ -298,7 +298,7 @@
           >
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-neutral-50"
               (click)="openEditAppointment(apt)"
             >
               <div
@@ -310,7 +310,7 @@
                       apt.start.toDate() | date: "EEE dd/MM" : undefined : "es"
                     }}
                   </p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-neutral-500">
                     {{
                       apt.start.toDate() | date: "shortTime" : undefined : "es"
                     }}
@@ -321,8 +321,8 @@
                   </p>
                 </div>
                 <div class="text-center sm:text-left">
-                  <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                  <p class="text-sm text-gray-500">
+                  <h3 class="font-semibold text-neutral-800">{{ apt.title }}</h3>
+                  <p class="text-sm text-neutral-500">
                     {{ clientsMap.get(apt.clientId) || "Cliente Desconocido" }}
                   </p>
                 </div>
@@ -350,7 +350,7 @@
             </div>
           </div>
           <ng-template #emptyWeek
-            ><p class="text-center text-gray-500">
+            ><p class="text-center text-neutral-500">
               No tienes citas programadas esta semana.
             </p></ng-template
           >
@@ -367,7 +367,7 @@
           >
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-neutral-50"
               (click)="openEditAppointment(apt)"
             >
               <div
@@ -379,7 +379,7 @@
                       apt.start.toDate() | date: "EEE dd/MM" : undefined : "es"
                     }}
                   </p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-neutral-500">
                     {{
                       apt.start.toDate() | date: "shortTime" : undefined : "es"
                     }}
@@ -390,8 +390,8 @@
                   </p>
                 </div>
                 <div class="text-center sm:text-left">
-                  <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                  <p class="text-sm text-gray-500">
+                  <h3 class="font-semibold text-neutral-800">{{ apt.title }}</h3>
+                  <p class="text-sm text-neutral-500">
                     {{ clientsMap.get(apt.clientId) || "Cliente Desconocido" }}
                   </p>
                 </div>
@@ -419,7 +419,7 @@
             </div>
           </div>
           <ng-template #emptyMonth
-            ><p class="text-center text-gray-500">
+            ><p class="text-center text-neutral-500">
               No tienes citas programadas este mes.
             </p></ng-template
           >
@@ -439,7 +439,7 @@
           >
             <div
               *ngFor="let apt of appointments"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-neutral-50"
               (click)="openEditAppointment(apt)"
             >
               <div
@@ -451,7 +451,7 @@
                       apt.start.toDate() | date: "EEE dd/MM" : undefined : "es"
                     }}
                   </p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-neutral-500">
                     {{
                       apt.start.toDate() | date: "shortTime" : undefined : "es"
                     }}
@@ -462,8 +462,8 @@
                   </p>
                 </div>
                 <div class="text-center sm:text-left">
-                  <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                  <p class="text-sm text-gray-500">
+                  <h3 class="font-semibold text-neutral-800">{{ apt.title }}</h3>
+                  <p class="text-sm text-neutral-500">
                     {{ clientsMap.get(apt.clientId) || "Cliente Desconocido" }}
                   </p>
                 </div>
@@ -485,7 +485,7 @@
             </div>
           </div>
         <ng-template #emptyPending
-          ><p class="text-center text-gray-500">
+          ><p class="text-center text-neutral-500">
             No tienes citas pendientes este mes.
           </p></ng-template
         >
@@ -499,7 +499,7 @@
         >
           <div
             *ngFor="let apt of cancelledAppointments"
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-gray-50"
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-2 cursor-pointer hover:bg-neutral-50"
             (click)="openEditAppointment(apt)"
           >
             <div
@@ -509,15 +509,15 @@
                 <p class="font-bold text-primary">
                   {{ apt.start.toDate() | date: "EEE dd/MM" : undefined : "es" }}
                 </p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-neutral-500">
                   {{ apt.start.toDate() | date: "shortTime" : undefined : "es" }}
                   -
                   {{ apt.end.toDate() | date: "shortTime" : undefined : "es" }}
                 </p>
               </div>
               <div class="text-center sm:text-left">
-                <h3 class="font-semibold text-gray-800">{{ apt.title }}</h3>
-                <p class="text-sm text-gray-500">
+                <h3 class="font-semibold text-neutral-800">{{ apt.title }}</h3>
+                <p class="text-sm text-neutral-500">
                   {{ clientsMap.get(apt.clientId) || "Cliente Desconocido" }}
                 </p>
               </div>
@@ -539,14 +539,14 @@
           </div>
         </div>
         <ng-template #emptyCancelled>
-          <p class="text-center text-gray-500">
+          <p class="text-center text-neutral-500">
             No tienes citas canceladas próximas.
           </p>
         </ng-template>
       </ng-container>
 
       <ng-template #loading
-        ><p class="text-gray-500">Cargando citas...</p></ng-template
+        ><p class="text-neutral-500">Cargando citas...</p></ng-template
       >
     </div>
   </div>
