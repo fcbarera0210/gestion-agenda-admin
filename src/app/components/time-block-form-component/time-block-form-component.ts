@@ -56,16 +56,35 @@ export class TimeBlockFormComponent implements OnInit, OnChanges, OnDestroy {
     this.blockForm.get('date')?.valueChanges.subscribe(date => {
       if (date) {
         this.generateAvailableStartTimes(date);
-        this.blockForm.get('startTime')?.setValue('');
+        const startControl = this.blockForm.get('startTime');
+        if (this.availableStartTimes.length) {
+          startControl?.setValue(this.availableStartTimes[0]);
+        } else {
+          startControl?.setValue('', { emitEvent: false });
+          this.availableEndTimes = [];
+          this.blockForm.get('endTime')?.setValue('', { emitEvent: false });
+        }
+      } else {
+        this.availableStartTimes = [];
         this.availableEndTimes = [];
+        this.blockForm.get('startTime')?.setValue('', { emitEvent: false });
+        this.blockForm.get('endTime')?.setValue('', { emitEvent: false });
       }
     });
+
     this.blockForm.get('startTime')?.valueChanges.subscribe(time => {
       const date = this.blockForm.get('date')?.value;
       if (time && date) {
         this.generateAvailableEndTimes(date, time);
+        const endControl = this.blockForm.get('endTime');
+        if (this.availableEndTimes.length) {
+          endControl?.setValue(this.availableEndTimes[0]);
+        } else {
+          endControl?.setValue('', { emitEvent: false });
+        }
       } else {
         this.availableEndTimes = [];
+        this.blockForm.get('endTime')?.setValue('', { emitEvent: false });
       }
     });
   }
@@ -245,17 +264,6 @@ export class TimeBlockFormComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     return true;
-  }
-
-  onDateChange(date: string): void {
-    this.generateAvailableStartTimes(date);
-  }
-
-  onStartTimeChange(time: string): void {
-    const date = this.blockForm.get('date')?.value;
-    if (date) {
-      this.generateAvailableEndTimes(date, time);
-    }
   }
 
   private configureFormForMode(): void {
