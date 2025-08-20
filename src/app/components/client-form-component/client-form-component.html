@@ -1,18 +1,18 @@
 <div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
 
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
+  <div class="w-full max-w-lg p-8 rounded-2xl shadow-lg bg-gradient-to-br from-neutral-50 to-neutral-100 space-y-6">
 
-    <h2 class="text-2xl font-bold text-gray-800">
+    <h2 class="text-2xl font-bold text-neutral-800">
       {{ client?.id ? 'Editar Cliente' : 'Añadir Nuevo Cliente' }}
     </h2>
 
     <form [formGroup]="clientForm" (ngSubmit)="save()" class="space-y-4">
 
       <div>
-        <label for="name" class="text-sm font-medium text-gray-700">Nombre Completo</label>
+        <label for="name" class="text-sm font-medium text-neutral-700">Nombre Completo</label>
           <input id="name" type="text" formControlName="name" placeholder="Ej: Ana Contreras"
-                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                 class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                  [attr.aria-invalid]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched"
                  [attr.aria-describedby]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched ? 'name-error' : null">
         <div id="name-error" *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched" class="mt-1 text-sm text-red-600">
@@ -22,9 +22,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label for="email" class="text-sm font-medium text-gray-700">Correo Electrónico</label>
+          <label for="email" class="text-sm font-medium text-neutral-700">Correo Electrónico</label>
             <input id="email" type="email" formControlName="email" placeholder="ejemplo@correo.com"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                    [attr.aria-invalid]="clientForm.get('email')?.invalid && clientForm.get('email')?.touched"
                    [attr.aria-describedby]="clientForm.get('email')?.invalid && clientForm.get('email')?.touched ? 'email-error' : null">
           <div id="email-error" *ngIf="clientForm.get('email')?.invalid && clientForm.get('email')?.touched" class="mt-1 text-sm text-red-600">
@@ -32,9 +32,9 @@
           </div>
         </div>
         <div>
-          <label for="phone" class="text-sm font-medium text-gray-700">Teléfono</label>
+          <label for="phone" class="text-sm font-medium text-neutral-700">Teléfono</label>
             <input id="phone" type="tel" formControlName="phone" placeholder="+56 9 1234 5678"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                    [attr.aria-invalid]="clientForm.get('phone')?.invalid && clientForm.get('phone')?.touched"
                    [attr.aria-describedby]="clientForm.get('phone')?.invalid && clientForm.get('phone')?.touched ? 'phone-error' : null">
           <div id="phone-error" *ngIf="clientForm.get('phone')?.invalid && clientForm.get('phone')?.touched" class="mt-1 text-sm text-red-600">
@@ -44,24 +44,14 @@
       </div>
 
       <div>
-        <label for="notes" class="text-sm font-medium text-gray-700">Notas Adicionales</label>
+        <label for="notes" class="text-sm font-medium text-neutral-700">Notas Adicionales</label>
           <textarea id="notes" formControlName="notes" rows="3" placeholder="Alergias, preferencias, etc."
-                    class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                    class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
       </div>
 
         <div class="flex flex-col sm:flex-row sm:justify-end pt-4 space-y-4 sm:space-y-0 sm:space-x-4">
-          <button type="button" (click)="cancel()" class="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 sm:w-auto">
-            Cancelar
-          </button>
-          <button type="submit"
-                  class="w-full px-4 py-2 font-semibold text-white rounded-lg transition-colors sm:w-32"
-                  [ngClass]="{
-                    'bg-primary hover:bg-opacity-90': clientForm.valid,
-                    'bg-gray-400 cursor-not-allowed': !clientForm.valid
-                  }"
-                  [disabled]="clientForm.invalid">
-            Guardar Cliente
-          </button>
+          <app-ui-button type="button" (click)="cancel()" class="w-full sm:w-auto">Cancelar</app-ui-button>
+          <app-ui-button type="submit" [disabled]="clientForm.invalid" class="w-full sm:w-32 flex items-center justify-center">Guardar Cliente</app-ui-button>
         </div>
       </form>
   </div>
