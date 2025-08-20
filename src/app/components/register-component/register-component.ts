@@ -5,11 +5,12 @@ import { Router, RouterLink } from '@angular/router';
 import { ToastContainerComponent } from '../toast-container-component/toast-container-component';
 import { ToastService } from '../../services/toast-service';
 import { CommonModule } from '@angular/common';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastContainerComponent, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, ToastContainerComponent, RouterLink, UiButtonComponent],
   templateUrl: './register-component.html',
   styleUrls: ['./register-component.scss']
 })

@@ -1,6 +1,6 @@
-<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="close()"></div>
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50 transition duration-300" (click)="close()" @backdrop></div>
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg space-y-4">
+  <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg space-y-4 transition duration-300" @modal>
     <h2 class="text-xl font-bold text-gray-800">{{ appointment.title }}</h2>
     <div class="space-y-2">
       <p><span class="font-semibold">Fecha:</span> {{ appointment.start.toDate() | date:'fullDate' }}</p>

@@ -1,18 +1,18 @@
 <div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
 
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
+  <div class="w-full max-w-lg p-8 rounded-2xl shadow-lg bg-gradient-to-br from-neutral-50 to-neutral-100 space-y-6">
 
-    <h2 class="text-2xl font-bold text-gray-800">
+    <h2 class="text-2xl font-bold text-neutral-800">
       {{ service?.id ? 'Editar Servicio' : 'Añadir Nuevo Servicio' }}
     </h2>
 
     <form [formGroup]="serviceForm" (ngSubmit)="save()" class="space-y-4">
 
       <div>
-        <label for="name" class="text-sm font-medium text-gray-700">Nombre del Servicio</label>
+        <label for="name" class="text-sm font-medium text-neutral-700">Nombre del Servicio</label>
           <input id="name" type="text" formControlName="name" placeholder="Ej: Consulta Inicial"
-                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                 class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                  [attr.aria-invalid]="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched"
                  [attr.aria-describedby]="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched ? 'service-name-error' : null">
         <div id="service-name-error" *ngIf="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched" class="mt-1 text-sm text-red-600">
@@ -22,9 +22,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label for="duration" class="text-sm font-medium text-gray-700">Duración (min)</label>
+          <label for="duration" class="text-sm font-medium text-neutral-700">Duración (min)</label>
             <input id="duration" type="number" formControlName="duration"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                    [attr.aria-invalid]="serviceForm.get('duration')?.invalid && serviceForm.get('duration')?.touched"
                    [attr.aria-describedby]="serviceForm.get('duration')?.invalid && serviceForm.get('duration')?.touched ? 'duration-error' : null">
           <div id="duration-error" *ngIf="serviceForm.get('duration')?.invalid && serviceForm.get('duration')?.touched" class="mt-1 text-sm text-red-600">
@@ -32,9 +32,9 @@
           </div>
         </div>
         <div>
-          <label for="price" class="text-sm font-medium text-gray-700">Precio</label>
+          <label for="price" class="text-sm font-medium text-neutral-700">Precio</label>
             <input id="price" type="number" formControlName="price"
-                   class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                   class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                    [attr.aria-invalid]="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched"
                    [attr.aria-describedby]="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched ? 'price-error' : null">
           <div id="price-error" *ngIf="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched" class="mt-1 text-sm text-red-600">
@@ -44,10 +44,10 @@
       </div>
 
       <div>
-        <label for="bufferTime" class="text-sm font-medium text-gray-700">Tiempo Búfer (min)</label>
-        <p class="text-xs text-gray-500">Tiempo extra no visible para el cliente (antes/después de la cita).</p>
+        <label for="bufferTime" class="text-sm font-medium text-neutral-700">Tiempo Búfer (min)</label>
+        <p class="text-xs text-neutral-500">Tiempo extra no visible para el cliente (antes/después de la cita).</p>
           <input id="bufferTime" type="number" formControlName="bufferTime"
-                 class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                 class="w-full px-4 py-3 mt-1 text-neutral-700 bg-neutral-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                  [attr.aria-invalid]="serviceForm.get('bufferTime')?.invalid && serviceForm.get('bufferTime')?.touched"
                  [attr.aria-describedby]="serviceForm.get('bufferTime')?.invalid && serviceForm.get('bufferTime')?.touched ? 'buffer-error' : null">
         <div id="buffer-error" *ngIf="serviceForm.get('bufferTime')?.invalid && serviceForm.get('bufferTime')?.touched" class="mt-1 text-sm text-red-600">
@@ -56,18 +56,8 @@
       </div>
 
         <div class="flex flex-col sm:flex-row sm:justify-end pt-4 space-y-4 sm:space-y-0 sm:space-x-4">
-          <button type="button" (click)="cancel()" class="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 sm:w-auto">
-            Cancelar
-          </button>
-          <button type="submit"
-                  class="w-full px-4 py-2 font-semibold text-white rounded-lg transition-colors sm:w-32"
-                  [ngClass]="{
-                    'bg-primary hover:bg-opacity-90': serviceForm.valid,
-                    'bg-gray-400 cursor-not-allowed': !serviceForm.valid
-                  }"
-                  [disabled]="serviceForm.invalid">
-            Guardar
-          </button>
+          <app-ui-button type="button" (click)="cancel()" class="w-full sm:w-auto">Cancelar</app-ui-button>
+          <app-ui-button type="submit" [disabled]="serviceForm.invalid" class="w-full sm:w-32 flex items-center justify-center">Guardar</app-ui-button>
         </div>
       </form>
   </div>

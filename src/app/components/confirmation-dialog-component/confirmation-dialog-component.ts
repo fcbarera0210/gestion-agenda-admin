@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UiButtonComponent],
   templateUrl: './confirmation-dialog-component.html',
 })
 export class ConfirmationDialogComponent {

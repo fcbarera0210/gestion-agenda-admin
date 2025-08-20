@@ -12,11 +12,12 @@ import { Appointment, AppointmentStatus, AppointmentType, AppointmentsService } 
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog-component/confirmation-dialog-component';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-appointment-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationDialogComponent, UiButtonComponent],
   templateUrl: './appointment-form-component.html',
 })
 export class AppointmentFormComponent implements OnInit, OnChanges {

@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Client } from '../../services/clients-service';
+import { UiButtonComponent } from '../ui-button/ui-button.component';
 
 @Component({
   selector: 'app-client-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, UiButtonComponent],
   templateUrl: './client-form-component.html',
 })
 export class ClientFormComponent implements OnInit {

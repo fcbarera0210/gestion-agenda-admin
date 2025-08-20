@@ -3,11 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-primary: 243 92% 62%; /* Este es un color HSL azul/púrpura similar al de la imagen */
-}
-
 .light-theme {
+  --color-primary: 243 92% 62%;
+  --color-secondary: 162 73% 46%;
+  --color-neutral-50: 0 0% 100%;
+  --color-neutral-100: 210 40% 96%;
+  --color-neutral-200: 214 32% 91%;
+  --color-neutral-300: 213 27% 84%;
+  --color-neutral-400: 215 20% 65%;
+  --color-neutral-500: 215 16% 47%;
+  --color-neutral-600: 215 19% 35%;
+  --color-neutral-700: 215 25% 27%;
+  --color-neutral-800: 217 33% 17%;
+  --color-neutral-900: 222 47% 11%;
+
   --bg-color: #f8fafc;
   --text-color: #1f2937;
   --card-bg: #ffffff;
@@ -18,6 +27,19 @@
 }
 
 .dark-theme {
+  --color-primary: 243 92% 62%;
+  --color-secondary: 162 73% 46%;
+  --color-neutral-50: 222 47% 11%;
+  --color-neutral-100: 217 33% 17%;
+  --color-neutral-200: 215 25% 27%;
+  --color-neutral-300: 215 19% 35%;
+  --color-neutral-400: 215 16% 47%;
+  --color-neutral-500: 215 20% 65%;
+  --color-neutral-600: 213 27% 84%;
+  --color-neutral-700: 214 32% 91%;
+  --color-neutral-800: 210 40% 96%;
+  --color-neutral-900: 0 0% 100%;
+
   --bg-color: #1f2937;
   --text-color: #f8fafc;
   --card-bg: #111827;

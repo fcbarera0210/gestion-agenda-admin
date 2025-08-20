@@ -1,7 +1,7 @@
-<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50 transition duration-300" (click)="cancel()" @backdrop></div>
 
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-2xl p-8 bg-white rounded-2xl shadow-lg">
+  <div class="w-full max-w-2xl p-8 bg-white rounded-2xl shadow-lg transition duration-300" @modal>
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-800">{{ title }}</h2>
       <button (click)="cancel()" class="p-2 text-gray-400 dark:text-gray-300 rounded-full bg-transparent hover:bg-gray-100 dark:hover:!bg-gray-700 hover:text-gray-600">
