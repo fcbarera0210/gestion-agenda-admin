@@ -24,17 +24,18 @@ import { ToastService } from '../../services/toast-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
 import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
 import { AppointmentDetailsModalComponent } from '../../components/appointment-details-modal-component/appointment-details-modal-component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    AppointmentFormComponent,
-    TimeBlockFormComponent,
-    AppointmentDetailsModalComponent,
-  ],
+    imports: [
+      CommonModule,
+      RouterModule,
+      AppointmentFormComponent,
+      AppointmentDetailsModalComponent,
+      MatDialogModule,
+    ],
   templateUrl: './dashboard-component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -58,9 +59,8 @@ export class DashboardComponent implements OnInit {
   };
 
   // Propiedades para los modales de acción rápida
-  showAppointmentModal = false;
-  showTimeBlockModal = false;
-  showAppointmentDetailsModal = false;
+    showAppointmentModal = false;
+    showAppointmentDetailsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
 
@@ -71,10 +71,11 @@ export class DashboardComponent implements OnInit {
     private appointmentsService: AppointmentsService,
     private clientsService: ClientsService,
     private servicesService: ServicesService,
-    private timeBlockService: TimeBlockService,
-    private toastService: ToastService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+      private timeBlockService: TimeBlockService,
+      private toastService: ToastService,
+      private cdr: ChangeDetectorRef,
+      private dialog: MatDialog,
+    ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -176,14 +177,19 @@ export class DashboardComponent implements OnInit {
     this.showAppointmentModal = true;
   }
 
-  openNewBlockModal(): void {
-    this.selectedDate = new Date(); // El bloqueo por defecto es "ahora"
-    this.showTimeBlockModal = true;
-  }
+    openNewBlockModal(): void {
+      this.selectedDate = new Date(); // El bloqueo por defecto es "ahora"
+      const dialogRef = this.dialog.open(TimeBlockFormComponent);
+      dialogRef.componentInstance.startDate = this.selectedDate;
+      dialogRef.componentInstance.timeBlock = null;
+      dialogRef.componentInstance.onSave = this.handleSaveTimeBlock.bind(this);
+      dialogRef.afterClosed().subscribe(() => {
+        this.closeAllModals();
+      });
+    }
 
   closeAllModals(): void {
     this.showAppointmentModal = false;
-    this.showTimeBlockModal = false;
     this.showAppointmentDetailsModal = false;
     this.selectedAppointment = null;
     this.selectedDate = null;

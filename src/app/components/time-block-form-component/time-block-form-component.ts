@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Timestamp } from '@angular/fire/firestore';
 import { addMinutes, parseISO, addDays, setHours, setMinutes, areIntervalsOverlapping } from 'date-fns';
 import { combineLatest } from 'rxjs';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { Appointment, AppointmentsService } from '../../services/appointments-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
@@ -21,7 +22,6 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   @Input() timeBlock: TimeBlock | null = null;
   @Input() isDeleting = false;
   @Input() onSave!: (blockData: TimeBlock) => Promise<any>;
-  @Output() onCancel = new EventEmitter<void>();
   @Output() onDelete = new EventEmitter<string>();
 
   blockForm: FormGroup;
@@ -40,7 +40,8 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private appointmentsService: AppointmentsService,
     private timeBlockService: TimeBlockService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private dialogRef: MatDialogRef<TimeBlockFormComponent>,
   ) {
     this.blockForm = this.fb.group({
       title: ['Horario Bloqueado', Validators.required],
@@ -307,6 +308,7 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
     this.onSave(blockData as TimeBlock)
       .finally(() => {
         this.isLoading = false;
+        this.dialogRef.close(blockData);
       });
   }
 
@@ -317,6 +319,7 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   confirmDelete(): void {
     if (this.timeBlock?.id) {
       this.onDelete.emit(this.timeBlock.id);
+      this.dialogRef.close();
     }
     this.showConfirmationDialog = false;
   }
@@ -326,6 +329,6 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   }
 
   cancel(): void {
-    this.onCancel.emit();
+    this.dialogRef.close();
   }
 }

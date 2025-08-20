@@ -1,11 +1,8 @@
-<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
+<div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
 
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
-    
-    <h2 class="text-2xl font-bold text-gray-800">Bloquear Horario</h2>
+  <h2 class="text-2xl font-bold text-gray-800">Bloquear Horario</h2>
 
-    <form [formGroup]="blockForm" (ngSubmit)="save()" class="space-y-4">
+  <form [formGroup]="blockForm" (ngSubmit)="save()" class="space-y-4">
       
       <div>
         <label for="title" class="text-sm font-medium text-gray-700">Motivo (opcional)</label>
@@ -69,8 +66,7 @@
           </button>
         </div>
       </div>
-      </form>
-  </div>
+  </form>
 </div>
 
 <app-confirmation-dialog

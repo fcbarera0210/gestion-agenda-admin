@@ -19,11 +19,12 @@ import { DayAppointmentsModalComponent } from '../../components/day-appointments
 import { ViewDateFormatPipe } from '../../pipes/view-date-format.pipe';
 import { ToastService } from '../../services/toast-service';
 import { NotificationService } from '../../services/notification-service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe, MatDialogModule],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -67,14 +68,12 @@ export class AgendaComponent implements OnInit, OnDestroy {
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
   showAppointmentModal = false;
-  showTimeBlockModal = false;
   showDayAppointmentsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
   selectedTimeBlock: TimeBlock | null = null;
   dayAppointments: CalendarEvent[] = [];
   isDeletingAppointment = false;
-  isDeletingBlock = false;
 
   constructor(
     private settingsService: SettingsService,
@@ -83,7 +82,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
     private timeBlockService: TimeBlockService,
     private toastService: ToastService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -351,7 +351,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
     } else if (event.meta.eventType === 'timeBlock') {
       this.selectedTimeBlock = event.meta;
       this.selectedDate = event.start;
-      this.showTimeBlockModal = true;
+      this.openTimeBlockForm();
     }
   }
 
@@ -366,7 +366,16 @@ export class AgendaComponent implements OnInit, OnDestroy {
 
   openTimeBlockForm(): void {
     this.showChoiceModal = false;
-    this.showTimeBlockModal = true;
+    const dialogRef = this.dialog.open(TimeBlockFormComponent);
+    dialogRef.componentInstance.startDate = this.selectedDate!;
+    dialogRef.componentInstance.timeBlock = this.selectedTimeBlock;
+    dialogRef.componentInstance.onSave = this.handleSaveTimeBlock.bind(this);
+    dialogRef.componentInstance.onDelete.subscribe(id => this.handleDeleteTimeBlock(id));
+    dialogRef.afterClosed().subscribe(() => {
+      this.selectedTimeBlock = null;
+      this.selectedDate = null;
+      this.cdr.markForCheck();
+    });
   }
 
   handleSaveAppointment(appointmentData: any): void {
@@ -447,18 +456,16 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
   
   handleDeleteTimeBlock(blockId: string): void {
-    this.isDeletingBlock = true;
     this.timeBlockService.deleteTimeBlock(blockId)
       .then(() => {
         this.toastService.show('Bloqueo eliminado correctamente', 'success');
-        this.closeAllModals();
       })
       .catch(err => {
         this.toastService.show('Error al eliminar el bloqueo', 'error');
         console.error(err);
       })
       .finally(() => {
-        this.isDeletingBlock = false;
+        this.closeAllModals();
       });
   }
 
@@ -477,7 +484,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
   closeAllModals(): void {
     this.showChoiceModal = false;
     this.showAppointmentModal = false;
-    this.showTimeBlockModal = false;
     this.showDayAppointmentsModal = false;
     this.selectedDate = null;
     this.selectedAppointment = null;
