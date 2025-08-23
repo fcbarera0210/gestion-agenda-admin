@@ -153,6 +153,7 @@
 <app-block-time-modal
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
+  [timeBlock]="selectedBlock"
   (onSave)="handleSaveTimeBlock($event)"
   (onCancel)="closeAllModals()">
 </app-block-time-modal>

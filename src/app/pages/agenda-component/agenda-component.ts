@@ -71,6 +71,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   showDayAppointmentsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
+  selectedBlock: TimeBlock | null = null;
   dayAppointments: CalendarEvent[] = [];
   isDeletingAppointment = false;
 
@@ -345,6 +346,10 @@ export class AgendaComponent implements OnInit, OnDestroy {
       this.selectedAppointment = event.meta;
       this.selectedDate = event.start;
       this.showAppointmentModal = true;
+    } else if (event.meta.eventType === 'timeBlock') {
+      this.selectedBlock = event.meta;
+      this.selectedDate = event.start;
+      this.showTimeBlockModal = true;
     }
   }
 
@@ -358,6 +363,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
 
   openTimeBlockForm(): void {
+    this.selectedBlock = null;
     this.showChoiceModal = false;
     this.showTimeBlockModal = true;
   }
@@ -458,6 +464,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.showDayAppointmentsModal = false;
     this.selectedDate = null;
     this.selectedAppointment = null;
+    this.selectedBlock = null;
     this.dayAppointments = [];
     this.cdr.markForCheck();
   }
