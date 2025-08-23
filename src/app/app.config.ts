@@ -13,12 +13,36 @@ import localeEs from '@angular/common/locales/es';
 
 registerLocaleData(localeEs);
 
+declare const process: {
+  env: {
+    FIREBASE_PROJECT_ID?: string;
+    FIREBASE_APP_ID?: string;
+    FIREBASE_STORAGE_BUCKET?: string;
+    FIREBASE_API_KEY?: string;
+    FIREBASE_AUTH_DOMAIN?: string;
+    FIREBASE_MESSAGING_SENDER_ID?: string;
+  };
+};
+
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: LOCALE_ID, useValue: 'es' }, 
+    { provide: LOCALE_ID, useValue: 'es' },
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideAnimations(),
-    provideRouter(routes), provideFirebaseApp(() => initializeApp({ projectId: "gestion-agenda-pro", appId: "1:135115227347:web:85880d4f669d90359f5426", storageBucket: "gestion-agenda-pro.firebasestorage.app", apiKey: "AIzaSyCrVIIKMjAOhcGqihB7lRrB9T9TVolPR0c", authDomain: "gestion-agenda-pro.firebaseapp.com", messagingSenderId: "135115227347" })), provideAuth(() => getAuth()), provideFirestore(() => getFirestore()), provideFunctions(() => getFunctions())
-  ]
+    provideRouter(routes),
+    provideFirebaseApp(() =>
+      initializeApp({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        appId: process.env.FIREBASE_APP_ID,
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+        apiKey: process.env.FIREBASE_API_KEY,
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      })
+    ),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions()),
+  ],
 };

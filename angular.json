@@ -15,9 +15,14 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
-            "browser": "src/main.ts",
+            "customWebpackConfig": {
+              "path": "webpack.config.js"
+            },
+            "outputPath": "dist/admin-panel",
+            "index": "src/index.html",
+            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -40,7 +45,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "3mb" 
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -59,13 +64,13 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "admin-panel:build:production"
+              "browserTarget": "admin-panel:build:production"
             },
             "development": {
-              "buildTarget": "admin-panel:build:development"
+              "browserTarget": "admin-panel:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -74,8 +79,11 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular-builders/custom-webpack:karma",
           "options": {
+            "customWebpackConfig": {
+              "path": "webpack.config.js"
+            },
             "polyfills": [
               "zone.js",
               "zone.js/testing"

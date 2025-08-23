@@ -41,6 +41,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Environment variables
+.env
+
 # Firebase
 .firebase
 *-debug.log
