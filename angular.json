@@ -65,12 +65,15 @@
         },
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
+          "options": {
+            "buildTarget": "admin-panel:build"
+          },
           "configurations": {
             "production": {
-              "browserTarget": "admin-panel:build:production"
+              "buildTarget": "admin-panel:build:production"
             },
             "development": {
-              "browserTarget": "admin-panel:build:development"
+              "buildTarget": "admin-panel:build:development"
             }
           },
           "defaultConfiguration": "development"
