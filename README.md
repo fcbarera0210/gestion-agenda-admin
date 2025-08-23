@@ -59,11 +59,30 @@ Para levantar una copia local del proyecto, sigue estos pasos.
     ```sh
     npm install
     ```
-4.  Configura tus variables de entorno de Firebase en `src/environments/environment.ts`.
+4.  Crea un archivo `.env` en la raíz del proyecto (puedes usar `.env.example` como base) con las siguientes variables:
+    ```env
+    FIREBASE_PROJECT_ID=
+    FIREBASE_APP_ID=
+    FIREBASE_STORAGE_BUCKET=
+    FIREBASE_API_KEY=
+    FIREBASE_AUTH_DOMAIN=
+    FIREBASE_MESSAGING_SENDER_ID=
+    ```
 5.  Levanta el servidor de desarrollo:
     ```sh
     ng serve -o
     ```
+
+### Variables de Entorno
+
+El archivo `.env` debe definir estas claves utilizadas por Firebase:
+
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_APP_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_MESSAGING_SENDER_ID`
 
 ---
 
