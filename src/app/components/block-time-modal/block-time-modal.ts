@@ -75,60 +75,33 @@ export class BlockTimeModalComponent implements OnInit {
       this.timeBlocks = this.block ? blocks.filter(b => b.id !== this.block!.id) : blocks;
       this.generateAvailableDates();
 
-      const dateControl = this.blockForm.get('date');
-
       if (this.block) {
         const blockStart = this.block.start.toDate();
         const blockEnd = this.block.end.toDate();
         const dateStr = formatDate(blockStart, 'yyyy-MM-dd', 'en-US');
         const startStr = formatDate(blockStart, 'HH:mm', 'en-US');
         const endStr = formatDate(blockEnd, 'HH:mm', 'en-US');
-        dateControl?.setValue(dateStr, { emitEvent: false });
         this.generateAvailableStartTimes(dateStr);
-        this.blockForm.get('startTime')?.setValue(startStr, { emitEvent: false });
         this.generateAvailableEndTimes(dateStr, startStr);
-        this.blockForm.get('endTime')?.setValue(endStr, { emitEvent: false });
-        this.blockForm.get('motivo')?.setValue(this.block.title !== 'Horario Bloqueado' ? this.block.title : '', { emitEvent: false });
+        this.blockForm.patchValue({
+          date: dateStr,
+          startTime: startStr,
+          endTime: endStr,
+          motivo: this.block.title !== 'Horario Bloqueado' ? this.block.title : '',
+        }, { emitEvent: false });
       } else {
-        if (dateControl && this.availableDates.length) {
-          let selectedDate = dateControl.value as string;
-          if (!selectedDate || !this.availableDates.includes(selectedDate)) {
-            selectedDate = this.availableDates[0];
-          }
-          dateControl.setValue(selectedDate, { emitEvent: false });
-        }
-        const date = dateControl?.value as string | undefined;
-        if (date) {
-          this.generateAvailableStartTimes(date);
-          const startControl = this.blockForm.get('startTime');
-          let start = startControl?.value as string | undefined;
-          if (!start || !this.availableStartTimes.includes(start)) {
-            start = this.availableStartTimes[0];
-            startControl?.setValue(start, { emitEvent: false });
-          }
-          if (start) {
-            this.generateAvailableEndTimes(date, start);
-            const endControl = this.blockForm.get('endTime');
-            let end = endControl?.value as string | undefined;
-            if (!end || !this.availableEndTimes.includes(end)) {
-              end = this.availableEndTimes[0];
-              endControl?.setValue(end, { emitEvent: false });
-            }
-          }
-        }
+        const dateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
+        const startStr = formatDate(this.startDate, 'HH:mm', 'en-US');
+        const endStr = formatDate(addMinutes(this.startDate, 30), 'HH:mm', 'en-US');
+        this.generateAvailableStartTimes(dateStr);
+        this.generateAvailableEndTimes(dateStr, startStr);
+        this.blockForm.patchValue({
+          date: dateStr,
+          startTime: startStr,
+          endTime: endStr,
+        }, { emitEvent: false });
       }
     });
-
-    if (!this.block) {
-      const dateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
-      const startStr = formatDate(this.startDate, 'HH:mm', 'en-US');
-      const endStr = formatDate(addMinutes(this.startDate, 30), 'HH:mm', 'en-US');
-      this.blockForm.patchValue({
-        date: dateStr,
-        startTime: startStr,
-        endTime: endStr,
-      });
-    }
   }
 
   private generateAvailableDates(): void {
