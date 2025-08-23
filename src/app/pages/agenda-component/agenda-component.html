@@ -150,14 +150,13 @@
   </div>
 </div>
 
-<app-time-block-form
+<app-block-time-modal
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
-  [timeBlock]="selectedTimeBlock"
-  [isDeleting]="isDeletingBlock" [onSave]="handleSaveTimeBlock.bind(this)"
-  (onDelete)="handleDeleteTimeBlock($event)"
+  [timeBlock]="selectedBlock"
+  (onSave)="handleSaveTimeBlock($event)"
   (onCancel)="closeAllModals()">
-</app-time-block-form>
+</app-block-time-modal>
 
 <app-day-appointments-modal
   *ngIf="showDayAppointmentsModal"
