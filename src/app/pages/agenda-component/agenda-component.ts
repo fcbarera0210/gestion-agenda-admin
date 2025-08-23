@@ -14,7 +14,7 @@ import { Appointment, AppointmentsService } from '../../services/appointments-se
 import { ClientsService } from '../../services/clients-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
-import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
+import { BlockTimeModalComponent } from '../../components/block-time-modal/block-time-modal';
 import { DayAppointmentsModalComponent } from '../../components/day-appointments-modal-component/day-appointments-modal-component';
 import { ViewDateFormatPipe } from '../../pipes/view-date-format.pipe';
 import { ToastService } from '../../services/toast-service';
@@ -23,7 +23,7 @@ import { NotificationService } from '../../services/notification-service';
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, BlockTimeModalComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -71,10 +71,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
   showDayAppointmentsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
-  selectedTimeBlock: TimeBlock | null = null;
   dayAppointments: CalendarEvent[] = [];
   isDeletingAppointment = false;
-  isDeletingBlock = false;
 
   constructor(
     private settingsService: SettingsService,
@@ -333,7 +331,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
 
   onHourSegmentClicked(event: { date: Date }): void {
     this.selectedAppointment = null;
-    this.selectedTimeBlock = null;
     this.selectedDate = new Date(event.date);
     this.showChoiceModal = true;
     this.cdr.markForCheck();
@@ -348,10 +345,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
       this.selectedAppointment = event.meta;
       this.selectedDate = event.start;
       this.showAppointmentModal = true;
-    } else if (event.meta.eventType === 'timeBlock') {
-      this.selectedTimeBlock = event.meta;
-      this.selectedDate = event.start;
-      this.showTimeBlockModal = true;
     }
   }
 
@@ -446,22 +439,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
     return promise;
   }
   
-  handleDeleteTimeBlock(blockId: string): void {
-    this.isDeletingBlock = true;
-    this.timeBlockService.deleteTimeBlock(blockId)
-      .then(() => {
-        this.toastService.show('Bloqueo eliminado correctamente', 'success');
-        this.closeAllModals();
-      })
-      .catch(err => {
-        this.toastService.show('Error al eliminar el bloqueo', 'error');
-        console.error(err);
-      })
-      .finally(() => {
-        this.isDeletingBlock = false;
-      });
-  }
-
   openDayAppointmentsModal(date: Date): void {
     this.selectedDate = date;
     this.dayAppointments = this.events.filter(
@@ -481,7 +458,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.showDayAppointmentsModal = false;
     this.selectedDate = null;
     this.selectedAppointment = null;
-    this.selectedTimeBlock = null;
     this.dayAppointments = [];
     this.cdr.markForCheck();
   }

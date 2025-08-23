@@ -1,0 +1,63 @@
+<div class="fixed inset-0 z-40 bg-black bg-opacity-50" (click)="cancel()"></div>
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg space-y-6">
+
+    <h2 class="text-2xl font-bold text-gray-800">Bloquear Horario</h2>
+
+    <form [formGroup]="blockForm" (ngSubmit)="save()" class="space-y-4">
+
+      <div>
+        <label for="motivo" class="text-sm font-medium text-gray-700">Motivo (opcional)</label>
+        <input id="motivo" type="text" formControlName="motivo" placeholder="Ej: Almuerzo, Cita Médica"
+               class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+      </div>
+
+      <div class="pt-4 border-t space-y-4">
+        <div>
+          <label for="date" class="text-sm font-medium text-gray-700">Fecha</label>
+          <select id="date" formControlName="date" (change)="onDateChange($any($event.target)?.value)"
+                  class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+            <option value="" disabled>Selecciona una fecha...</option>
+            <option *ngFor="let date of availableDates" [value]="date">{{ date | date:'EEEE d MMMM' }}</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="startTime" class="text-sm font-medium text-gray-700">Hora de Inicio</label>
+            <select id="startTime" formControlName="startTime" (change)="onStartTimeChange($any($event.target)?.value)"
+                    class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+              <option value="" disabled>Selecciona hora...</option>
+              <option *ngFor="let time of availableStartTimes" [value]="time">{{ time }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="endTime" class="text-sm font-medium text-gray-700">Hora de Fin</label>
+            <select id="endTime" formControlName="endTime"
+                    class="w-full px-4 py-3 mt-1 text-gray-700 bg-gray-100 border rounded-lg">
+              <option value="" disabled>Selecciona hora...</option>
+              <option *ngFor="let time of availableEndTimes" [value]="time">{{ time }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:justify-end pt-4 space-y-4 md:space-y-0 md:space-x-4">
+        <button type="button" (click)="cancel()" class="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="flex items-center justify-center w-full md:w-32 px-4 py-2 font-semibold text-white rounded-lg transition-colors"
+                [ngClass]="{ 'bg-primary hover:bg-opacity-90': !isLoading, 'bg-primary/70 cursor-wait': isLoading }"
+                [disabled]="isLoading || blockForm.invalid">
+          <ng-container *ngIf="!isLoading">Bloquear</ng-container>
+          <ng-container *ngIf="isLoading">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Guardando...
+          </ng-container>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

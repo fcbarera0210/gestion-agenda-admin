@@ -568,11 +568,10 @@
   (onCancel)="closeAllModals()"
 ></app-appointment-details-modal>
 
-<app-time-block-form
+<app-block-time-modal
   *ngIf="showTimeBlockModal"
   [startDate]="selectedDate!"
-  [timeBlock]="null"
-  [onSave]="handleSaveTimeBlock.bind(this)"
+  (onSave)="handleSaveTimeBlock($event)"
   (onCancel)="closeAllModals()"
 >
-</app-time-block-form>
+</app-block-time-modal>
