@@ -121,8 +121,13 @@ table {
   border-color: var(--border-color) !important;
 }
 
-.cal-event {
+.dark-theme .cal-month-view .cal-event {
   color: var(--text-color) !important;
+}
+
+.dark-theme .cal-week-view .cal-event,
+.dark-theme .cal-day-view .cal-event {
+  color: #1f2937 !important;
 }
 
 .client-avatar {
