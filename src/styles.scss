@@ -25,6 +25,7 @@
   --calendar-bg: #1f2937;
   --input-bg: #1f2937;
   --border-color: #374151;
+  --hover-bg: #374151; /* Tailwind gray-700 */
 }
 
 body {
@@ -82,7 +83,7 @@ table {
 .dark-theme .hover\:bg-gray-300:hover,
 .dark-theme .hover\:bg-gray-400:hover,
 .dark-theme .hover\:bg-gray-500:hover {
-  background-color: var(--card-bg) !important;
+  background-color: var(--hover-bg) !important;
 }
 
 .dark-theme .text-gray-900,
