@@ -3,7 +3,7 @@ import { CommonModule, formatDate } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
 import { addMinutes, parseISO, addDays, setHours, setMinutes, areIntervalsOverlapping } from 'date-fns';
-import { combineLatest } from 'rxjs';
+import { combineLatest, take } from 'rxjs';
 
 import { Appointment, AppointmentsService } from '../../services/appointments-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
@@ -74,41 +74,70 @@ export class TimeBlockFormComponent implements OnInit, OnChanges {
   }
 
   private loadData(): void {
+    const appointments$ = this.appointmentsService.getAppointments();
+    const blocks$ = this.timeBlockService.getTimeBlocks();
+
     combineLatest([
       this.settingsService.getProfessionalProfile(),
-      this.appointmentsService.getAppointments(),
-      this.timeBlockService.getTimeBlocks()
-    ]).subscribe(([profile, appointments, blocks]) => {
-      this.workSchedule = profile?.workSchedule || null;
-      this.appointments = appointments;
-      this.timeBlocks = blocks;
-      this.generateAvailableDates();
+      appointments$,
+      blocks$,
+    ])
+      .pipe(take(1))
+      .subscribe(([profile, appointments, blocks]) => {
+        this.workSchedule = profile?.workSchedule || null;
+        this.appointments = appointments;
+        this.timeBlocks = blocks;
+        this.generateAvailableDates();
 
-      const dateControl = this.blockForm.get('date');
-      if (dateControl && this.availableDates.length) {
-        let selectedDate = dateControl.value as string;
-        if (!selectedDate || !this.availableDates.includes(selectedDate)) {
-          selectedDate = this.availableDates[0];
+        const dateControl = this.blockForm.get('date');
+        if (dateControl && this.availableDates.length) {
+          let selectedDate = dateControl.value as string;
+          if (!selectedDate || !this.availableDates.includes(selectedDate)) {
+            selectedDate = this.availableDates[0];
+          }
+          dateControl.setValue(selectedDate, { emitEvent: false });
         }
-        dateControl.setValue(selectedDate, { emitEvent: false });
-      }
-      const date = dateControl?.value as string | undefined;
+        const date = dateControl?.value as string | undefined;
+        if (date) {
+          this.generateAvailableStartTimes(date);
+          const startControl = this.blockForm.get('startTime');
+          let start = startControl?.value as string | undefined;
+          if (!start || !this.availableStartTimes.includes(start)) {
+            start = this.availableStartTimes[0];
+            startControl?.setValue(start, { emitEvent: false });
+          }
+          if (start) {
+            this.generateAvailableEndTimes(date, start);
+            const endControl = this.blockForm.get('endTime');
+            let end = endControl?.value as string | undefined;
+            if (!end || !this.availableEndTimes.includes(end)) {
+              end = this.availableEndTimes[0];
+              endControl?.setValue(end, { emitEvent: false });
+            }
+          }
+        }
+      });
+
+    appointments$.subscribe(appointments => {
+      this.appointments = appointments;
+      const date = this.blockForm.get('date')?.value as string | undefined;
+      const start = this.blockForm.get('startTime')?.value as string | undefined;
       if (date) {
         this.generateAvailableStartTimes(date);
-        const startControl = this.blockForm.get('startTime');
-        let start = startControl?.value as string | undefined;
-        if (!start || !this.availableStartTimes.includes(start)) {
-          start = this.availableStartTimes[0];
-          startControl?.setValue(start, { emitEvent: false });
-        }
         if (start) {
           this.generateAvailableEndTimes(date, start);
-          const endControl = this.blockForm.get('endTime');
-          let end = endControl?.value as string | undefined;
-          if (!end || !this.availableEndTimes.includes(end)) {
-            end = this.availableEndTimes[0];
-            endControl?.setValue(end, { emitEvent: false });
-          }
+        }
+      }
+    });
+
+    blocks$.subscribe(blocks => {
+      this.timeBlocks = blocks;
+      const date = this.blockForm.get('date')?.value as string | undefined;
+      const start = this.blockForm.get('startTime')?.value as string | undefined;
+      if (date) {
+        this.generateAvailableStartTimes(date);
+        if (start) {
+          this.generateAvailableEndTimes(date, start);
         }
       }
     });
