@@ -66,6 +66,19 @@ table {
   color: var(--text-color) !important;
 }
 
+.dark-theme .cal-month-view,
+.dark-theme .cal-cell,
+.dark-theme .cal-day-cell {
+  background-color: var(--calendar-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.dark-theme .cal-day-cell.cal-today,
+.dark-theme .cal-day-badge {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-color) !important;
+}
+
 .dark-theme .bg-white,
 .dark-theme .bg-gray-50,
 .dark-theme .bg-gray-100,
@@ -109,7 +122,7 @@ table {
 }
 
 .cal-event {
-  color: #000 !important;
+  color: var(--text-color) !important;
 }
 
 .client-avatar {
