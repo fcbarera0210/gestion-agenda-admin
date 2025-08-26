@@ -22,7 +22,6 @@ import { ServicesService } from '../../services/services-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { ToastService } from '../../services/toast-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
-import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
 import { AppointmentDetailsModalComponent } from '../../components/appointment-details-modal-component/appointment-details-modal-component';
 
 @Component({
@@ -32,7 +31,6 @@ import { AppointmentDetailsModalComponent } from '../../components/appointment-d
     CommonModule,
     RouterModule,
     AppointmentFormComponent,
-    TimeBlockFormComponent,
     AppointmentDetailsModalComponent,
   ],
   templateUrl: './dashboard-component.html',
@@ -59,10 +57,10 @@ export class DashboardComponent implements OnInit {
 
   // Propiedades para los modales de acción rápida
   showAppointmentModal = false;
-  showTimeBlockModal = false;
   showAppointmentDetailsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
+  formMode: 'appointment' | 'block' = 'appointment';
 
   // Control de la lista mostrada en la tarjeta principal
   activeView: 'day' | 'week' | 'month' | 'pending' | 'cancelled' = 'day';
@@ -171,19 +169,21 @@ export class DashboardComponent implements OnInit {
   // --- Lógica para los Modales de Acción Rápida ---
 
   openNewAppointmentModal(): void {
+    this.formMode = 'appointment';
     this.selectedAppointment = null;
-    this.selectedDate = new Date(); // La cita por defecto es "ahora"
+    this.selectedDate = new Date();
     this.showAppointmentModal = true;
   }
 
   openNewBlockModal(): void {
-    this.selectedDate = new Date(); // El bloqueo por defecto es "ahora"
-    this.showTimeBlockModal = true;
+    this.formMode = 'block';
+    this.selectedAppointment = null;
+    this.selectedDate = new Date();
+    this.showAppointmentModal = true;
   }
 
   closeAllModals(): void {
     this.showAppointmentModal = false;
-    this.showTimeBlockModal = false;
     this.showAppointmentDetailsModal = false;
     this.selectedAppointment = null;
     this.selectedDate = null;

@@ -120,9 +120,14 @@
 <app-appointment-form
   *ngIf="showAppointmentModal"
   [startDate]="selectedDate!"
-  [appointment]="selectedAppointment"  
-  [isDeleting]="isDeletingAppointment" (onSave)="handleSaveAppointment($event)"
-  (onDelete)="handleDeleteAppointment($event)" 
+  [appointment]="selectedAppointment"
+  [timeBlock]="selectedTimeBlock"
+  [mode]="formMode"
+  [isDeleting]="formMode === 'appointment' ? isDeletingAppointment : isDeletingBlock"
+  (onSave)="handleSaveAppointment($event)"
+  (onDelete)="handleDeleteAppointment($event)"
+  (onSaveBlock)="handleSaveBlock($event)"
+  (onDeleteBlock)="handleDeleteBlock($event)"
   (onCancel)="closeAllModals()"> </app-appointment-form>
 
 <div *ngIf="showChoiceModal" (click)="closeAllModals()" class="fixed inset-0 z-40 bg-black bg-opacity-50"></div>
@@ -140,24 +145,16 @@
 
     <h2 class="text-2xl font-bold text-center text-gray-800">¿Qué deseas hacer?</h2>
     <div class="flex flex-col space-y-4">
-      <button (click)="openAppointmentForm()" class="px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
+      <button (click)="openAppointmentForm('appointment')" class="px-6 py-3 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
         Agendar Nueva Cita
       </button>
-      <button (click)="openTimeBlockForm()" class="px-6 py-3 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+      <button (click)="openAppointmentForm('block')" class="px-6 py-3 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
         Bloquear este Horario
       </button>
     </div>
   </div>
 </div>
 
-<app-time-block-form
-  *ngIf="showTimeBlockModal"
-  [startDate]="selectedDate!"
-  [timeBlock]="selectedTimeBlock"
-  [isDeleting]="isDeletingBlock" [onSave]="handleSaveTimeBlock.bind(this)"
-  (onDelete)="handleDeleteTimeBlock($event)"
-  (onCancel)="closeAllModals()">
-</app-time-block-form>
 
 <app-day-appointments-modal
   *ngIf="showDayAppointmentsModal"
