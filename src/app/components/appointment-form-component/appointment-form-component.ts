@@ -97,8 +97,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
 
     this.clients$.subscribe(list => {
       this.clients = list;
-      if (this.appointment) {
-        const current = list.find(c => c.id === this.appointment!.clientId);
+      if (this.mode === 'appointment' && this.isAppointment(this.appointment)) {
+        const current = list.find(c => c.id === this.appointment.clientId);
         if (current) {
           this.clientSearch.setValue(current.name, { emitEvent: false });
         }
@@ -107,8 +107,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
 
     this.services$.subscribe(list => {
       this.services = list;
-      if (this.appointment) {
-        const current = list.find(s => s.id === this.appointment!.serviceId);
+      if (this.mode === 'appointment' && this.isAppointment(this.appointment)) {
+        const current = list.find(s => s.id === this.appointment.serviceId);
         if (current) {
           this.serviceSearch.setValue(current.name, { emitEvent: false });
         }
@@ -124,6 +124,12 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       const service = this.services.find(s => s.name.toLowerCase() === (name || '').toLowerCase());
       this.appointmentForm.get('serviceId')?.setValue(service ? service.id : '');
     });
+  }
+
+  private isAppointment(
+    value: Appointment | TimeBlock | undefined | null
+  ): value is Appointment {
+    return !!value && 'clientId' in value;
   }
 
   ngOnInit(): void {
