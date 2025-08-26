@@ -75,6 +75,16 @@ table {
   background-color: var(--card-bg) !important;
 }
 
+.dark-theme .hover\:bg-white:hover,
+.dark-theme .hover\:bg-gray-50:hover,
+.dark-theme .hover\:bg-gray-100:hover,
+.dark-theme .hover\:bg-gray-200:hover,
+.dark-theme .hover\:bg-gray-300:hover,
+.dark-theme .hover\:bg-gray-400:hover,
+.dark-theme .hover\:bg-gray-500:hover {
+  background-color: var(--card-bg) !important;
+}
+
 .dark-theme .text-gray-900,
 .dark-theme .text-gray-800,
 .dark-theme .text-gray-700,
