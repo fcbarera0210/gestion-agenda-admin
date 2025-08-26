@@ -4,13 +4,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormControl } 
 import { Observable, firstValueFrom, combineLatest } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { Timestamp } from '@angular/fire/firestore';
-import { addMinutes, parseISO, addDays, setHours, setMinutes, areIntervalsOverlapping } from 'date-fns';
+import { addMinutes, parseISO } from 'date-fns';
 
 import { Client, ClientsService } from '../../services/clients-service';
 import { Service, ServicesService } from '../../services/services-service';
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentsService } from '../../services/appointments-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
-import { SettingsService, WorkSchedule, DaySchedule } from '../../services/settings-service';
+import { SettingsService, WorkSchedule } from '../../services/settings-service';
+import { TimeSlotService } from '../../services/time-slot.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog-component/confirmation-dialog-component';
 
 @Component({
@@ -59,7 +60,8 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     private servicesService: ServicesService,
     private appointmentsService: AppointmentsService,
     private timeBlockService: TimeBlockService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private timeSlotService: TimeSlotService
   ) {
     this.appointmentForm = this.fb.group({
       clientId: ['', Validators.required],
@@ -151,7 +153,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       this.workSchedule = profile?.workSchedule || null;
       this.appointments = appointments;
       this.timeBlocks = blocks;
-      this.generateAvailableDates();
+      this.availableDates = this.timeSlotService.getAvailableDates(this.workSchedule);
       const date = this.appointmentForm.get('date')?.value;
       if (date) {
         await this.generateAvailableTimes(date);
@@ -161,23 +163,6 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
         }
       }
     });
-  }
-
-  generateAvailableDates(): void {
-    this.availableDates = [];
-    if (!this.workSchedule) {
-      return;
-    }
-    const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-    const today = new Date();
-    for (let i = 0; i < 21; i++) {
-      const date = addDays(today, i);
-      const dayName = daysOfWeek[date.getDay()];
-      const daySchedule = this.workSchedule[dayName];
-      if (daySchedule && daySchedule.isActive) {
-        this.availableDates.push(formatDate(date, 'yyyy-MM-dd', 'en-US'));
-      }
-    }
   }
 
   async generateAvailableTimes(date: string): Promise<void> {
@@ -191,73 +176,23 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     const selectedService = services.find(s => s.id === serviceId);
     const duration = selectedService ? selectedService.duration : 30;
 
-    const baseDate = parseISO(`${date}T00:00:00`);
-    const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][baseDate.getDay()];
-    const daySchedule = this.workSchedule[dayName];
-    if (!daySchedule || !daySchedule.isActive) {
-      return;
-    }
+    this.availableTimes = this.timeSlotService.getAvailableTimes({
+      date,
+      duration,
+      workSchedule: this.workSchedule,
+      appointments: this.appointments,
+      timeBlocks: this.timeBlocks,
+      excludeAppointmentId: this.isEditMode ? this.appointment?.id : undefined,
+    });
 
-    const [startHour, startMinute] = daySchedule.workHours.start.split(':').map(Number);
-    const [endHour, endMinute] = daySchedule.workHours.end.split(':').map(Number);
-    let slotStart = setMinutes(setHours(baseDate, startHour), startMinute);
-    const workEnd = setMinutes(setHours(baseDate, endHour), endMinute);
-
-    while (addMinutes(slotStart, duration) <= workEnd) {
-      if (this.isSlotAvailable(slotStart, duration, daySchedule)) {
-        this.availableTimes.push(formatDate(slotStart, 'HH:mm', 'en-US'));
-      }
-      slotStart = addMinutes(slotStart, 30);
-    }
-
-    if (this.isEditMode) {
-      const currentDate = formatDate(this.appointment!.start.toDate(), 'yyyy-MM-dd', 'en-US');
-      const currentTime = formatDate(this.appointment!.start.toDate(), 'HH:mm', 'en-US');
+    if (this.isEditMode && this.appointment) {
+      const currentDate = formatDate(this.appointment.start.toDate(), 'yyyy-MM-dd', 'en-US');
+      const currentTime = formatDate(this.appointment.start.toDate(), 'HH:mm', 'en-US');
       if (currentDate === date && !this.availableTimes.includes(currentTime)) {
         this.availableTimes.push(currentTime);
         this.availableTimes.sort();
       }
     }
-  }
-
-  private isSlotAvailable(start: Date, duration: number, daySchedule: DaySchedule): boolean {
-    const end = addMinutes(start, duration);
-    const interval = { start, end };
-
-    if (daySchedule.breaks) {
-      for (const brk of daySchedule.breaks) {
-        const [bsHour, bsMinute] = brk.start.split(':').map(Number);
-        const [beHour, beMinute] = brk.end.split(':').map(Number);
-        const breakStart = setMinutes(setHours(new Date(start), bsHour), bsMinute);
-        const breakEnd = setMinutes(setHours(new Date(start), beHour), beMinute);
-        if (areIntervalsOverlapping(interval, { start: breakStart, end: breakEnd })) {
-          return false;
-        }
-      }
-    }
-
-    for (const apt of this.appointments) {
-      if (this.isEditMode && apt.id === this.appointment?.id) continue;
-      const aptStart = apt.start.toDate();
-      const aptEnd = apt.end.toDate();
-      if (formatDate(aptStart, 'yyyy-MM-dd', 'en-US') === formatDate(start, 'yyyy-MM-dd', 'en-US')) {
-        if (areIntervalsOverlapping(interval, { start: aptStart, end: aptEnd })) {
-          return false;
-        }
-      }
-    }
-
-    for (const block of this.timeBlocks) {
-      const blockStart = block.start.toDate();
-      const blockEnd = block.end.toDate();
-      if (formatDate(blockStart, 'yyyy-MM-dd', 'en-US') === formatDate(start, 'yyyy-MM-dd', 'en-US')) {
-        if (areIntervalsOverlapping(interval, { start: blockStart, end: blockEnd })) {
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 
   onDateChange(date: string): void {
@@ -390,7 +325,17 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
 
     const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][startDate.getDay()];
     const daySchedule = this.workSchedule ? this.workSchedule[dayName] : undefined;
-    if (!daySchedule || !this.isSlotAvailable(startDate, selectedService.duration, daySchedule)) {
+    if (
+      !daySchedule ||
+      !this.timeSlotService.isIntervalAvailable(
+        startDate,
+        addMinutes(startDate, selectedService.duration),
+        daySchedule,
+        this.appointments,
+        this.timeBlocks,
+        this.isEditMode ? this.appointment?.id : undefined
+      )
+    ) {
       this.isLoading = false;
       this.appointmentForm.get('time')?.setErrors({ unavailable: true });
       return;
