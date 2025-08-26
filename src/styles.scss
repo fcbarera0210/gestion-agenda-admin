@@ -25,6 +25,7 @@
   --calendar-bg: #1f2937;
   --input-bg: #1f2937;
   --border-color: #374151;
+  --hover-bg: #374151; /* Tailwind gray-700 */
 }
 
 body {
@@ -65,6 +66,19 @@ table {
   color: var(--text-color) !important;
 }
 
+.dark-theme .cal-month-view,
+.dark-theme .cal-cell,
+.dark-theme .cal-day-cell {
+  background-color: var(--calendar-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.dark-theme .cal-day-cell.cal-today,
+.dark-theme .cal-day-badge {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-color) !important;
+}
+
 .dark-theme .bg-white,
 .dark-theme .bg-gray-50,
 .dark-theme .bg-gray-100,
@@ -73,6 +87,16 @@ table {
 .dark-theme .bg-gray-400,
 .dark-theme .bg-gray-500 {
   background-color: var(--card-bg) !important;
+}
+
+.dark-theme .hover\:bg-white:hover,
+.dark-theme .hover\:bg-gray-50:hover,
+.dark-theme .hover\:bg-gray-100:hover,
+.dark-theme .hover\:bg-gray-200:hover,
+.dark-theme .hover\:bg-gray-300:hover,
+.dark-theme .hover\:bg-gray-400:hover,
+.dark-theme .hover\:bg-gray-500:hover {
+  background-color: var(--hover-bg) !important;
 }
 
 .dark-theme .text-gray-900,
@@ -97,8 +121,13 @@ table {
   border-color: var(--border-color) !important;
 }
 
-.cal-event {
-  color: #000 !important;
+.dark-theme .cal-month-view .cal-event {
+  color: var(--text-color) !important;
+}
+
+.dark-theme .cal-week-view .cal-event,
+.dark-theme .cal-day-view .cal-event {
+  color: #1f2937 !important;
 }
 
 .client-avatar {
