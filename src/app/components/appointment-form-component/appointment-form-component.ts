@@ -27,9 +27,10 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     cancelled: { primary: '#dc3545', secondary: '#F8D7DA' }, // Rojo
   };
   @Input() startDate!: Date;
-  @Input() appointment: Appointment | undefined | null = null;
+  @Input() mode: 'appointment' | 'block' = 'appointment';
+  @Input() appointment: Appointment | TimeBlock | undefined | null = null;
   @Input() isDeleting = false;
-  @Output() onSave = new EventEmitter<Appointment>();
+  @Output() onSave = new EventEmitter<Appointment | TimeBlock>();
   @Output() onCancel = new EventEmitter<void>();
 
   appointmentForm: FormGroup;
@@ -64,12 +65,12 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     private timeSlotService: TimeSlotService
   ) {
     this.appointmentForm = this.fb.group({
-      clientId: ['', Validators.required],
-      serviceId: ['', Validators.required],
+      clientId: [''],
+      serviceId: [''],
       date: ['', Validators.required],
       time: ['', Validators.required],
-      status: ['confirmed' as AppointmentStatus, Validators.required],
-      type: ['presencial' as AppointmentType, Validators.required],
+      status: ['confirmed' as AppointmentStatus],
+      type: ['presencial' as AppointmentType],
       notes: ['']
     });
 
@@ -126,6 +127,7 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.applyModeValidators();
     this.loadData();
     this.appointmentForm.get('date')?.valueChanges.subscribe(date => {
       if (date) {
@@ -141,7 +143,20 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['mode']) {
+      this.applyModeValidators();
+    }
     this.configureFormForMode();
+  }
+
+  private applyModeValidators(): void {
+    const controls = ['clientId', 'serviceId', 'status', 'type'];
+    if (this.mode === 'appointment') {
+      controls.forEach(c => this.appointmentForm.get(c)?.setValidators(Validators.required));
+    } else {
+      controls.forEach(c => this.appointmentForm.get(c)?.clearValidators());
+    }
+    controls.forEach(c => this.appointmentForm.get(c)?.updateValueAndValidity());
   }
 
   loadData(): void {
@@ -176,14 +191,21 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     const selectedService = services.find(s => s.id === serviceId);
     const duration = selectedService ? selectedService.duration : 30;
 
-    this.availableTimes = this.timeSlotService.getAvailableTimes({
+    const options: any = {
       date,
       duration,
       workSchedule: this.workSchedule,
       appointments: this.appointments,
       timeBlocks: this.timeBlocks,
-      excludeAppointmentId: this.isEditMode ? this.appointment?.id : undefined,
-    });
+    };
+    if (this.isEditMode) {
+      if (this.mode === 'appointment') {
+        options.excludeAppointmentId = this.appointment?.id;
+      } else {
+        options.excludeBlockId = this.appointment?.id;
+      }
+    }
+    this.availableTimes = this.timeSlotService.getAvailableTimes(options);
 
     if (this.isEditMode && this.appointment) {
       const currentDate = formatDate(this.appointment.start.toDate(), 'yyyy-MM-dd', 'en-US');
@@ -232,30 +254,34 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
   private configureFormForMode(): void {
     if (this.appointment) {
       this.isEditMode = true;
+      const start = this.appointment.start.toDate();
+      const dateStr = formatDate(start, 'yyyy-MM-dd', 'en-US');
+      const timeStr = formatDate(start, 'HH:mm', 'en-US');
 
-      const dateStr = formatDate(this.appointment!.start.toDate(), 'yyyy-MM-dd', 'en-US');
-      const timeStr = formatDate(this.appointment!.start.toDate(), 'HH:mm', 'en-US');
+      const patch: any = { date: dateStr, time: timeStr };
+      if (this.mode === 'appointment') {
+        const apt = this.appointment as Appointment;
+        patch.clientId = apt.clientId;
+        patch.serviceId = apt.serviceId;
+        patch.status = apt.status;
+        patch.type = apt.type;
+        patch.notes = apt.notes || '';
 
-      this.appointmentForm.patchValue({
-        clientId: this.appointment!.clientId,
-        serviceId: this.appointment!.serviceId,
-        date: dateStr,
-        time: timeStr,
-        status: this.appointment!.status,
-        type: this.appointment!.type,
-        notes: this.appointment!.notes || ''
-      });
+        const client = this.clients.find(c => c.id === apt.clientId);
+        if (client) {
+          this.clientSearch.setValue(client.name, { emitEvent: false });
+        }
 
-      const client = this.clients.find(c => c.id === this.appointment!.clientId);
-      if (client) {
-        this.clientSearch.setValue(client.name, { emitEvent: false });
+        const service = this.services.find(s => s.id === apt.serviceId);
+        if (service) {
+          this.serviceSearch.setValue(service.name, { emitEvent: false });
+        }
+      } else {
+        const block = this.appointment as TimeBlock;
+        patch.notes = block.title || '';
       }
 
-      const service = this.services.find(s => s.id === this.appointment!.serviceId);
-      if (service) {
-        this.serviceSearch.setValue(service.name, { emitEvent: false });
-      }
-
+      this.appointmentForm.patchValue(patch);
       this.generateAvailableTimes(dateStr).then(() => {
         this.appointmentForm.get('time')?.setValue(timeStr);
       });
@@ -264,12 +290,12 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
       this.appointmentForm.reset();
       const dateStr = formatDate(this.startDate, 'yyyy-MM-dd', 'en-US');
       const timeStr = formatDate(this.startDate, 'HH:mm', 'en-US');
-      this.appointmentForm.patchValue({
-        date: dateStr,
-        time: timeStr,
-        status: 'confirmed',
-        type: 'presencial'
-      });
+      const patch: any = { date: dateStr, time: timeStr };
+      if (this.mode === 'appointment') {
+        patch.status = 'confirmed';
+        patch.type = 'presencial';
+      }
+      this.appointmentForm.patchValue(patch);
       this.clientSearch.setValue('', { emitEvent: false });
       this.serviceSearch.setValue('', { emitEvent: false });
     }
@@ -315,56 +341,102 @@ export class AppointmentFormComponent implements OnInit, OnChanges {
     const formValue = this.appointmentForm.value;
     const startDate = parseISO(`${formValue.date}T${formValue.time}`);
 
-    const services = await firstValueFrom(this.services$);
-    const selectedService = services.find(s => s.id === formValue.serviceId);
-
-    if (!selectedService) {
-      this.isLoading = false;
-      return;
-    }
-
     const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][startDate.getDay()];
     const daySchedule = this.workSchedule ? this.workSchedule[dayName] : undefined;
-    if (
-      !daySchedule ||
-      !this.timeSlotService.isIntervalAvailable(
-        startDate,
-        addMinutes(startDate, selectedService.duration),
-        daySchedule,
-        this.appointments,
-        this.timeBlocks,
-        this.isEditMode ? this.appointment?.id : undefined
-      )
-    ) {
-      this.isLoading = false;
-      this.appointmentForm.get('time')?.setErrors({ unavailable: true });
-      return;
+
+    let duration = 30;
+    let excludeAppointmentId: string | undefined;
+    let excludeBlockId: string | undefined;
+
+    if (this.mode === 'appointment') {
+      const services = await firstValueFrom(this.services$);
+      const selectedService = services.find(s => s.id === formValue.serviceId);
+      if (!selectedService) {
+        this.isLoading = false;
+        return;
+      }
+      duration = selectedService.duration;
+      excludeAppointmentId = this.isEditMode ? (this.appointment as Appointment)?.id : undefined;
+      if (
+        !daySchedule ||
+        !this.timeSlotService.isIntervalAvailable(
+          startDate,
+          addMinutes(startDate, duration),
+          daySchedule,
+          this.appointments,
+          this.timeBlocks,
+          excludeAppointmentId
+        )
+      ) {
+        this.isLoading = false;
+        this.appointmentForm.get('time')?.setErrors({ unavailable: true });
+        return;
+      }
+
+      const endDate = addMinutes(startDate, duration);
+      const appointmentData: any = {
+        professionalId: (this.appointment as Appointment)?.professionalId,
+        clientId: formValue.clientId,
+        serviceId: formValue.serviceId,
+        start: Timestamp.fromDate(startDate),
+        end: Timestamp.fromDate(endDate),
+        title: `${selectedService.name}`,
+        color: this.statusColors[formValue.status as AppointmentStatus],
+        status: formValue.status,
+        type: formValue.type,
+        notes: formValue.notes
+      };
+
+      try {
+        if (this.isEditMode) {
+          appointmentData.id = (this.appointment as Appointment)?.id;
+          await this.appointmentsService.updateAppointment(appointmentData);
+        } else {
+          await this.appointmentsService.addAppointment(appointmentData);
+        }
+        this.onSave.emit(appointmentData as Appointment);
+      } finally {
+        this.isLoading = false;
+      }
+    } else {
+      excludeBlockId = this.isEditMode ? (this.appointment as TimeBlock)?.id : undefined;
+      if (
+        !daySchedule ||
+        !this.timeSlotService.isIntervalAvailable(
+          startDate,
+          addMinutes(startDate, duration),
+          daySchedule,
+          this.appointments,
+          this.timeBlocks,
+          undefined,
+          excludeBlockId
+        )
+      ) {
+        this.isLoading = false;
+        this.appointmentForm.get('time')?.setErrors({ unavailable: true });
+        return;
+      }
+
+      const endDate = addMinutes(startDate, duration);
+      const blockData: any = {
+        start: Timestamp.fromDate(startDate),
+        end: Timestamp.fromDate(endDate),
+        title: formValue.notes || 'Horario Bloqueado',
+        color: { primary: '#6c757d', secondary: '#e9ecef' }
+      };
+
+      try {
+        if (this.isEditMode) {
+          blockData.id = (this.appointment as TimeBlock)?.id;
+          await this.timeBlockService.updateTimeBlock(blockData);
+        } else {
+          await this.timeBlockService.addTimeBlock(blockData);
+        }
+        this.onSave.emit(blockData as TimeBlock);
+      } finally {
+        this.isLoading = false;
+      }
     }
-
-    const endDate = addMinutes(startDate, selectedService.duration);
-    
-    // 👇 **AQUÍ ESTÁ LA CORRECCIÓN**
-    // 1. Creamos un objeto base sin el 'id'.
-    const appointmentData: any = {
-      professionalId: this.appointment?.professionalId,
-      clientId: formValue.clientId,
-      serviceId: formValue.serviceId,
-      start: Timestamp.fromDate(startDate),
-      end: Timestamp.fromDate(endDate),
-      title: `${selectedService.name}`,
-      color: this.statusColors[formValue.status as AppointmentStatus],
-      status: formValue.status,
-      type: formValue.type,
-      notes: formValue.notes
-    };
-
-    // 2. Si estamos en modo edición, añadimos el 'id' al objeto.
-    if (this.isEditMode) {
-      appointmentData.id = this.appointment?.id;
-    }
-
-    // 3. Emitimos el objeto, que tendrá o no el 'id' según corresponda.
-    this.onSave.emit(appointmentData as Appointment);
   }
 
   cancel(): void {
