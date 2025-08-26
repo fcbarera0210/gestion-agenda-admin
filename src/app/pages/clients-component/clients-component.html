@@ -36,7 +36,7 @@
           [(ngModel)]="searchTerm"
           (ngModelChange)="searchTerm$.next($event)"
           placeholder="Buscar por nombre o correo"
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
         />
       </div>
       <button (click)="openClientModal()" class="px-4 py-2 font-semibold text-white rounded-lg shadow-md bg-primary hover:bg-opacity-90">
