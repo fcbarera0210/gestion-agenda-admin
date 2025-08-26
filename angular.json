@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "admin-panel": {
+    "gestion-agenda-admin": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
             "customWebpackConfig": {
               "path": "webpack.config.js"
             },
-            "outputPath": "dist/admin-panel",
+            "outputPath": "dist/gestion-agenda-admin",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -66,14 +66,14 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "buildTarget": "admin-panel:build"
+            "buildTarget": "gestion-agenda-admin:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "admin-panel:build:production"
+              "buildTarget": "gestion-agenda-admin:build:production"
             },
             "development": {
-              "buildTarget": "admin-panel:build:development"
+              "buildTarget": "gestion-agenda-admin:build:development"
             }
           },
           "defaultConfiguration": "development"
