@@ -14,7 +14,6 @@ import { Appointment, AppointmentsService } from '../../services/appointments-se
 import { ClientsService } from '../../services/clients-service';
 import { TimeBlock, TimeBlockService } from '../../services/time-block-service';
 import { AppointmentFormComponent } from '../../components/appointment-form-component/appointment-form-component';
-import { TimeBlockFormComponent } from '../../components/time-block-form-component/time-block-form-component';
 import { DayAppointmentsModalComponent } from '../../components/day-appointments-modal-component/day-appointments-modal-component';
 import { ViewDateFormatPipe } from '../../pipes/view-date-format.pipe';
 import { ToastService } from '../../services/toast-service';
@@ -23,7 +22,7 @@ import { NotificationService } from '../../services/notification-service';
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, TimeBlockFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
+  imports: [CommonModule, FormsModule, CalendarModule, AppointmentFormComponent, DayAppointmentsModalComponent, ViewDateFormatPipe],
   templateUrl: './agenda-component.html',
   styleUrls: ['./agenda-component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -67,7 +66,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
   // --- Propiedades de Estado de los Modales ---
   showChoiceModal = false;
   showAppointmentModal = false;
-  showTimeBlockModal = false;
   showDayAppointmentsModal = false;
   selectedDate: Date | null = null;
   selectedAppointment: Appointment | null = null;
@@ -75,6 +73,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   dayAppointments: CalendarEvent[] = [];
   isDeletingAppointment = false;
   isDeletingBlock = false;
+  formMode: 'appointment' | 'block' = 'appointment';
 
   constructor(
     private settingsService: SettingsService,
@@ -345,28 +344,23 @@ export class AgendaComponent implements OnInit, OnDestroy {
     }
 
     if (event.meta.eventType === 'appointment') {
-      this.selectedAppointment = event.meta;
       this.selectedDate = event.start;
-      this.showAppointmentModal = true;
+      this.openAppointmentForm('appointment', event.meta);
     } else if (event.meta.eventType === 'timeBlock') {
-      this.selectedTimeBlock = event.meta;
       this.selectedDate = event.start;
-      this.showTimeBlockModal = true;
+      this.openAppointmentForm('block', event.meta);
     }
   }
 
   // --- Manejadores de Acciones de los Modales ---
 
-  openAppointmentForm(): void {
-    this.selectedAppointment = null;
+  openAppointmentForm(mode: 'appointment' | 'block', data?: Appointment | TimeBlock): void {
+    this.formMode = mode;
+    this.selectedAppointment = mode === 'appointment' ? (data as Appointment || null) : null;
+    this.selectedTimeBlock = mode === 'block' ? (data as TimeBlock || null) : null;
     this.showChoiceModal = false;
     this.showAppointmentModal = true;
     this.cdr.markForCheck();
-  }
-
-  openTimeBlockForm(): void {
-    this.showChoiceModal = false;
-    this.showTimeBlockModal = true;
   }
 
   handleSaveAppointment(appointmentData: any): void {
@@ -426,7 +420,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
       });
   }
 
-  handleSaveTimeBlock(blockData: TimeBlock): Promise<any> {
+  handleSaveBlock(blockData: TimeBlock): Promise<any> {
     const promise = blockData.id
       ? this.timeBlockService.updateTimeBlock(blockData)
       : this.timeBlockService.addTimeBlock(blockData);
@@ -445,8 +439,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
 
     return promise;
   }
-  
-  handleDeleteTimeBlock(blockId: string): void {
+
+  handleDeleteBlock(blockId: string): void {
     this.isDeletingBlock = true;
     this.timeBlockService.deleteTimeBlock(blockId)
       .then(() => {
@@ -477,7 +471,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
   closeAllModals(): void {
     this.showChoiceModal = false;
     this.showAppointmentModal = false;
-    this.showTimeBlockModal = false;
     this.showDayAppointmentsModal = false;
     this.selectedDate = null;
     this.selectedAppointment = null;
