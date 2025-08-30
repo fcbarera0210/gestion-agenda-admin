@@ -1,9 +1,10 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd, Router } from '@angular/router';
 import { ToastContainerComponent } from '../toast-container-component/toast-container-component';
 import { AuthService } from '../../services/auth-service';
 import { ThemeService } from '../../services/theme-service';
+import { Auth, authState } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-layout',
@@ -12,19 +13,29 @@ import { ThemeService } from '../../services/theme-service';
   templateUrl: './layout-component.html',
   styleUrls: ['./layout-component.scss']
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   isSidebarOpen = false;
   isSidebarCollapsed = false;
   isMobile = window.innerWidth < 768;
+  clientPortalUrl: string | null = null;
   constructor(
     private authService: AuthService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private auth: Auth
   ) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd && this.isMobile) {
         this.isSidebarOpen = false;
       }
+    });
+  }
+
+  ngOnInit(): void {
+    authState(this.auth).subscribe((user) => {
+      this.clientPortalUrl = user
+        ? `https://gestion-agenda-cliente.web.app/agendar/${user.uid}`
+        : null;
     });
   }
 
