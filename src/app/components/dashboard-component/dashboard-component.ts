@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Auth, authState } from '@angular/fire/auth';
 import {
   startOfDay,
   endOfDay,
@@ -49,6 +50,8 @@ export class DashboardComponent implements OnInit {
     pendingAppointments: 0,
   };
 
+  clientPortalUrl: string | null = null;
+
   private statusLabels: Record<Appointment['status'], string> = {
     confirmed: 'Confirmada',
     pending: 'Pendiente',
@@ -72,10 +75,16 @@ export class DashboardComponent implements OnInit {
     private timeBlockService: TimeBlockService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
+    private auth: Auth,
   ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
+    authState(this.auth).subscribe((user) => {
+      this.clientPortalUrl = user
+        ? `https://gestion-agenda-cliente.web.app/agendar/${user.uid}`
+        : null;
+    });
   }
 
   loadDashboardData(): void {
